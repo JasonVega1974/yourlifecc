@@ -1753,9 +1753,10 @@ function fzOpenDest(dest){
     biblehub:'bible', timeline:'timeline', proof:'proofProphecy', archaeology:'bibleworld', prayerwall:'prayer',
     // 2026-07-03 — GROW + CHURCH & YOU cards (MORE-door retirement).
     // plans rides bfTab's readingPlans alias (pre-selects the reading
-    // sub-tab); sermon notes live partway down the Journey panel.
+    // sub-tab). sermon/growth/walk are handled below — they now open My
+    // Walk's "My Faith Life" tab directly, not a bf-<tab> panel.
     academy:'academy', plans:'readingPlans', devotional:'devotional', memorize:'memorize',
-    traditions:'denominations', sermon:'journey',
+    traditions:'denominations',
     // 2026-07-03 — MEET JESUS + LISTEN sections.
     jesus:'jesus', audio:'audioMeditations', sleep:'sleepStories', createmed:'createMeditation',
     // 2026-07-06 — WATCH: Bible Project video archive surface.
@@ -1763,10 +1764,6 @@ function fzOpenDest(dest){
   };
   // Scroll target per DEST where it isn't simply 'bf-' + tab.
   var _fzTabScrollId = { plans:'bf-plans' };
-  // Journey deep links whose target is a hub-and-spoke spoke — open it
-  // directly. The section lives inside a display:none .fjh-spoke, so the old
-  // scroll-to-#sermonNotesList dead-ended on the hub. 2026-07-07.
-  var _fzJourneySpoke = { sermon:'sermon' };
   if (_fzTabAlias[dest]){
     if (D){
       D.faithLastDest = dest;
@@ -1774,15 +1771,10 @@ function fzOpenDest(dest){
     }
     var _fzTb = _fzTabAlias[dest];
     if (typeof bfTab === 'function') bfTab(_fzTb);
-    var _spoke = _fzJourneySpoke[dest];
-    if (_spoke && typeof fjOpenSpoke === 'function'){
-      fjOpenSpoke(_spoke);   // opens the spoke + lands the view at its top
-    } else {
-      setTimeout(function(){
-        var p = document.getElementById(_fzTabScrollId[dest] || ('bf-' + _fzTb));
-        if (p) p.scrollIntoView({ behavior:'smooth', block:'start' });
-      }, 120);
-    }
+    setTimeout(function(){
+      var p = document.getElementById(_fzTabScrollId[dest] || ('bf-' + _fzTb));
+      if (p) p.scrollIntoView({ behavior:'smooth', block:'start' });
+    }, 120);
     return;
   }
 
@@ -1880,44 +1872,32 @@ function fzOpenDest(dest){
       '</button>' +
       '<div id="fzReflectionsHistory" style="margin-top:2rem;"></div>';
     if (typeof renderReflectionsHistory === 'function') renderReflectionsHistory();
-  } else if (dest === 'growth'){
-    titleEl.textContent = "Growth Profile";
-    bodyEl.innerHTML =
-      '<div class="fz-growth-explainer">' +
-        '<div class="fzg-explain-emoji" aria-hidden="true">✦</div>' +
-        '<h3 class="fzg-explain-title">Seven traits. One you.</h3>' +
-        '<p class="fzg-explain-text">' +
-          'Every action in the app grows the traits that match it. ' +
-          'Pray for someone → Compassion grows. Face a hard question → ' +
-          'Courage grows. Show up daily → Discipline grows.' +
-        '</p>' +
-        '<p class="fzg-explain-text-sub">Tap any trait to see what builds it.</p>' +
-      '</div>' +
-      '<div id="fzGrowthFull"></div>';
-    renderGrowthFull();
   } else if (dest === 'heart'){
     titleEl.textContent = "Heart Check";
     bodyEl.innerHTML = renderHeartCheckPicker();
-  } else if (dest === 'walk'){
-    // My Walk with God — full-height pathway via the standard destination
-    // takeover. renderWalkPath (walk-path.js) draws the node trail, golden-cross
-    // horizon, "YOU ARE HERE" beacon, and weekly quests into #walkPathWrap.
+  } else if (dest === 'walk' || dest === 'walkfaith' || dest === 'growth' || dest === 'sermon'){
+    // My Walk with God — a two-tab surface (2026-07-07): "⛰️ Pathway" (the
+    // 14-station path, drawn by renderWalkPath/walk-path.js, UNCHANGED) +
+    // "✨ My Faith Life" (Faith Profile, Giving, My Verses, Sermon Notes,
+    // Spiritual Disciplines, Growth Profile — hub-and-spoke, one card opens
+    // one section in isolation). Growth Profile and Sermon Notes used to be
+    // separate destinations (their own #fzGrowthFull takeover / the old
+    // #bf-journey hub); both now land here directly on the matching card so
+    // nothing is lost. 'walkfaith' opens the My Faith Life hub itself (no
+    // specific card) — used by the retired Faith Journey tab's redirect.
     // typeof-guarded so a module-load failure falls back to an empty panel
     // instead of blanking the app.
     titleEl.textContent = "✨ My Walk with God";
-    // 2026-07-03 — My Story (walk-story.js) absorbs the "My Journey so far"
-    // journal: path on top, daily strip (on-this-day + once/day prompt)
-    // between, full timeline below. Falls back to the old journal if
-    // walk-story.js failed to load.
-    bodyEl.innerHTML = '<div id="walkPathWrap"></div><div id="walkDailyStrip"></div><div id="walkStoryWrap"></div><div id="walkJournalWrap"></div>';
-    if (typeof window.renderWalkPath === 'function'){ window.renderWalkPath('walkPathWrap'); }
-    if (typeof window.renderWalkStory === 'function'){
-      window.renderWalkStory('walkStoryWrap');
-      if (typeof window.renderWalkDailyStrip === 'function') window.renderWalkDailyStrip('walkDailyStrip');
-    } else {
-      renderWalkJournal('walkJournalWrap');
+    bodyEl.innerHTML = '<div id="mwHost"></div>';
+    if (typeof window.renderMyWalkTabs === 'function'){
+      if (dest === 'walk'){
+        window.renderMyWalkTabs('mwHost', { startTab:'pathway' });
+      } else if (dest === 'walkfaith'){
+        window.renderMyWalkTabs('mwHost', { startTab:'faith' });
+      } else {
+        window.renderMyWalkTabs('mwHost', { startTab:'faith', startSpoke: dest });
+      }
     }
-    _fjInstallWalkJournalHooks();
   }
 
   setTimeout(function(){ destEl.scrollIntoView({ behavior:'smooth', block:'start' }); }, 60);

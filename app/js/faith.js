@@ -796,6 +796,24 @@ function bfInjectBackPill(panelId){
 }
 
 function bfTab(tab, btn){
+  // 2026-07-07 — Faith Journey retired as a standalone bf-<tab> panel;
+  // consolidated into My Walk's "✨ My Faith Life" tab (my-walk-tabs.js).
+  // #bf-journey is now empty, so redirect instead of showing it. The two
+  // tab-strip "🌟 Journey" buttons and the #bf-home topic-card still call
+  // bfTab('journey') unchanged (left in place per the staged-deprecation
+  // plan) — only the destination changed. Collapse Zone 3 first (mirrors
+  // renderFaithJourneyHome's own collapse) so nothing bleeds under the
+  // #fzDest takeover if the user was mid-browse inside a bf-<tab> panel.
+  if(tab === 'journey'){
+    try{
+      if (typeof D !== 'undefined' && D) D.faithExploreOpen = false;
+      if (typeof renderFaithExploreToggle === 'function') renderFaithExploreToggle();
+      var z3 = document.getElementById('fzZone3Wrap');
+      if (z3) z3.style.display = 'none';
+    }catch(_e){}
+    if(typeof fzOpenDest === 'function') fzOpenDest('walkfaith');
+    return;
+  }
   // Alias routing — redirect removed tabs to unified cards with pre-selected sub-tab
   if(tab === 'audioBible'){ _bibleSubTab = 'listen'; tab = 'bible'; }
   else if(tab === 'readingPlans'){ _plansSubTab = 'reading'; tab = 'plans'; }

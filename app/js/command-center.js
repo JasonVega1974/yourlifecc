@@ -719,11 +719,10 @@
   // ── MY WALK overlay host — mirror of _ccClimbOverlay ─────────
   // z 8000 sits BELOW walk-path.js's own station sheet
   // (#walkStationOverlay, z 9000) so station pages open above the
-  // path as designed. walk-path.js hard-codes 'walkPathWrap' in its
-  // own step re-render, so this host must own that id exclusively
-  // while open — ccOpenWalk strips the id from any stale faith-side
-  // host (fzOpenDest('walk') rebuilds its panel innerHTML on every
-  // open, so that node is disposable between visits).
+  // path as designed. 2026-07-07 — now a two-tab surface (my-walk-tabs.js);
+  // the walkPathWrap exclusivity dance (walk-path.js hard-codes that literal
+  // id in its own step re-render) lives inside renderMyWalkTabs() now, not
+  // duplicated here.
   function _ccWalkOverlay(){
     var ov = document.getElementById('ccWalkOverlay');
     if (ov) return ov;
@@ -734,7 +733,7 @@
       +   '<button type="button" class="cc-climb-ovhome cc-walk-ovhome" id="ccWalkHomeBtn">← Home</button>'
       +   '<span class="cc-climb-ovtitle cc-walk-ovtitle">MY WALK WITH GOD</span>'
       + '</div>'
-      + '<div style="max-width:560px;margin:0 auto;padding:1rem .9rem 2.5rem;"><div id="walkPathWrap"></div></div>';
+      + '<div style="max-width:560px;margin:0 auto;padding:1rem .9rem 2.5rem;"><div id="mwHost"></div></div>';
     document.body.appendChild(ov);
     ov.querySelector('#ccWalkHomeBtn').addEventListener('click', ccCloseWalk);
     // Esc: close the station sheet first if it's up, else leave the walk.
@@ -753,7 +752,9 @@
 
   function ccOpenWalk(){
     // Module-load failure degrades to a quiet notice, never a dead tap.
-    if (typeof window.renderWalkPath !== 'function'){
+    // Both modules are required: walk-path.js draws Tab 1, my-walk-tabs.js
+    // builds the two-tab shell that hosts it.
+    if (typeof window.renderWalkPath !== 'function' || typeof window.renderMyWalkTabs !== 'function'){
       if (typeof window.showToast === 'function') window.showToast('My Walk is unavailable right now — try a refresh');
       return;
     }
@@ -773,16 +774,14 @@
       };
     }
     var ov = _ccWalkOverlay();
-    // Exclusive id claim — see _ccWalkOverlay comment.
-    try {
-      document.querySelectorAll('[id="walkPathWrap"]').forEach(function(n){
-        if (!ov.contains(n)) n.removeAttribute('id');
-      });
-    } catch(_){}
     ov.style.display = 'block';
     document.body.style.overflow = 'hidden';
     try {
-      window.renderWalkPath('walkPathWrap');
+      if (typeof window.renderMyWalkTabs === 'function'){
+        window.renderMyWalkTabs('mwHost', { startTab:'pathway' });
+      } else {
+        throw new Error('renderMyWalkTabs unavailable');
+      }
     } catch(e){
       ccCloseWalk();
       if (typeof window.showToast === 'function') window.showToast('My Walk could not open');
@@ -790,6 +789,8 @@
       return;
     }
     // Land on the "YOU ARE HERE" beacon (current station) if present.
+    // (renderMyWalkTabs already does this internally too — harmless no-op
+    // here if it already scrolled.)
     try {
       var cur = ov.querySelector('.wk-current');
       if (cur && cur.scrollIntoView) cur.scrollIntoView({ block:'center' });

@@ -11861,119 +11861,15 @@
 
   <!-- MY FAITH JOURNEY -->
   <div id="bf-journey" style="display:none;">
-    <!-- Hub-and-spoke (2026-07-07). Was one scrolling pane stacking Profile,
-         Milestones, Giving, Sermon Notes, Verses — tapping "Sermon Notes"
-         showed everything above it. Now a 5-card hub; each card opens ONE
-         spoke. renderFaithJourney/fjOpenSpoke/fjBackToHub live in faith.js.
-         My Prayers removed — it lives in the Prayer hub (prOpenCompose). -->
-    <style>
-      #bf-journey .fjh-grid{ display:grid; grid-template-columns:1fr; gap:.85rem; margin-top:.4rem; }
-      @media(min-width:480px){ #bf-journey .fjh-grid{ grid-template-columns:1fr 1fr; } }
-      #bf-journey .fjh-card{ display:flex; flex-direction:column; width:100%; text-align:left; font-family:inherit; padding:0; overflow:hidden; cursor:pointer; border-radius:20px; background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92)); border:1px solid rgba(245,180,49,.16); box-shadow:0 8px 22px rgba(0,0,0,.35); transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease; }
-      #bf-journey .fjh-card:hover{ transform:translateY(-2px); border-color:rgba(245,180,49,.4); box-shadow:0 12px 26px rgba(0,0,0,.4); }
-      #bf-journey .fjh-card:focus-visible{ outline:2px solid #f5b431; outline-offset:2px; }
-      #bf-journey .fjh-hero{ position:relative; width:100%; height:118px; overflow:hidden; border-bottom:1px solid rgba(245,180,49,.10); }
-      #bf-journey .fjh-ph{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:40px; background:radial-gradient(ellipse at 30% 30%, rgba(245,180,49,.20), transparent 60%), radial-gradient(ellipse at 75% 75%, rgba(108,150,230,.14), transparent 60%), linear-gradient(180deg,#1c2547 0%,#0d1226 100%); }
-      #bf-journey img.fjh-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:brightness(.92) saturate(1.05); }
-      #bf-journey .fjh-shade{ position:absolute; left:0; right:0; bottom:0; height:58%; background:linear-gradient(180deg,rgba(10,15,31,0),rgba(10,15,31,.82)); pointer-events:none; }
-      #bf-journey .fjh-title{ font:700 14.5px/1.15 Oswald,sans-serif; letter-spacing:.03em; color:#efe7d4; padding:12px 14px 4px; }
-      #bf-journey .fjh-sub{ font:italic 400 12px/1.4 Newsreader,serif; color:#9aa2ba; padding:0 14px 13px; }
-      #bf-journey .fjh-back{ display:inline-flex; align-items:center; gap:.4rem; margin:0 0 .9rem; padding:.5rem .9rem; border:1px solid rgba(245,180,49,.4); border-radius:99px; background:rgba(245,180,49,.1); color:#f5b431; font:600 .8rem/1 Oswald,sans-serif; letter-spacing:.04em; cursor:pointer; }
-      #bf-journey .fjh-back:hover{ background:rgba(245,180,49,.18); }
-      #bf-journey .fjh-back:focus-visible{ outline:2px solid #f5b431; outline-offset:2px; }
-      /* In a spoke, the gold "← Faith Journey" pill is the only back
-         affordance — hide the tab-level cyan "← Back to Home" pill so the
-         two don't stack in two color languages. Toggled by fj-in-spoke. */
-      #bf-journey.fj-in-spoke .bf-back-btn{ display:none; }
-      @media (prefers-reduced-motion: reduce){ #bf-journey .fjh-card{ transition:none; } #bf-journey .fjh-card:hover{ transform:none; } }
-      /* light mode — paper */
-      :root.light #bf-journey .fjh-card{ background:linear-gradient(158deg,#ffffff,#fbf7ee); border-color:rgba(146,64,14,.22); box-shadow:0 1px 3px rgba(26,18,51,.08); }
-      :root.light #bf-journey .fjh-card:hover{ border-color:rgba(146,64,14,.4); box-shadow:0 4px 12px rgba(26,18,51,.1); }
-      :root.light #bf-journey .fjh-ph{ background:linear-gradient(158deg,#efe8da,#e2d9c6); }
-      :root.light #bf-journey .fjh-shade{ background:linear-gradient(180deg,rgba(255,255,255,0),rgba(120,90,30,.10)); }
-      :root.light #bf-journey .fjh-title{ color:#1a1233; }
-      :root.light #bf-journey .fjh-sub{ color:#57534e; }
-      :root.light #bf-journey .fjh-back{ color:#b45309; border-color:rgba(180,83,9,.4); background:rgba(180,83,9,.08); }
-      :root.light #bf-journey .fjh-back:hover{ background:rgba(180,83,9,.14); }
-    </style>
-
-    <!-- ══ HUB (5 cards) ══ -->
-    <div id="fjHub">
-      <div class="bf-section-hdr">
-        <div class="bf-eyebrow">YOUR WALK WITH GOD</div>
-        <div class="bf-title">Faith Journey</div>
-        <div class="bf-sub">Pick a space to open it — your profile, giving, verses, sermon notes, and disciplines. Each opens on its own.</div>
-      </div>
-      <div class="fjh-grid">
-        <button type="button" class="fjh-card" onclick="fjOpenSpoke('profile')">
-          <div class="fjh-hero"><div class="fjh-ph" aria-hidden="true">👤</div><img class="fjh-img" data-card-id="fjh-profile" loading="lazy" alt="" onerror="this.style.display='none'"><div class="fjh-shade" aria-hidden="true"></div></div>
-          <div class="fjh-title">MY FAITH PROFILE</div>
-          <div class="fjh-sub">Your identity, spiritual milestones, and the moments that mattered.</div>
-        </button>
-        <button type="button" class="fjh-card" onclick="fjOpenSpoke('giving')">
-          <div class="fjh-hero"><div class="fjh-ph" aria-hidden="true">💝</div><img class="fjh-img" data-card-id="fjh-giving" loading="lazy" alt="" onerror="this.style.display='none'"><div class="fjh-shade" aria-hidden="true"></div></div>
-          <div class="fjh-title">GIVING</div>
-          <div class="fjh-sub">Track your generosity over time.</div>
-        </button>
-        <button type="button" class="fjh-card" onclick="fjOpenSpoke('verses')">
-          <div class="fjh-hero"><div class="fjh-ph" aria-hidden="true">💎</div><img class="fjh-img" data-card-id="fjh-verses" loading="lazy" alt="" onerror="this.style.display='none'"><div class="fjh-shade" aria-hidden="true"></div></div>
-          <div class="fjh-title">MY VERSES</div>
-          <div class="fjh-sub">Verses worth keeping close.</div>
-        </button>
-        <button type="button" class="fjh-card" onclick="fjOpenSpoke('sermon')">
-          <div class="fjh-hero"><div class="fjh-ph" aria-hidden="true">📝</div><img class="fjh-img" data-card-id="fjh-sermon" loading="lazy" alt="" onerror="this.style.display='none'"><div class="fjh-shade" aria-hidden="true"></div></div>
-          <div class="fjh-title">SERMON NOTES</div>
-          <div class="fjh-sub">Capture what you heard on Sunday.</div>
-        </button>
-        <button type="button" class="fjh-card" onclick="fjOpenSpoke('disciplines')">
-          <div class="fjh-hero"><div class="fjh-ph" aria-hidden="true">🔥</div><img class="fjh-img" data-card-id="fjh-disciplines" loading="lazy" alt="" onerror="this.style.display='none'"><div class="fjh-shade" aria-hidden="true"></div></div>
-          <div class="fjh-title">SPIRITUAL DISCIPLINES</div>
-          <div class="fjh-sub">Build rhythms that grow your faith.</div>
-        </button>
-      </div>
-    </div>
-
-    <!-- ══ SPOKE: My Faith Profile (Profile + Spiritual Milestones + Faith Milestones) ══ -->
-    <div class="fjh-spoke" data-fj-spoke="profile" style="display:none;">
-      <button type="button" class="fjh-back" onclick="fjBackToHub()">← Faith Journey</button>
-      <div id="fjProfileContainer"></div>
-      <div id="fjMilestonesContainer"></div>
-      <div class="bf-sub-eye" style="font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;opacity:.85;font-weight:700;margin:1rem 0 .55rem;">✨ Faith Milestones</div>
-      <div id="faithMilestones" style="margin-bottom:1rem;"></div>
-    </div>
-
-    <!-- ══ SPOKE: Giving ══ -->
-    <div class="fjh-spoke" data-fj-spoke="giving" style="display:none;">
-      <button type="button" class="fjh-back" onclick="fjBackToHub()">← Faith Journey</button>
-      <div id="fjDonationsContainer"></div>
-    </div>
-
-    <!-- ══ SPOKE: My Verses ══ -->
-    <div class="fjh-spoke" data-fj-spoke="verses" style="display:none;">
-      <button type="button" class="fjh-back" onclick="fjBackToHub()">← Faith Journey</button>
-      <div class="bf-sub-eye" style="font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;opacity:.85;font-weight:700;margin:0 0 .55rem;">💎 My Favorite Verses</div>
-      <div style="display:grid;grid-template-columns:1fr 80px;gap:.3rem;margin-bottom:.4rem;">
-        <input type="text" id="favVerseInput" placeholder="Type a verse (e.g. Philippians 4:13 - I can do all things...)">
-        <button class="btn bp bs" onclick="saveFavVerse()">+ Save</button>
-      </div>
-      <div id="favVersesList" style="max-height:60vh;overflow-y:auto;"></div>
-    </div>
-
-    <!-- ══ SPOKE: Sermon Notes (only) ══ -->
-    <div class="fjh-spoke" data-fj-spoke="sermon" style="display:none;">
-      <button type="button" class="fjh-back" onclick="fjBackToHub()">← Faith Journey</button>
-      <div style="display:flex;align-items:center;gap:.5rem;margin:0 0 .55rem;">
-        <span class="bf-sub-eye" style="font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;opacity:.85;font-weight:700;">📝 Sermon Notes</span>
-        <button onclick="openSermonNote()" style="margin-left:auto;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0d1a;border:none;border-radius:99px;padding:.4rem .85rem;font-size:.72rem;font-weight:900;letter-spacing:.04em;cursor:pointer;font-family:var(--fm);box-shadow:0 4px 14px rgba(251,191,36,.32);">+ New Sermon</button>
-      </div>
-      <div id="sermonNotesList" style="margin-bottom:1rem;"></div>
-    </div>
-
-    <!-- ══ SPOKE: Spiritual Disciplines ══ -->
-    <div class="fjh-spoke" data-fj-spoke="disciplines" style="display:none;">
-      <button type="button" class="fjh-back" onclick="fjBackToHub()">← Faith Journey</button>
-      <div id="fjDisciplinesContainer"></div>
-    </div>
+    <!-- 2026-07-07 — RETIRED as a standalone tab. Consolidated into My
+         Walk's "✨ My Faith Life" tab (app/js/my-walk-tabs.js) alongside
+         the 14-station Pathway + Growth Profile (formerly its own #fzDest
+         destination). bfTab('journey') now redirects here instead of
+         showing this panel (see faith.js); the nav buttons/cards that call
+         bfTab('journey') are left in place per the staged-deprecation plan
+         — only their destination changed. renderFaithJourney/fjOpenSpoke/
+         fjBackToHub remain defined in faith.js but are now unreachable
+         (harmless) since this panel never receives content again. -->
   </div>
 
   <!-- ════ READING PLANS (F2-B) ════ -->
@@ -22816,6 +22712,15 @@
      so it can hand tool routes to fzOpenDest at runtime. Dark launch — nothing
      renders until renderWalkPath() is called; no doorway wired yet. -->
 <script defer src="/app/js/walk-path.js"></script>
+<!-- My Walk two-tab shell (2026-07-07) — "⛰️ Pathway" (renderWalkPath,
+     untouched) + "✨ My Faith Life" (the retired #bf-journey 5-card hub +
+     Growth Profile, consolidated). Loads after walk-path.js (calls
+     renderWalkPath) and after faith.js/faith-zones.js/traits.js (calls
+     renderFJ*/renderFavVerses/renderSermonNotes/renderGrowthFull), all of
+     which are already loaded above. Both entry points — faith-zones.js
+     fzOpenDest('walk'|'walkfaith'|'growth'|'sermon') and command-center.js
+     ccOpenWalk() — call window.renderMyWalkTabs(). -->
+<script defer src="/app/js/my-walk-tabs.js"></script>
 <!-- My Story — the walk's spiritual journal (timeline, add-entry sheet,
      private milestone photos, on-this-day, share summary). Loads after
      walk-path.js (reads WALK_STATIONS/QUESTS + walkQuestBump); before
