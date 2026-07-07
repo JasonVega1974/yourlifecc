@@ -13534,9 +13534,80 @@
       #bf-bibleworld .bw-chip{flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:99px;padding:.3rem .7rem;font-size:.66rem;font-weight:700;cursor:pointer;font-family:var(--fm);transition:all .15s;}
       #bf-bibleworld .bw-chip:hover{background:rgba(255,255,255,.08);}
       #bf-bibleworld .bw-chip.active{color:#0b1220;border-color:transparent;}
-      #bf-bibleworld #bwMap{height:380px;width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:#0d1117;margin-bottom:.85rem;}
-      #bf-bibleworld .bw-section-hdr{font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.16em;margin:.6rem 0 .4rem;}
+      #bf-bibleworld #bwMap{height:380px;width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:#0d1117;}
+      /* "ALL SITES (32)" + other bw-section-hdr labels — gold Oswald caps
+         eyebrow + hairline rule (docs/design-system.md: Oswald is faith-
+         eyebrow-only; gold is the faith register #fbbf24/light #92400e). */
+      #bf-bibleworld .bw-section-hdr{
+        font-family:'Oswald',var(--fm);font-size:.66rem;font-weight:700;
+        color:#fbbf24;text-transform:uppercase;letter-spacing:.18em;
+        margin:1rem 0 .5rem;padding-bottom:.5rem;
+        border-bottom:1px solid rgba(251,191,36,.3);
+      }
+      :root.light #bf-bibleworld .bw-section-hdr{color:#92400e;border-bottom-color:rgba(146,64,14,.3);}
       #bf-bibleworld .bw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.5rem;}
+
+      /* ── Era rail / pill row (2026-07-07) ──────────────────────────
+         .bw-map-layout: column <640px (pill row above, map below,
+         touching), row ≥640px (180px rail | map). Same #bwFilters button
+         list either way — CSS alone reshapes rail vs. pill row. */
+      #bf-bibleworld .bw-map-layout{display:flex;flex-direction:column;margin-bottom:.85rem;}
+      #bf-bibleworld .arch-era-rail{
+        background:rgba(255,255,255,.04);border:1px solid rgba(251,191,36,.14);
+        border-radius:16px 16px 0 0;padding:.65rem .7rem;
+      }
+      #bf-bibleworld .arch-era-eyebrow{
+        font-family:'Oswald',var(--fm);font-size:.58rem;font-weight:700;
+        letter-spacing:.2em;text-transform:uppercase;color:#fbbf24;
+        margin-bottom:.5rem;display:none; /* shown on the desktop rail only */
+      }
+      #bf-bibleworld .bw-filters{display:flex;gap:.35rem;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:.15rem;}
+      #bf-bibleworld .arch-era-item{
+        flex:0 0 auto;display:flex;align-items:center;gap:.4rem;
+        background:transparent;border:1px solid rgba(251,191,36,.3);
+        border-radius:999px;padding:.4rem .8rem;min-height:36px;
+        font-family:var(--fm);font-size:.72rem;font-weight:600;color:var(--tx2);
+        cursor:pointer;transition:background .15s,border-color .15s,color .15s;
+        white-space:nowrap;
+      }
+      #bf-bibleworld .arch-era-item:hover{border-color:rgba(251,191,36,.55);}
+      #bf-bibleworld .arch-era-item:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}
+      #bf-bibleworld .arch-era-dot{width:6px;height:6px;border-radius:50%;background:rgba(251,191,36,.35);flex-shrink:0;}
+      #bf-bibleworld .arch-era-item.active{background:#fbbf24;border-color:transparent;color:#1a1000;font-weight:700;}
+      #bf-bibleworld .arch-era-item.active .arch-era-dot{background:#1a1000;}
+      #bf-bibleworld .arch-era-desc{
+        font-family:var(--fm);font-style:italic;font-size:.72rem;line-height:1.5;
+        color:rgba(251,191,36,.75);margin-top:.55rem;
+      }
+      #bf-bibleworld .arch-map-col #bwMap{border-radius:0 0 16px 16px;border-top:none;}
+      :root.light #bf-bibleworld .arch-era-rail{background:rgba(0,0,0,.03);border-color:rgba(146,64,14,.2);}
+      :root.light #bf-bibleworld .arch-era-eyebrow{color:#92400e;}
+      :root.light #bf-bibleworld .arch-era-item{color:#57534e;border-color:rgba(146,64,14,.3);}
+      :root.light #bf-bibleworld .arch-era-item:hover{border-color:rgba(146,64,14,.55);}
+      :root.light #bf-bibleworld .arch-era-dot{background:rgba(146,64,14,.35);}
+      :root.light #bf-bibleworld .arch-era-item.active{background:#92400e;color:#fff;}
+      :root.light #bf-bibleworld .arch-era-item.active .arch-era-dot{background:#fff;}
+      :root.light #bf-bibleworld .arch-era-desc{color:#92400e;}
+      @media(min-width:640px){
+        #bf-bibleworld .bw-map-layout{flex-direction:row;align-items:stretch;gap:0;}
+        #bf-bibleworld .arch-era-rail{
+          flex:0 0 180px;border-radius:16px 0 0 16px;border-right:none;
+          display:flex;flex-direction:column;
+        }
+        #bf-bibleworld .arch-era-eyebrow{display:block;}
+        #bf-bibleworld .bw-filters{flex-direction:column;overflow-x:visible;}
+        #bf-bibleworld .arch-era-item{justify-content:flex-start;border:none;border-radius:8px;padding:.5rem .55rem;background:transparent;}
+        #bf-bibleworld .arch-era-item.active{background:rgba(251,191,36,.14);color:#fbbf24;}
+        :root.light #bf-bibleworld .arch-era-item.active{background:rgba(146,64,14,.12);color:#92400e;}
+        #bf-bibleworld .arch-era-item.active .arch-era-dot{background:#fbbf24;box-shadow:0 0 0 3px rgba(251,191,36,.22);}
+        :root.light #bf-bibleworld .arch-era-item.active .arch-era-dot{background:#92400e;box-shadow:0 0 0 3px rgba(146,64,14,.18);}
+        #bf-bibleworld .arch-era-desc{margin-top:auto;padding-top:.6rem;}
+        #bf-bibleworld .arch-map-col{flex:1 1 auto;min-width:0;}
+        #bf-bibleworld .arch-map-col #bwMap{height:520px;max-height:60vh;border-radius:0 16px 16px 0;border-left:none;}
+      }
+      @media(prefers-reduced-motion: reduce){
+        #bf-bibleworld .arch-era-item{transition:none;}
+      }
       #bf-bibleworld .bw-card{background:var(--cd-card-bg);border:var(--cd-card-border);border-left-width:4px;border-radius:var(--cd-card-radius);padding:.7rem .85rem;cursor:pointer;box-shadow:var(--cd-card-shadow);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;}
       #bf-bibleworld .bw-card:hover{transform:translateY(-4px);box-shadow:var(--cd-card-shadow-hover);}
       #bf-bibleworld .bw-card-name{font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:.15rem;}
@@ -13549,29 +13620,42 @@
     <div class="bf-section-hdr">
       <div class="bf-eyebrow">SITES · DISCOVERIES · PILGRIMAGES</div>
       <div class="bf-title">Biblical Archaeology</div>
-      <div class="bf-sub">Thirty sites, twenty archaeological discoveries, eight biblical periods — tap any card or any place name in the Bible reader to walk its story.</div>
+      <div class="bf-sub">Explore the real places where the Bible happened — 32 sites, twenty archaeological discoveries — tap any card or any place name in the Bible reader to walk its story.</div>
     </div>
 
     <!-- View tabs: Sites · Discoveries · Pilgrimage -->
     <div style="display:flex;gap:.4rem;margin-bottom:.7rem;">
-      <button class="bw-vtab active" data-bw-view="sites" onclick="bwSetView('sites',this)" style="flex:1;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🗺️ Sites (30)</button>
+      <button class="bw-vtab active" data-bw-view="sites" onclick="bwSetView('sites',this)" style="flex:1;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🗺️ Sites (32)</button>
       <button class="bw-vtab" data-bw-view="discoveries" onclick="bwSetView('discoveries',this)" style="flex:1;background:rgba(255,255,255,.04);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🏺 Discoveries (20)</button>
       <button class="bw-vtab" data-bw-view="pilgrimage" onclick="bwSetView('pilgrimage',this)" style="flex:1;background:rgba(255,255,255,.04);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🏆 Pilgrimage</button>
     </div>
 
-    <!-- Sites view: era filters + map + grid -->
+    <!-- Sites view: era rail + map + grid. 2026-07-07 — rail restyle:
+         .bw-map-layout is a flex ROW ≥640px (rail | map column) and a
+         flex COLUMN <640px (pill row above, map below, touching — no
+         gap). #bwFilters carries the same era-button list either way;
+         CSS alone reshapes it into a rail vs. a scrollable pill row. -->
     <div id="bwSitesView">
-      <div class="bw-filters" id="bwFilters">
-        <button class="bw-chip active" data-bw-era="all" onclick="bwFilter('all',this)">All eras</button>
+      <div class="bw-map-layout">
+        <div class="arch-era-rail">
+          <div class="arch-era-eyebrow">ERA</div>
+          <div class="bw-filters" id="bwFilters">
+            <button type="button" class="arch-era-item active" data-bw-era="all" onclick="bwFilter('all',this)">
+              <span class="arch-era-dot" aria-hidden="true"></span>
+              <span class="arch-era-label">All</span>
+            </button>
+          </div>
+          <div class="arch-era-desc" id="bwEraDesc">Explore 32 sites across the entire biblical world</div>
+        </div>
+        <div class="arch-map-col">
+          <!-- F4-A: Animated travel paths -->
+          <div style="display:flex;gap:.4rem;margin-bottom:.55rem;flex-wrap:wrap;align-items:center;">
+            <span style="font-size:.62rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.14em;">▶ Animated Paths:</span>
+            <div id="bwRoutes" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
+          </div>
+          <div id="bwMap"></div>
+        </div>
       </div>
-
-      <!-- F4-A: Animated travel paths -->
-      <div style="display:flex;gap:.4rem;margin-bottom:.55rem;flex-wrap:wrap;align-items:center;">
-        <span style="font-size:.62rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.14em;">▶ Animated Paths:</span>
-        <div id="bwRoutes" style="display:flex;gap:.3rem;flex-wrap:wrap;"></div>
-      </div>
-
-      <div id="bwMap"></div>
       <div class="bw-section-hdr" id="bwListHdr">All sites</div>
       <div class="bw-grid" id="bwGrid"></div>
     </div>

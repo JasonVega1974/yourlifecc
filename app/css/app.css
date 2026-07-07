@@ -7533,14 +7533,28 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   align-items:flex-start;
   gap:.7rem;
 }
-#bf-bibleworld .bw-card-head{flex:1;min-width:0;display:flex;flex-direction:column;gap:.45rem;}
-#bf-bibleworld .bw-card-name{
-  font-family:'Bebas Neue', var(--fh, var(--fm)) !important;
-  font-size:1.1rem !important;
-  letter-spacing:.06em !important;
-  color:var(--tx) !important;
+#bf-bibleworld .bw-card-head{flex:1;min-width:0;display:flex;flex-direction:column;gap:.3rem;}
+/* 2026-07-07 redesign — gold Oswald caps eyebrow (site name) above a
+   cream Georgia serif line (tagline). Matches the faith gold register
+   (docs/design-system.md: Oswald = faith eyebrows only, #fbbf24 dark /
+   #92400e light) instead of the old Bebas Neue heading treatment. */
+#bf-bibleworld .bw-card-eyebrow{
+  font-family:'Oswald',var(--fm) !important;
+  font-size:.62rem !important;
   font-weight:700 !important;
-  line-height:1.15 !important;
+  letter-spacing:.16em !important;
+  text-transform:uppercase !important;
+  color:#fbbf24 !important;
+  line-height:1.2 !important;
+  margin:0 !important;
+}
+#bf-bibleworld .bw-card-name{
+  font-family:Georgia,'Times New Roman',serif !important;
+  font-size:1.05rem !important;
+  font-style:normal !important;
+  font-weight:400 !important;
+  color:var(--tx) !important;
+  line-height:1.25 !important;
   margin:0 !important;
   text-shadow:none !important;
 }
@@ -7560,7 +7574,10 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   background:linear-gradient(135deg, rgba(251,191,36,.18), rgba(251,191,36,.06));
 }
 
-/* Era pill row — same compact treatment as plan category chips */
+/* Discoveries grid ONLY (bwRenderDiscoveries()) — certainty pill row.
+   Restored as-is; the Sites-card redesign above uses a new, separate
+   .bw-card-era-label class instead of this one, specifically so it
+   doesn't get touched by that change. */
 #bf-bibleworld .bw-card-eras{
   display:flex !important;
   flex-wrap:wrap !important;
@@ -7591,40 +7608,54 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   }
 }
 
-#bf-bibleworld .bw-card-tagline{
-  font-family:Georgia,'Times New Roman',serif !important;
+/* 2026-07-07 redesign — truncated body preview (2-line clamp), Inter
+   italic (NOT Newsreader: that's scoped narrowly to Journey Home's
+   .fjp-sub verse text per docs/design-system.md's typography ruling —
+   this surface isn't Journey Home). Inline "Read more →" in gold. */
+#bf-bibleworld .bw-card-desc{
+  font-family:var(--fm) !important;
   font-style:italic !important;
-  font-size:.88rem !important;
+  font-size:.78rem !important;
   font-weight:400 !important;
-  line-height:1.55 !important;
+  line-height:1.5 !important;
   color:var(--tx2) !important;
-  opacity:1 !important;
   margin:0 !important;
-  flex:1 1 auto;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+#bf-bibleworld .bw-card-more{
+  font-style:normal;font-weight:700;color:#fbbf24;white-space:nowrap;
+}
+/* Gold hairline rule between the description and the era/ref footer —
+   same recipe as The Story's .jsy-front-rule (rgba(251,191,36,.55)). */
+#bf-bibleworld .bw-card-rule{
+  width:100%;height:1px;background:rgba(251,191,36,.35);
+  margin:.15rem 0;flex-shrink:0;
+}
+/* Single gold text era label for SITE cards only — new class, NOT a
+   rename of .bw-card-era: that class is also used by the separate
+   Discoveries grid (bwRenderDiscoveries(), confirmed/consistent/
+   contested certainty badges, colored via --era-c) — reusing it here
+   would have silently recolored those badges gold too. Sites no longer
+   show a per-era colored pill list (era filtering shows/hides cards,
+   it doesn't recolor them); Discoveries' certainty coloring is
+   untouched, out of scope for this change. */
+#bf-bibleworld .bw-card-era-label{
+  font-family:'Oswald',var(--fm);
+  font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:#fbbf24;line-height:1.2;white-space:nowrap;
 }
 
-/* Bottom row: scripture ref pill on the left, EXPLORE → on the right */
+/* Bottom row: era label on the left, scripture ref on the right */
 #bf-bibleworld .bw-card-foot{
-  display:flex;align-items:center;gap:.5rem;
-  margin-top:auto;padding-top:.3rem;
-  border-top:1px solid rgba(251,191,36,.1);
+  display:flex;align-items:center;justify-content:space-between;gap:.5rem;
+  margin-top:auto;
 }
 #bf-bibleworld .bw-card-ref{
   display:inline-flex;align-items:center;gap:.25rem;
   font-family:var(--fm);
   font-size:.6rem;font-weight:700;letter-spacing:.06em;
-  color:var(--tx2);
-  background:rgba(56,189,248,.12);
-  border:1px solid rgba(56,189,248,.28);
-  border-radius:99px;
-  padding:.15rem .55rem;
+  color:#fbbf24;
   white-space:nowrap;
-}
-#bf-bibleworld .bw-card-cta{
-  margin-left:auto;
-  font-family:var(--fm);
-  font-size:.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--era-c, #fbbf24);
 }
 
 /* Legacy .bw-card-meta retained in case other render paths still use it */
@@ -7649,12 +7680,15 @@ html[data-faith-free="1"] #fhUpgradeCard { display: block !important; }
   border-color:rgba(180,120,20,.55) !important;
   box-shadow:0 8px 28px rgba(180,120,20,.22) !important;
 }
+:root.light #bf-bibleworld .bw-card-eyebrow{color:#92400e !important;}
 :root.light #bf-bibleworld .bw-card-name{color:#111827 !important;}
-:root.light #bf-bibleworld .bw-card-tagline{color:#7a7b85 !important;opacity:1;}
+:root.light #bf-bibleworld .bw-card-desc{color:#57534e !important;}
+:root.light #bf-bibleworld .bw-card-more{color:#92400e;}
+:root.light #bf-bibleworld .bw-card-rule{background:rgba(146,64,14,.28);}
+:root.light #bf-bibleworld .bw-card-era-label{color:#92400e;}
 :root.light #bf-bibleworld .bw-card-era{color:var(--era-c, #111827);}
 :root.light #bf-bibleworld .bw-card-photo{background:rgba(255,250,235,.7);border-color:rgba(180,120,20,.32);}
-:root.light #bf-bibleworld .bw-card-ref{background:rgba(56,189,248,.16);border-color:rgba(56,189,248,.4);color:#1e3a8a;}
-:root.light #bf-bibleworld .bw-card-foot{border-top-color:rgba(180,120,20,.18);}
+:root.light #bf-bibleworld .bw-card-ref{color:#92400e;}
 
 /* ─── Family verse card light-mode parchment ─── */
 :root.light #fhFamilyVerseCard{

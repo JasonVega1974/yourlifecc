@@ -8065,6 +8065,41 @@ function _bwPeriods(){ return (typeof window !== 'undefined' && window.BIBLICAL_
 function _bwSiteById(id){ return _bwSites().find(s => s && s.id === id) || null; }
 function _bwPeriodById(id){ return _bwPeriods().find(p => p && p.id === id) || null; }
 
+// 2026-07-07 — Era rail groups. BIBLICAL_PERIODS has 8 real era ids
+// (patriarchs, exodus-conquest, united-kingdom, divided-kingdom,
+// exile-return, second-temple, jesus-ministry, pauline-journeys); the
+// redesigned rail collapses these into 7 UI buttons (united+divided
+// kingdom merge into one "Kingdom" era; second-temple has no dedicated
+// button — those sites still show under "All", just not isolatable by a
+// single era tap). Each group's `range` is pulled from its first real
+// era's BIBLICAL_PERIODS entry for the description line under the rail.
+const ARCH_ERA_GROUPS = [
+  { id:'patriarchs',    label:'Patriarchs',    eras:['patriarchs'] },
+  { id:'exodus',        label:'Exodus',        eras:['exodus-conquest'] },
+  { id:'kingdom',       label:'Kingdom',       eras:['united-kingdom','divided-kingdom'] },
+  { id:'exile',         label:'Exile',         eras:['exile-return'] },
+  { id:'jesus',         label:'Jesus',         eras:['jesus-ministry'] },
+  { id:'early-church',  label:'Early Church',  eras:['pauline-journeys'] },
+];
+function _archGroupById(id){ return ARCH_ERA_GROUPS.find(g => g && g.id === id) || null; }
+// True if a site belongs to the active rail selection ('all' or a group id).
+function _archSiteMatchesEra(site, groupId){
+  if(groupId === 'all') return true;
+  const g = _archGroupById(groupId);
+  if(!g) return false;
+  const eras = site.eras || [];
+  return g.eras.some(function(e){ return eras.indexOf(e) !== -1; });
+}
+// Era range/description text under the rail — real BIBLICAL_PERIODS range
+// strings, joined when a group spans more than one real era.
+function _archGroupRange(groupId){
+  if(groupId === 'all') return 'Explore 32 sites across the entire biblical world';
+  const g = _archGroupById(groupId);
+  if(!g) return '';
+  const ranges = g.eras.map(function(e){ const p = _bwPeriodById(e); return p ? p.range : ''; }).filter(Boolean);
+  return ranges.length ? ranges[0] : '';
+}
+
 function renderBibleWorld(){
   const filterWrap = document.getElementById('bwFilters');
   // Lazy-load gate — biblical-sites.js drives the map markers, grid
@@ -8086,16 +8121,26 @@ function renderBibleWorld(){
       });
     return;
   }
-  // Build filter chips (idempotent — only build once).
+  // Build the era rail (idempotent — only build once). One list of
+  // buttons, rendered as a left rail ≥640px and a horizontal scroll
+  // pill row <640px via CSS alone (see #bf-bibleworld .arch-era-rail).
   if(filterWrap && !filterWrap.dataset.bwBuilt){
-    const periods = _bwPeriods();
-    let html = '<button class="bw-chip active" data-bw-era="all" onclick="bwFilter(\'all\',this)">All eras</button>';
-    periods.forEach(p => {
-      html += '<button class="bw-chip" data-bw-era="'+p.id+'" style="--era-color:'+p.color+';" onclick="bwFilter(\''+p.id+'\',this)">'+escapeHtml(p.label)+'</button>';
+    let html = '<button type="button" class="arch-era-item active" data-bw-era="all" onclick="bwFilter(\'all\',this)">'
+              +   '<span class="arch-era-dot" aria-hidden="true"></span>'
+              +   '<span class="arch-era-label">All</span>'
+              + '</button>';
+    ARCH_ERA_GROUPS.forEach(function(g){
+      html += '<button type="button" class="arch-era-item" data-bw-era="'+g.id+'" onclick="bwFilter(\''+g.id+'\',this)">'
+            +   '<span class="arch-era-dot" aria-hidden="true"></span>'
+            +   '<span class="arch-era-label">'+escapeHtml(g.label)+'</span>'
+            + '</button>';
     });
     filterWrap.innerHTML = html;
     filterWrap.dataset.bwBuilt = '1';
   }
+  // Era description line under the rail/pill row.
+  const descEl = document.getElementById('bwEraDesc');
+  if(descEl) descEl.textContent = _archGroupRange(_bwEra);
 
   // Initialize map lazily — Leaflet may still be loading on first call.
   _bwInitMap();
@@ -8144,6 +8189,40 @@ function _bwInitMap(){
       if(_bwMap) _bwMap.invalidateSize();
     });
   });
+  // The map's CSS height now changes at the 640px breakpoint (380px
+  // mobile -> 520px desktop rail layout, added in this same change) —
+  // a resize crossing that breakpoint changes #bwMap's real pixel size
+  // after Leaflet already cached its old one. One idempotent, debounced
+  // listener; harmless no-op if the map never gets recreated.
+  if(!window._bwResizeWired){
+    window._bwResizeWired = true;
+    let t;
+    window.addEventListener('resize', function(){
+      clearTimeout(t);
+      t = setTimeout(function(){ if(_bwMap) _bwMap.invalidateSize(); }, 150);
+    });
+  }
+}
+
+// 2026-07-07 — one gold marker for every pin, era-independent. Era
+// filtering shows/hides which pins are on the map; it no longer changes
+// their color (matches the app's faith-gold register, docs/design-
+// system.md — a single accent, not a rainbow per category).
+const ARCH_GOLD_ICON = (typeof L !== 'undefined') ? L.divIcon({
+  className: '',
+  html: '<div style="width:10px;height:10px;background:#fbbf24;border-radius:50%;border:2px solid rgba(251,191,36,.4);box-shadow:0 0 6px rgba(251,191,36,.5);"></div>',
+  iconSize: [10, 10],
+  iconAnchor: [5, 5],
+}) : null;
+function _archGoldIcon(){
+  // Built lazily too (Leaflet may not exist yet at parse time — same
+  // guard _bwInitMap() already uses).
+  return ARCH_GOLD_ICON || (typeof L !== 'undefined' ? L.divIcon({
+    className: '',
+    html: '<div style="width:10px;height:10px;background:#fbbf24;border-radius:50%;border:2px solid rgba(251,191,36,.4);box-shadow:0 0 6px rgba(251,191,36,.5);"></div>',
+    iconSize: [10, 10],
+    iconAnchor: [5, 5],
+  }) : null);
 }
 
 function _bwRenderMarkers(){
@@ -8152,36 +8231,48 @@ function _bwRenderMarkers(){
   _bwMarkers.forEach(m => { try { _bwMap.removeLayer(m); } catch(_){} });
   _bwMarkers = [];
 
-  const sites = _bwSites().filter(s => s && (_bwEra === 'all' || (s.eras || []).indexOf(_bwEra) !== -1));
+  const icon = _archGoldIcon();
+  if(!icon) return;
+  const sites = _bwSites().filter(s => s && _archSiteMatchesEra(s, _bwEra));
   sites.forEach(s => {
     if(typeof s.lat !== 'number' || typeof s.lng !== 'number') return;
-    // Pick the marker color from the first matching era for the active filter,
-    // or the most recent era if "all" is selected.
-    const eraId = (_bwEra !== 'all' ? _bwEra : (s.eras && s.eras[s.eras.length-1])) || '';
-    const period = _bwPeriodById(eraId);
-    const color  = period ? period.color : '#38bdf8';
-    const icon = L.divIcon({
-      className: 'bw-marker',
-      html: '<div style="width:18px;height:18px;border-radius:50%;background:'+color+';border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);"></div>',
-      iconSize: [18,18],
-      iconAnchor: [9,9],
-    });
     const m = L.marker([s.lat, s.lng], { icon: icon }).addTo(_bwMap);
     m.bindPopup('<b>'+_bwEsc(s.name)+'</b><br><span style="font-size:11px;color:#555;">'+_bwEsc(s.tagline||'')+'</span><br><a href="javascript:void(0)" onclick="openBwSite(\''+s.id+'\')">Read more →</a>');
     _bwMarkers.push(m);
   });
 }
 
+// One era LABEL (gold Oswald text, not a colored pill) per card — the
+// active filter's group when one is selected, else the site's first
+// matching group. Sites with no group match (second-temple-only) show
+// no era label, same as before this redesign era-pilled everything.
+function _archSiteEraLabel(site){
+  if(_bwEra !== 'all'){
+    const active = _archGroupById(_bwEra);
+    return active ? active.label : '';
+  }
+  const eraIds = site.eras || [];
+  const g = ARCH_ERA_GROUPS.find(function(grp){ return grp.eras.some(function(e){ return eraIds.indexOf(e) !== -1; }); });
+  return g ? g.label : '';
+}
+// Plain-text preview of the HTML `body` field, stripped of tags, capped
+// to ~140 chars so the 2-line CSS clamp doesn't just cut mid-tag.
+function _archBodyPreview(html){
+  if(!html) return '';
+  const text = String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  return text.length > 140 ? text.slice(0, 140).replace(/\s+\S*$/, '') + '…' : text;
+}
+
 function _bwRenderGrid(){
   const el = document.getElementById('bwGrid');
   const hdr = document.getElementById('bwListHdr');
   if(!el) return;
-  const sites = _bwSites().filter(s => s && (_bwEra === 'all' || (s.eras || []).indexOf(_bwEra) !== -1));
+  const sites = _bwSites().filter(s => s && _archSiteMatchesEra(s, _bwEra));
   if(hdr){
     if(_bwEra === 'all') hdr.textContent = 'All sites (' + sites.length + ')';
     else {
-      const p = _bwPeriodById(_bwEra);
-      hdr.textContent = (p ? p.label : _bwEra) + ' (' + sites.length + ')';
+      const g = _archGroupById(_bwEra);
+      hdr.textContent = (g ? g.label : _bwEra) + ' (' + sites.length + ')';
     }
   }
   if(!sites.length){
@@ -8189,53 +8280,29 @@ function _bwRenderGrid(){
     return;
   }
   el.innerHTML = sites.map(s => {
-    const eraIds = s.eras || [];
-    const firstEra = eraIds[0] || '';
-    // Each era family gets its own warm tint, matching Reading Plans cards.
-    // Two stops of low-opacity color blended diagonally.
-    const eraTints = {
-      'patriarchs':       'rgba(251,191,36,.08), rgba(251,191,36,.03)',
-      'exodus-conquest':  'rgba(251,146,60,.08), rgba(251,191,36,.03)',
-      'judges':           'rgba(167,139,250,.08), rgba(139,92,246,.04)',
-      'united-kingdom':   'rgba(56,189,248,.08), rgba(167,139,250,.04)',
-      'divided-kingdom':  'rgba(56,189,248,.08), rgba(167,139,250,.04)',
-      'exile-return':     'rgba(167,139,250,.08), rgba(139,92,246,.04)',
-      'second-temple':    'rgba(52,211,153,.08), rgba(34,197,94,.04)',
-      'jesus-ministry':   'rgba(34,211,238,.08), rgba(56,189,248,.04)',
-      'pauline-journeys': 'rgba(248,113,113,.08), rgba(251,146,60,.04)',
-    };
-    const tint = eraTints[firstEra] || 'rgba(251,191,36,.06), rgba(167,139,250,.04)';
-    const firstPeriod = _bwPeriodById(firstEra);
-    const accent = firstPeriod ? firstPeriod.color : '#fbbf24';
-    // Pill badges per era — color-mix tinted bg + border (CSS handles fallback)
-    const pills = eraIds.slice(0, 3).map(id => {
-      const p = _bwPeriodById(id);
-      const c = p ? p.color : '#38bdf8';
-      const label = p ? p.label : id;
-      return '<span class="bw-card-era" style="--era-c:'+c+';">'+_bwEsc(label)+'</span>';
-    }).join('');
-    // Photo thumbnail (40x40 rounded, gold hairline) or 🏺 emoji fallback
+    const eraLabel = _archSiteEraLabel(s);
+    // Photo thumbnail (48x48 rounded, gold hairline) or 🏺 emoji fallback
     const photo = s.heroPhoto
       ? '<div class="bw-card-photo"><img src="'+_bwEsc(s.heroPhoto)+'" alt="" loading="lazy"></div>'
       : '<div class="bw-card-photo bw-card-photo-fallback">🏺</div>';
-    // First scripture ref as a small pill at the bottom
-    const refPill = (s.scriptureRefs && s.scriptureRefs.length)
+    // First scripture ref — gold, plain text (was a cyan pill)
+    const ref = (s.scriptureRefs && s.scriptureRefs.length)
       ? '<span class="bw-card-ref">📖 '+_bwEsc(s.scriptureRefs[0])+'</span>'
       : '';
-    return '<button class="bw-card" data-bw-id="'+_bwEsc(s.id)+'" '
-         +   'onclick="openBwSite(this.dataset.bwId)" '
-         +   'style="--era-tint:'+tint+';--era-c:'+accent+';">'
+    const preview = _archBodyPreview(s.body);
+    return '<button class="bw-card" data-bw-id="'+_bwEsc(s.id)+'" onclick="openBwSite(this.dataset.bwId)">'
          + '<div class="bw-card-top">'
          +   '<div class="bw-card-head">'
-         +     '<div class="bw-card-name">'+_bwEsc(s.name)+'</div>'
-         +     (pills ? '<div class="bw-card-eras">'+pills+'</div>' : '')
+         +     '<div class="bw-card-eyebrow">'+_bwEsc(s.name)+'</div>'
+         +     '<div class="bw-card-name">'+_bwEsc(s.tagline || s.name)+'</div>'
          +   '</div>'
          +   photo
          + '</div>'
-         + '<div class="bw-card-tagline">'+_bwEsc(s.tagline || '')+'</div>'
+         + (preview ? '<div class="bw-card-desc">'+_bwEsc(preview)+' <span class="bw-card-more">Read more →</span></div>' : '')
+         + '<div class="bw-card-rule" aria-hidden="true"></div>'
          + '<div class="bw-card-foot">'
-         +   refPill
-         +   '<span class="bw-card-cta">Explore →</span>'
+         +   (eraLabel ? '<span class="bw-card-era-label">'+_bwEsc(eraLabel)+'</span>' : '<span></span>')
+         +   ref
          + '</div>'
          + '</button>';
   }).join('');
@@ -8243,26 +8310,13 @@ function _bwRenderGrid(){
 
 function bwFilter(eraId, btn){
   _bwEra = eraId;
-  document.querySelectorAll('#bwFilters .bw-chip').forEach(c => {
-    c.classList.remove('active');
-    c.style.background = '';
-    c.style.borderColor = '';
-    c.style.color = '';
-  });
-  if(btn){
-    btn.classList.add('active');
-    if(eraId === 'all'){
-      btn.style.background = 'var(--cd-banner)';
-      btn.style.color = 'var(--cd-banner-text)';
-      btn.style.borderColor = 'transparent';
-    } else {
-      const p = _bwPeriodById(eraId);
-      const c = p ? p.color : '#38bdf8';
-      btn.style.background = c;
-      btn.style.color = '#0b1220';
-      btn.style.borderColor = 'transparent';
-    }
-  }
+  // Uniform gold active state (CSS-driven via .active — no more inline
+  // per-era colored background/text; era filtering shows/hides pins and
+  // cards, it no longer recolors anything).
+  document.querySelectorAll('#bwFilters .arch-era-item').forEach(c => c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const descEl = document.getElementById('bwEraDesc');
+  if(descEl) descEl.textContent = _archGroupRange(eraId);
   _bwRenderMarkers();
   _bwRenderGrid();
 }
