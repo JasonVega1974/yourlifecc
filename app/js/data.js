@@ -512,6 +512,14 @@ const DEF = {
   // is the multi-select from step 3 — used by goal-suggest, content
   // personalization, and future home-screen curation.
   onboardingDone:false, onboardingInterests:[],
+  // 2026-07-07 — faith-only 3-screen wizard (onboard.html, standalone
+  // page, no sync.js loaded there). Written directly into the shared
+  // localStorage blob on wizard completion; must exist here for
+  // loadData() to restore it. Distinct from onboardingDone (the
+  // unrelated interest-picker overlay above) and from the in-app "Well
+  // Onboarding" overlay (profiles.well_onboarded, Supabase-only, not
+  // mirrored into D) — three separate onboarding flags, don't conflate.
+  onboarding_complete:false,
   bannerMode:'scroll',
   // ── Email Engagement Bundle (PR 0, 2026-06-08) ──────────────
   // Per-user opt-ins, send-stamps, and counters for three email
