@@ -5008,7 +5008,7 @@ async function renderPrayerWallPane(){
     if(supa){
       const { data, error } = await supa
         .from('prayer_requests')
-        .select('id, text, category, created_at')
+        .select('id, text, category, created_at, user_id')
         .eq('privacy', 'community')
         .order('created_at', { ascending: false })
         .limit(60);
@@ -5031,15 +5031,22 @@ async function renderPrayerWallPane(){
     yourself:'#a78bfa', 'the-world':'#06b6d4',
     self:'#a78bfa', friend:'#38bdf8', world:'#06b6d4', general:'#fbbf24',
   };
+  // Own-vs-others distinction: prayer_requests has no name/email column
+  // (just a bare user_id FK — nothing PII-bearing to leak), so "own" is
+  // determined purely by comparing row.user_id to the signed-in user's id.
+  // Never render user_id itself — it's read only for this comparison.
+  const myUid = (typeof _supaUser !== 'undefined' && _supaUser && _supaUser.id) || null;
   el.innerHTML = rows.map((r, i) => {
     const color = catColor[r.category] || '#fbbf24';
     const stamp = _prRelativeTime(r.created_at);
     const localPrayedKey = 'ylcc_prayed_' + r.id;
     const alreadyPrayed = typeof localStorage !== 'undefined' && localStorage.getItem(localPrayedKey);
-    return `<div class="pr-wall-card" style="--pr-wall-color:${color};animation-delay:${(i * 60)}ms;">
+    const isOwn = !!(myUid && r.user_id === myUid);
+    return `<div class="pr-wall-card${isOwn ? ' pr-wall-card--own' : ''}" style="--pr-wall-color:${color};animation-delay:${(i * 60)}ms;">
       <span class="pr-wall-card-cat">${escapeHtml(r.category || 'prayer')}</span>
+      ${isOwn ? '<span class="pr-wall-card-you">YOU</span>' : ''}
       <div class="pr-wall-card-text">${escapeHtml(r.text || '')}</div>
-      <div class="pr-wall-card-meta">— Anonymous · ${stamp}</div>
+      <div class="pr-wall-card-meta">— ${isOwn ? 'You' : 'A fellow believer'} · ${stamp}</div>
       <div class="pr-wall-card-actions">
         <button class="pr-praying-btn ${alreadyPrayed ? 'tapped' : ''}" data-pr-wall="${escapeHtml(r.id)}" onclick="prWallPrayed('${escapeHtml(r.id)}',this)">
           <span>🙏</span><span class="pr-praying-label">${alreadyPrayed ? 'Prayed' : 'Praying'}</span>

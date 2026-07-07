@@ -12326,6 +12326,22 @@
         animation:prWallIn .55s ease both;
       }
       @keyframes prWallIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+      /* 2026-07-07 — own-vs-others distinction on the shared wall. The
+         existing --pr-wall-color left accent is CATEGORY color, so
+         ownership needs its own signal: a brighter gold ring + a "YOU"
+         chip, layered on top of the same cream paper-card look (this
+         card family has no :root.light variant by design — it always
+         reads as a lifted paper card, in both app themes). */
+      #bf-prayer .pr-wall-card--own{
+        border-color:#d97706;
+        box-shadow:0 14px 36px rgba(0,0,0,.55),0 4px 10px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.7),0 0 0 2px rgba(217,119,6,.35);
+      }
+      #bf-prayer .pr-wall-card-you{
+        float:right;
+        font-size:.62rem;font-weight:800;letter-spacing:.1em;
+        color:#3a2818;background:#d97706;
+        padding:.16rem .5rem;border-radius:99px;
+      }
       #bf-prayer .pr-wall-card-cat{
         display:inline-block;
         font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
