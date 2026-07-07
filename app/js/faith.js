@@ -8128,6 +8128,22 @@ function _bwInitMap(){
     maxZoom: 18,
     subdomains: 'abcd',
   }).addTo(_bwMap);
+  // 2026-07-07 — #bwMap already has an explicit CSS height and is
+  // display:block before this runs (confirmed: bfTab()'s panel-display
+  // toggle at faith.js:840-842 fires synchronously before renderBibleWorld()
+  // is called), so a hidden-container-at-init bug doesn't apply here. This
+  // is still cheap, standard-practice insurance against the broader "tiles
+  // fetch 200 but don't visually resolve" symptom class: Leaflet caches the
+  // container size at construction time, and anything that nudges that
+  // size afterward (a CSS transition still settling, a webfont reflow, a
+  // parent layout shift) leaves the tile grid stale until told to
+  // recompute. Double rAF defers past both the current paint and the next
+  // one, which is enough for any in-flight layout to settle first.
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      if(_bwMap) _bwMap.invalidateSize();
+    });
+  });
 }
 
 function _bwRenderMarkers(){
