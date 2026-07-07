@@ -59,6 +59,40 @@
 
   function _host(){ return _activeHostId ? document.getElementById(_activeHostId) : null; }
 
+  // The outer "go back" control for whichever shell My Walk is hosted in
+  // right now — #fzDest's ".fz-back-btn" (fzOpenDest path) or
+  // #ccWalkOverlay's "#ccWalkHomeBtn" (ccOpenWalk path). Scoped by walking
+  // up from the live host each call — no persistent flag to leak if the
+  // surface closes mid-spoke, unlike a body-level class would.
+  function _outerBackBtn(host){
+    if(!host || !host.closest) return null;
+    var fzDest = host.closest('#fzDest');
+    if(fzDest){ var b = fzDest.querySelector('.fz-back-btn'); if(b) return b; }
+    var ccOv = host.closest('#ccWalkOverlay');
+    if(ccOv){ var b2 = ccOv.querySelector('#ccWalkHomeBtn'); if(b2) return b2; }
+    return null;
+  }
+
+  // Hide the outer back control ONLY while Tab 2 is active AND a spoke is
+  // open — that's the one state with a real double-back-affordance (outer
+  // "Home" pill + the spoke's own "← My Faith Life" pill). Recomputed from
+  // live DOM state (not a transition flag) so it's correct no matter how
+  // the user got here — tapped the spoke's own back pill, or switched tabs
+  // directly while a spoke was open.
+  function _syncOuterBack(host){
+    var ob = _outerBackBtn(host);
+    if(!ob) return;
+    var pane = host.querySelector('.mw-pane[data-mw-pane="faith"]');
+    var spokeOpen = false;
+    if(pane && pane.style.display !== 'none'){
+      var spokes = pane.querySelectorAll('.mw-spoke');
+      for(var i=0;i<spokes.length;i++){
+        if(spokes[i].style.display !== 'none'){ spokeOpen = true; break; }
+      }
+    }
+    ob.style.display = spokeOpen ? 'none' : '';
+  }
+
   // ── entry ────────────────────────────────────────────────
   function renderMyWalkTabs(hostId, opts){
     opts = opts || {};
@@ -138,6 +172,7 @@
     }
     var se = _scrollEl(host);
     if(se) se.scrollTop = _scrollMem[tab] || 0;
+    _syncOuterBack(host);
   }
 
   // ── Tab 2: My Faith Life hub-and-spoke ─────────────────────
@@ -220,7 +255,7 @@
         '<button type="button" class="mw-back" onclick="mwBackToHub()">← My Faith Life</button>'+
         '<div style="display:flex;align-items:center;gap:.5rem;margin:0 0 .55rem;">'+
           '<span class="bf-sub-eye" style="font-family:var(--fm);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:#fbbf24;opacity:.85;font-weight:700;">📝 Sermon Notes</span>'+
-          '<button onclick="openSermonNote()" style="margin-left:auto;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0d1a;border:none;border-radius:99px;padding:.4rem .85rem;font-size:.72rem;font-weight:900;letter-spacing:.04em;cursor:pointer;font-family:var(--fm);box-shadow:0 4px 14px rgba(251,191,36,.32);">+ New Sermon</button>'+
+          '<button onclick="openSermonNote()" style="margin-left:auto;min-height:44px;display:inline-flex;align-items:center;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0d1a;border:none;border-radius:99px;padding:.4rem .85rem;font-size:.72rem;font-weight:900;letter-spacing:.04em;cursor:pointer;font-family:var(--fm);box-shadow:0 4px 14px rgba(251,191,36,.32);">+ New Sermon</button>'+
         '</div>'+
         '<div id="sermonNotesList" style="margin-bottom:1rem;"></div>'+
       '</div>'+
@@ -251,6 +286,7 @@
     for(var i=0;i<spokes.length;i++) spokes[i].style.display = 'none';
     var hub = pane.querySelector('#mwHub');
     if(hub) hub.style.display = '';
+    _syncOuterBack(host);
   }
 
   function mwOpenSpoke(name){
@@ -286,6 +322,7 @@
     try{ var b = opened && opened.querySelector('.mw-back'); if(b && b.focus) b.focus({ preventScroll:true }); }catch(_e){}
     var se = _scrollEl(host);
     if(se) se.scrollTop = 0;
+    _syncOuterBack(host);
   }
 
   // ── CSS (inject once) — same visual recipe as the retired .fjh-* cards ──
@@ -295,11 +332,15 @@
     _cssDone = true;
     var css =
     '.mw-tabs{ display:flex; gap:.4rem; margin:0 0 1rem; border-bottom:1px solid rgba(245,180,49,.16); }'+
-    '.mw-tab{ flex:1; text-align:center; background:none; border:none; border-bottom:2px solid transparent; padding:.7rem .5rem; font:600 .82rem/1 Oswald,sans-serif; letter-spacing:.03em; color:rgba(233,236,246,.5); cursor:pointer; }'+
+    '.mw-tab{ flex:1; display:flex; align-items:center; justify-content:center; min-height:44px; text-align:center; background:none; border:none; border-bottom:2px solid transparent; padding:.5rem; font:600 .82rem/1 Oswald,sans-serif; letter-spacing:.03em; color:rgba(233,236,246,.5); cursor:pointer; }'+
     '.mw-tab.active{ color:#efe7d4; border-bottom-color:#f5b431; }'+
     '.mw-tab:focus-visible{ outline:2px solid #f5b431; outline-offset:-2px; }'+
-    '.mw-grid{ display:grid; grid-template-columns:1fr; gap:.85rem; margin-top:.4rem; }'+
-    '@media(min-width:480px){ .mw-grid{ grid-template-columns:1fr 1fr; } }'+
+    /* Component owns its own width regardless of host — #fzDest has no
+       max-width of its own (unlike #ccWalkOverlay's 560px content wrap),
+       so without this the same card grid reads two different ways
+       depending on which entry point opened My Walk. */
+    '.mw-grid{ display:grid; grid-template-columns:1fr; gap:.85rem; margin-top:.4rem; max-width:560px; margin-left:auto; margin-right:auto; }'+
+    '@media(min-width:480px){ .mw-grid{ grid-template-columns:1fr 1fr; gap:1.5rem; } }'+
     '.mw-card{ display:flex; flex-direction:column; width:100%; text-align:left; font-family:inherit; padding:0; overflow:hidden; cursor:pointer; border-radius:20px; background:linear-gradient(158deg,rgba(30,39,64,.92),rgba(15,21,40,.92)); border:1px solid rgba(245,180,49,.16); box-shadow:0 8px 22px rgba(0,0,0,.35); transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease; }'+
     '.mw-card:hover{ transform:translateY(-2px); border-color:rgba(245,180,49,.4); box-shadow:0 12px 26px rgba(0,0,0,.4); }'+
     '.mw-card:focus-visible{ outline:2px solid #f5b431; outline-offset:2px; }'+
@@ -309,7 +350,7 @@
     '.mw-shade{ position:absolute; left:0; right:0; bottom:0; height:58%; background:linear-gradient(180deg,rgba(10,15,31,0),rgba(10,15,31,.82)); pointer-events:none; }'+
     '.mw-title{ font:700 14.5px/1.15 Oswald,sans-serif; letter-spacing:.03em; color:#efe7d4; padding:12px 14px 4px; }'+
     '.mw-sub{ font:italic 400 12px/1.4 Newsreader,serif; color:#9aa2ba; padding:0 14px 13px; }'+
-    '.mw-back{ display:inline-flex; align-items:center; gap:.4rem; margin:0 0 .9rem; padding:.5rem .9rem; border:1px solid rgba(245,180,49,.4); border-radius:99px; background:rgba(245,180,49,.1); color:#f5b431; font:600 .8rem/1 Oswald,sans-serif; letter-spacing:.04em; cursor:pointer; }'+
+    '.mw-back{ display:inline-flex; align-items:center; justify-content:center; min-height:44px; gap:.4rem; margin:0 0 .9rem; padding:.5rem .9rem; border:1px solid rgba(245,180,49,.4); border-radius:99px; background:rgba(245,180,49,.1); color:#f5b431; font:600 .8rem/1 Oswald,sans-serif; letter-spacing:.04em; cursor:pointer; }'+
     '.mw-back:hover{ background:rgba(245,180,49,.18); }'+
     '.mw-back:focus-visible{ outline:2px solid #f5b431; outline-offset:2px; }'+
     '@media (prefers-reduced-motion: reduce){ .mw-card{ transition:none; } .mw-card:hover{ transform:none; } }'+
@@ -323,7 +364,12 @@
     ':root.light .mw-title{ color:#1a1233; }'+
     ':root.light .mw-sub{ color:#57534e; }'+
     ':root.light .mw-back{ color:#b45309; border-color:rgba(180,83,9,.4); background:rgba(180,83,9,.08); }'+
-    ':root.light .mw-back:hover{ background:rgba(180,83,9,.14); }';
+    ':root.light .mw-back:hover{ background:rgba(180,83,9,.14); }'+
+    // Re-scoped from the retired app/css/app.css:7753 rule
+    // (":root.light #bf-journey .bf-sub-eye"), which lost its target when
+    // this markup moved out of #bf-journey — gold #fbbf24 on paper is a
+    // real contrast failure, not just a style nit.
+    ':root.light .mw-spoke .bf-sub-eye{ color:#92400e; }';
     var st = document.createElement('style');
     st.id = 'mw-tabs-css';
     st.textContent = css;
