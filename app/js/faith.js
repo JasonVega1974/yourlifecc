@@ -880,7 +880,7 @@ function bfTab(tab, btn){
   if(typeof window.fvInject==='function'){
     try{
       if(tab==='jesus')               window.fvInject('faith:jesus', 'bf-jesus', 'append');
-      else if(tab==='prayer')         window.fvInject('faith:prayer', 'bf-prayer', 'append');
+      else if(tab==='prayer')         window.fvInject('faith:prayer', 'prWatchHost', 'append');
       else if(tab==='bible')          window.fvInject('faith:bible', 'bf-bible', 'append');
       else if(tab==='proofProphecy')  window.fvInject('faith:proof', 'bf-proofProphecy', 'append');
     }catch(_e){}
