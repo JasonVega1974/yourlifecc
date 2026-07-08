@@ -187,6 +187,20 @@
   //   favVerseInput, favVersesList, sermonNotesList,
   //   fjDonationsContainer, fjDisciplinesContainer, fzGrowthFull
   function _faithHubHtml(){
+    // Admin photo override — read window.CARD_PHOTO_OVERRIDES at render
+    // time and bake the src into the initial markup, matching the
+    // established pattern for other dynamically-rendered hubs (Parent
+    // Hub's .phc-card, app/js/parent.js:3249-3257). This hub is built
+    // fresh via innerHTML every time My Walk opens, well after app boot —
+    // loadCardPhotoOverrides() (ui.js) has exactly one call site
+    // (init.js:744, boot-time only) and its DOM-patch step
+    // (querySelectorAll('img[data-card-id=...]')) only touches elements
+    // that already exist in the DOM at that moment. These cards don't
+    // exist yet at boot, so that patch never reaches them — the fix is
+    // for THIS render to read the (already-fetched, cached-on-window)
+    // override map itself, not to wait for or re-trigger the fetch.
+    const photoMap = (typeof window !== 'undefined' && window.CARD_PHOTO_OVERRIDES) || {};
+    const mflSrc = function(id){ var u = photoMap[id]; return u ? ' src="'+u+'"' : ''; };
     return ''+
       '<div id="mwHub">'+
         '<div class="bf-section-hdr">'+
@@ -196,32 +210,32 @@
         '</div>'+
         '<div class="mw-grid">'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'profile\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">👤</div><img class="mw-img" data-card-id="mfl-profile" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">👤</div><img class="mw-img" data-card-id="mfl-profile"'+mflSrc('mfl-profile')+' loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">MY FAITH PROFILE</div>'+
             '<div class="mw-sub">Your identity, spiritual milestones, and the moments that mattered.</div>'+
           '</button>'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'giving\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">💝</div><img class="mw-img" data-card-id="mfl-giving" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">💝</div><img class="mw-img" data-card-id="mfl-giving"'+mflSrc('mfl-giving')+' loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">GIVING</div>'+
             '<div class="mw-sub">Track your generosity over time.</div>'+
           '</button>'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'verses\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">💎</div><img class="mw-img" data-card-id="mfl-verses" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">💎</div><img class="mw-img" data-card-id="mfl-verses"'+mflSrc('mfl-verses')+' loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">MY VERSES</div>'+
             '<div class="mw-sub">Verses worth keeping close.</div>'+
           '</button>'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'sermon\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">📝</div><img class="mw-img" data-card-id="mfl-sermon" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">📝</div><img class="mw-img" data-card-id="mfl-sermon"'+mflSrc('mfl-sermon')+' loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">SERMON NOTES</div>'+
             '<div class="mw-sub">Capture what you heard on Sunday.</div>'+
           '</button>'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'disciplines\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">🔥</div><img class="mw-img" data-card-id="mfl-disciplines" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">🔥</div><img class="mw-img" data-card-id="mfl-disciplines"'+mflSrc('mfl-disciplines')+' loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">SPIRITUAL DISCIPLINES</div>'+
             '<div class="mw-sub">Build rhythms that grow your faith.</div>'+
           '</button>'+
           '<button type="button" class="mw-card" onclick="mwOpenSpoke(\'growth\')">'+
-            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">📊</div><img class="mw-img" data-card-id="mfl-growth" loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
+            '<div class="mw-hero"><div class="mw-ph" aria-hidden="true">📊</div><img class="mw-img" data-card-id="mfl-growth"'+mflSrc('mfl-growth')+' loading="lazy" alt="" onerror="this.style.display=\'none\'"><div class="mw-shade" aria-hidden="true"></div></div>'+
             '<div class="mw-title">GROWTH PROFILE</div>'+
             '<div class="mw-sub">See who you\'re becoming — all 7 traits.</div>'+
           '</button>'+
