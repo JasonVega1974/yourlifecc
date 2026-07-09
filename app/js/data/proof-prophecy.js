@@ -1,10 +1,16 @@
 /* =============================================================
-   proof-prophecy.js — 116 apologetics proof entries
+   proof-prophecy.js — 117 apologetics proof entries
    7 categories: archaeology (20), prophecy (20), manuscripts (15),
-   witnesses (15), science (21), resurrection (15), philosophy (10)
+   witnesses (15), science (22), resurrection (15), philosophy (10)
    2026-07-08 — +7 apologetics deep-dives: Kalam, 2nd law/entropy,
    Cambrian explosion, irreducible complexity, math effectiveness,
    consciousness (hard problem), time/space/matter (Gen 1:1).
+   2026-07-09 — +1 (evolution: the limits of the evidence) and a
+   `voice` field on the 11 apologetics entries (named authority —
+   Turek, Craig, Behe, Chalmers, Meyer, Rees, Hoyle, Collins, Wigner,
+   Lewis, Eddington) surfaced as a "Key voice" chip in the modal.
+   Schema: { id, category, title, year, eyebrow, voice?, summary,
+            scripture, source, impactScore, image, detail }
    Schema: { id, category, title, year, eyebrow, summary, scripture,
             source, impactScore, image, detail }
 ============================================================= */
@@ -2147,6 +2153,7 @@ The disciples did not gradually reorganize Jewish expectation. They asserted a r
     title: 'The Law Above the Laws',
     year: 1946,
     eyebrow: 'PHILOSOPHY \u00b7 THE MORAL ARGUMENT \u00b7 NUREMBERG, 1946',
+    voice: 'C.S. Lewis \u00b7 Oxford & Cambridge scholar',
     summary: 'At Nuremberg, Nazi defendants argued they had obeyed their own country\u2019s laws. The court convicted them anyway \u2014 by appealing to a law above nations that every human is expected to know. The moral argument asks the obvious question: whose law is that?',
     scripture: 'Romans 2:14-15; Micah 6:8; Psalm 19:7-9',
     source: 'C.S. Lewis, "Mere Christianity" Book I (1952); the Nuremberg Trials record (1945-46); William Lane Craig & J.P. Moreland, "Philosophical Foundations for a Christian Worldview" (2003)',
@@ -2232,6 +2239,7 @@ The disciples did not gradually reorganize Jewish expectation. They asserted a r
     title: 'The Knife-Edge Universe',
     year: 1999,
     eyebrow: 'COSMOLOGY · THE FINE-TUNED CONSTANTS · REES, 1999',
+    voice: 'Sir Martin Rees · Astronomer Royal (& Sir Fred Hoyle)',
     summary: `The universe runs on a handful of numbers — the strength of gravity, the charge of the electron, the cosmological constant — and if almost any of them were different by a hair: no stars, no chemistry, no life. The atheist astronomers who discovered this are the ones who called it a problem.`,
     scripture: 'Psalm 19:1; Isaiah 45:18; Job 38:4-7',
     source: `Martin Rees, "Just Six Numbers" (1999); Fred Hoyle, "The Universe: Past and Present Reflections," Annual Review of Astronomy & Astrophysics (1982); Roger Penrose, "The Emperor's New Mind" (1989); Luke Barnes & Geraint Lewis, "A Fortunate Universe" (2016)`,
@@ -2253,6 +2261,7 @@ Three thousand years before anyone measured a constant, the psalmist wrote that 
     title: 'The Library in Every Cell',
     year: 1953,
     eyebrow: 'MOLECULAR BIOLOGY · THE INFORMATION PROBLEM · DNA, 1953',
+    voice: 'Dr. Francis Collins · director, Human Genome Project',
     summary: `DNA is not LIKE a code — it is one: a four-letter alphabet storing assembly instructions, read by molecular machines, complete with error correction. In all of human experience, coded information has exactly one known source. The question is whether biology is the lone exception.`,
     scripture: 'Psalm 139:13-16; Genesis 2:7; John 1:1-3',
     source: `James Watson & Francis Crick, Nature 171 (1953); Francis Collins, "The Language of God" (2006); Bill Gates, "The Road Ahead" (1995); Leslie Orgel, "Prebiotic Chemistry and the Origin of the RNA World," Critical Reviews in Biochemistry (2004)`,
@@ -2284,6 +2293,7 @@ The psalmist, with no microscope, wrote: "You knit me together in my mother's wo
     title: 'Whatever Begins to Exist',
     year: 2003,
     eyebrow: 'PHILOSOPHY · THE KALAM ARGUMENT · BORDE-GUTH-VILENKIN, 2003',
+    voice: 'Dr. William Lane Craig · philosopher',
     summary: `Two premises a child can follow: whatever begins to exist has a cause, and the universe began to exist. The conclusion is unavoidable — the universe has a cause. The interesting part is what kind of cause the logic forces: spaceless, timeless, immaterial, and personal.`,
     scripture: 'Genesis 1:1; John 1:3; Hebrews 3:4; Psalm 90:2',
     source: `William Lane Craig, "The Kalam Cosmological Argument" (1979); Arvind Borde, Alan Guth & Alexander Vilenkin, "Inflationary Spacetimes Are Incomplete in Past Directions," Physical Review Letters 90 (2003); Alexander Vilenkin, "Many Worlds in One" (2006)`,
@@ -2305,6 +2315,7 @@ The Bible never argues the point; it assumes it. "In the beginning, God created 
     title: 'The Universe Is Running Down',
     year: 1850,
     eyebrow: 'PHYSICS · THE SECOND LAW OF THERMODYNAMICS · CLAUSIUS, 1850',
+    voice: 'Sir Arthur Eddington · astrophysicist',
     summary: `Everything winds down: heat spreads, order decays, stars burn out. The universe is spending a finite battery of usable energy and can never recharge it. A machine still running but running down cannot have been running forever — it had to be wound up, and wound up in a state of staggering order.`,
     scripture: 'Isaiah 51:6; Psalm 102:25-27; Hebrews 1:10-11; Romans 8:20-21',
     source: `Rudolf Clausius (1850, 1865); Arthur Eddington, "The Nature of the Physical World" (1928); Roger Penrose, "The Emperor's New Mind" (1989); Sean Carroll, "From Eternity to Here" (2010)`,
@@ -2326,6 +2337,7 @@ Isaiah saw the direction three thousand years ago: "the heavens will vanish like
     title: 'The Explosion in the Rocks',
     year: 1909,
     eyebrow: `PALEONTOLOGY · THE CAMBRIAN "BIG BANG OF BIOLOGY" · BURGESS SHALE, 1909`,
+    voice: 'Dr. Stephen C. Meyer · philosopher of science',
     summary: `In a geological blink, almost every major animal body plan appears in the fossil record — abruptly, fully formed, without the long chain of gradual ancestors Darwin's theory predicted. Darwin himself called it a serious objection. A century of digging has sharpened the puzzle, not solved it.`,
     scripture: 'Genesis 1:20-21; Psalm 104:24-25; Job 12:7-9',
     source: `Charles Darwin, "On the Origin of Species," ch. 10 (1859); Charles Walcott, Burgess Shale discovery (1909); Stephen Jay Gould, "Wonderful Life" (1989); J.Y. Chen et al., Chengjiang fauna reports (1990s-2000s); Stephen Meyer, "Darwin's Doubt" (2013)`,
@@ -2347,6 +2359,7 @@ The first chapter of Genesis describes life appearing not by slow accumulation b
     title: 'The Machine That Needs All Its Parts',
     year: 1996,
     eyebrow: 'BIOCHEMISTRY · IRREDUCIBLE COMPLEXITY · BEHE, 1996',
+    voice: 'Dr. Michael Behe · biochemist, Lehigh University',
     summary: `Some molecular machines only work when every part is present — remove one and the whole thing fails, so there is no useful "halfway" version for natural selection to build on. The bacterial flagellum, a rotary outboard motor inside a living cell, is the famous test case, and the debate over it is still live.`,
     scripture: 'Psalm 139:14; Genesis 1:31; Romans 1:20',
     source: `Michael Behe, "Darwin's Black Box" (1996) and "Darwin Devolves" (2019); Kenneth Miller, "Finding Darwin's God" (1999); the Kitzmiller v. Dover trial record (2005)`,
@@ -2368,6 +2381,7 @@ Scripture's response to the intricacy is not an argument but awe: "I praise you,
     title: 'The Language the Universe Obeys',
     year: 1960,
     eyebrow: 'PHILOSOPHY OF SCIENCE · THE UNREASONABLE EFFECTIVENESS OF MATHEMATICS · WIGNER, 1960',
+    voice: 'Eugene Wigner · Nobel laureate in physics',
     summary: `Mathematics is invented in the quiet of the human mind — and then, decades later, turns out to describe how galaxies move and particles behave, to absurd precision. Why should abstract thought map reality at all? The physicist who named the puzzle called it a gift we neither understand nor deserve.`,
     scripture: 'Proverbs 8:22-30; Colossians 1:16-17; Job 38:33; Jeremiah 33:25',
     source: `Eugene Wigner, "The Unreasonable Effectiveness of Mathematics in the Natural Sciences," Communications in Pure and Applied Mathematics 13 (1960); Galileo Galilei, "Il Saggiatore" (1623); Paul Dirac (1931); Albert Einstein, letters (1936)`,
@@ -2389,6 +2403,7 @@ The Bible personifies exactly this ordering wisdom present at creation: "When he
     title: 'The Ghost the Atoms Can’t Explain',
     year: 1995,
     eyebrow: 'PHILOSOPHY OF MIND · THE HARD PROBLEM OF CONSCIOUSNESS · CHALMERS, 1995',
+    voice: 'Dr. David Chalmers · philosopher of mind (& Thomas Nagel)',
     summary: `Science can map every neuron firing when you see red — and still not explain why there is something it is LIKE to see red at all. That inner light of first-person experience is the one thing physics has never reduced to physics. Even atheist philosophers admit it may not fit the materialist story.`,
     scripture: 'Genesis 2:7; Genesis 1:27; Job 32:8; Zechariah 12:1',
     source: `David Chalmers, "Facing Up to the Problem of Consciousness" (1995) and "The Conscious Mind" (1996); Thomas Nagel, "What Is It Like to Be a Bat?" (1974) and "Mind and Cosmos" (2012); Frank Jackson, "Epiphenomenal Qualia" (1982)`,
@@ -2410,6 +2425,7 @@ Genesis locates the difference at the source: "the LORD God formed the man of du
     title: 'Ten Words That Got the Physics Right',
     year: -1400,
     eyebrow: 'COSMOLOGY · TIME, SPACE & MATTER · GENESIS 1:1',
+    voice: 'Dr. Frank Turek · apologist, “I Don’t Have Enough Faith to Be an Atheist”',
     summary: `Modern physics says time, space, and matter are a bound trio that must begin together — you cannot have one without the others. The Bible's opening sentence names all three, in order, in ten words, millennia before Einstein: "In the beginning" (time), "God created the heavens" (space), "and the earth" (matter).`,
     scripture: 'Genesis 1:1; John 1:1-3; Hebrews 11:3; 2 Timothy 1:9',
     source: `Albert Einstein, general relativity (1915); Stephen Hawking & George Ellis, "The Large Scale Structure of Space-Time" (1973); Henry Morris, "The Genesis Record" (1976); Hugh Ross, "The Creator and the Cosmos" (1993)`,
@@ -2424,6 +2440,28 @@ This reframes the "who made God?" question completely. Everything INSIDE the pac
 The apologist Frank Turek puts the same logic in the plain two-step of the Kalam: everything that BEGINS to exist has a cause; the universe began to exist; so the universe has a cause — spaceless, timeless, immaterial, powerful, and personal enough to choose to create. God did not begin to exist, so God needs no cause. The honest question was never "who made God?" It's whether an eternal, uncreated Someone exists at all — and time, space, and matter all pointing back to a single beginning is a heavy thumb on the scale.
 
 Scripture says it flatly and repeatedly: "Before the mountains were brought forth, or ever you had formed the earth and the world, from everlasting to everlasting you are God" (Psalm 90:2). "By faith we understand that the universe was created by the word of God, so that what is seen was not made out of things that are visible" (Hebrews 11:3). The One who made time lives outside it — "from everlasting to everlasting" — which is precisely why the question stops with Him.`
+  },
+  {
+    id: 'sci-evolution-questions',
+    category: 'science',
+    title: 'What the Theory Can’t Show You',
+    year: 1859,
+    eyebrow: 'BIOLOGY · THE LIMITS OF THE EVIDENCE · DARWIN, 1859',
+    voice: 'Dr. Stephen C. Meyer · philosopher of science',
+    summary: `Two very different claims travel under one word. Small-scale change — finch beaks, drug-resistant germs — is observed, tested, and beyond dispute. But "every living thing from one ancestor by that same slow process" is an inference about an unrepeatable, unwitnessed past — and the fossils and the lab have never actually shown it happening.`,
+    scripture: 'Genesis 1:24-25; Job 12:7-10; Romans 1:20',
+    source: `Charles Darwin, "On the Origin of Species," ch. 6 & 10 (1859); Stephen Jay Gould & Niles Eldredge, "Punctuated Equilibria" (1972); Stephen Jay Gould, "Evolution's Erratic Pace," Natural History (1977); Michael Denton, "Evolution: A Theory in Crisis" (1985); Stephen C. Meyer, "Darwin's Doubt" (2013)`,
+    impactScore: 8,
+    image: '',
+    detail: `Start by separating two claims the word "evolution" quietly bundles together, because almost every argument about it is really an argument about which one you mean. The first is small-scale change — variation, natural selection, adaptation within a kind of creature. Finches grow thicker beaks in a drought; bacteria evolve resistance to an antibiotic; dog breeders reshape a wolf into a Chihuahua. This is observed, repeatable, and not in dispute — a Christian has no reason to deny a word of it. The second claim is far larger: that this same mechanism, given enough time, turned a single ancient cell into every fern, fish, finch, and philosopher that has ever lived, one slight step at a time. That is universal common descent, and it is a claim about the deep, unrepeatable past — not something anyone has watched happen or reproduced.
+
+Which raises the honest point behind the tired slogan "it's only a theory." In science, "theory" doesn't mean a hunch — it means a broad explanatory framework, and that's a fair correction to make. But there's a real distinction the slogan is fumbling toward: the difference between OPERATIONAL science (repeatable experiments you can run today — how a wing generates lift, how a cell divides) and ORIGINS science (reconstructing a one-time past you cannot rerun — how the first wing or the first cell came to be). The grand story of large-scale evolution belongs to the second kind. Nobody observed it; no experiment reproduces it; it is inferred from present-day clues about a vanished past. That doesn't make the inference worthless — but it makes it an inference, held with less certainty than a repeatable measurement, and it is fair to say so out loud.
+
+Then there are the fossils, where Darwin was more candid than his defenders often are. His theory required "innumerable transitional forms" — the rocks should be crowded with the in-between creatures. Their scarcity he called, in his own words, "the most obvious and gravest objection which can be urged against my theory." A century and a half of collecting has not produced the smooth, gradual ramp he pictured. What dominates instead is sudden appearance and then long stasis — species showing up abruptly, staying essentially unchanged, and vanishing. Stephen Jay Gould, no creationist, admitted this "extreme rarity of transitional forms" is "the trade secret of paleontology," and he and Niles Eldredge proposed "punctuated equilibrium" precisely to explain a fossil record that looks jumpy, not gradual. Be fair: genuine transitional fossils do exist (Tiktaalik, Archaeopteryx, the whale series), and punctuated equilibrium is a mainstream repair, not a surrender. But the tidy gradualism most people picture is not what the rocks plainly show.
+
+The laboratory tells the same cautious story. We have bred fruit flies for over a century and mutated them every way imaginable; we have watched E. coli through tens of thousands of generations in Richard Lenski's famous ongoing experiment. The result is impressive adaptation — and still fruit flies, still E. coli. We observe change WITHIN limits; we do not observe one kind of organism building the genuinely new organs and body plans of another. The leap from the small-scale change we can see to the large-scale transformation we cannot is exactly the step that is extrapolated rather than demonstrated — assumed to keep going forever because it goes a little way.
+
+None of this "disproves evolution," and honesty forbids pretending it does — most biologists accept common descent, and a thoughtful Christian can hold several views of how God made living things. The point is smaller and sturdier: much of the grand narrative is historical inference about an unwitnessed, unrepeatable past, not settled observation, and it deserves to be held with that humility rather than announced as closed fact. Scripture's refrain in Genesis 1 — living things reproducing "according to their kinds" (Genesis 1:24-25) — reads as a claim about real boundaries in the living world, boundaries the evidence has not clearly erased. The design you see in a living cell remains a live inference, not a defeated one. Ask the questions out loud; they are better questions than you've been told.`
   }
 ];
 

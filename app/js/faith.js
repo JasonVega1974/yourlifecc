@@ -10243,6 +10243,15 @@ function ppOpenModal(id){
       + '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.72rem;color:' + accent + ';text-transform:uppercase;letter-spacing:.2em;font-weight:800;margin-bottom:.85rem;">'
       +   _ppEsc(catLabel) + ' <span style="color:var(--tx3);">·</span> ' + 'IMPACT ' + impact + '/10' + yearBit
       + '</div>'
+      // Named-authority byline — only when the entry carries a `voice`
+      // (the apologetics deep-dives do). Makes "who says this" prominent
+      // instead of buried in the Source line at the bottom.
+      + (proof.voice
+          ? '<div style="display:inline-flex;align-items:center;gap:.5rem;background:' + soft + '0.1);border:1px solid ' + accent + '55;border-radius:999px;padding:.35rem .8rem .35rem .55rem;margin-bottom:1rem;font-family:var(--fm);font-size:.74rem;color:var(--tx2);line-height:1.3;">'
+              + '<span style="font-family:\'Bebas Neue\',var(--fm);font-weight:800;color:' + accent + ';letter-spacing:.14em;text-transform:uppercase;font-size:.6rem;flex-shrink:0;">Key voice</span>'
+              + '<span>' + _ppEsc(proof.voice) + '</span>'
+            + '</div>'
+          : '')
       + '<div style="margin-bottom:1rem;">' + paras + '</div>'
       + (proof.scripture
           ? '<div style="background:' + soft + '0.08);border-left:3px solid ' + accent + ';border-radius:0 10px 10px 0;padding:.85rem 1rem;margin-bottom:1rem;">'
