@@ -1,7 +1,10 @@
 /* =============================================================
-   proof-prophecy.js — 109 apologetics proof entries
+   proof-prophecy.js — 116 apologetics proof entries
    7 categories: archaeology (20), prophecy (20), manuscripts (15),
-   witnesses (15), science (17), resurrection (15), philosophy (7)
+   witnesses (15), science (21), resurrection (15), philosophy (10)
+   2026-07-08 — +7 apologetics deep-dives: Kalam, 2nd law/entropy,
+   Cambrian explosion, irreducible complexity, math effectiveness,
+   consciousness (hard problem), time/space/matter (Gen 1:1).
    Schema: { id, category, title, year, eyebrow, summary, scripture,
             source, impactScore, image, detail }
 ============================================================= */
@@ -2264,6 +2267,163 @@ Be honest about what this is not: it is not "science can't explain it, therefore
 It is worth knowing who says otherwise from inside the lab. Francis Collins directed the Human Genome Project — he led the team that read all three billion letters — and titled his memoir "The Language of God," writing that the genome is "God's instruction book" and that his work felt like "a glimpse of the mind of God." The man who read the library concluded there was a Librarian. That settles nothing by authority — but it retires the claim that no serious scientist can look at DNA and see design.
 
 The psalmist, with no microscope, wrote: "You knit me together in my mother's womb... all the days ordained for me were written in your book before one of them came to be" (Psalm 139:13-16). Written. Ordained. A book. Three thousand years later, we opened the cell and found the writing.`
+  },
+  // ════════════════════════════════════════════════════════════
+  // APOLOGETICS DEEP-DIVES (7) — 2026-07-08 install. The classic
+  // arguments a teen actually meets online: Kalam, entropy/2nd law,
+  // the Cambrian explosion, irreducible complexity, the unreasonable
+  // effectiveness of mathematics, the hard problem of consciousness,
+  // and the Genesis 1:1 time/space/matter reading. Authored in-session
+  // in the philosophy-batch register — flagged for editorial review.
+  // image:'' by design — styled placeholder, no hotlinked stock.
+  // Cross-linked from Man's Questions "Go deeper" doors.
+  // ════════════════════════════════════════════════════════════
+  {
+    id: 'phil-kalam-cosmological',
+    category: 'philosophy',
+    title: 'Whatever Begins to Exist',
+    year: 2003,
+    eyebrow: 'PHILOSOPHY · THE KALAM ARGUMENT · BORDE-GUTH-VILENKIN, 2003',
+    summary: `Two premises a child can follow: whatever begins to exist has a cause, and the universe began to exist. The conclusion is unavoidable — the universe has a cause. The interesting part is what kind of cause the logic forces: spaceless, timeless, immaterial, and personal.`,
+    scripture: 'Genesis 1:1; John 1:3; Hebrews 3:4; Psalm 90:2',
+    source: `William Lane Craig, "The Kalam Cosmological Argument" (1979); Arvind Borde, Alan Guth & Alexander Vilenkin, "Inflationary Spacetimes Are Incomplete in Past Directions," Physical Review Letters 90 (2003); Alexander Vilenkin, "Many Worlds in One" (2006)`,
+    impactScore: 9,
+    image: '',
+    detail: `The argument is ancient — medieval Muslim philosophers called it kalam — but William Lane Craig sharpened it in 1979 into two premises and a conclusion so tight that most of the last forty years' debate has been about the premises, not the logic. Premise one: whatever begins to exist has a cause. Premise two: the universe began to exist. Therefore the universe has a cause. If both premises are more plausibly true than false, the conclusion follows by simple deduction.
+
+Premise one is about as safe as any claim in philosophy. Things don't pop into being uncaused, out of nothing, for no reason — not tigers, not galaxies, not a single atom of experience anywhere in human history. The person who wants to escape the argument usually attacks here, but notice the cost: they must claim the entire universe came from literally nothing, with no cause at all — a bigger act of faith than any theist makes. As one philosopher put it, that's not science, it's magic without a magician.
+
+Premise two used to be the disputed one — until the science caught up with Genesis. The universe once looked eternal; the Big Bang model (galaxies flying apart, cosmic background radiation, the expansion mapped back to a beginning) planted a finite starting line. The last escape route was some past-eternal inflating multiverse. In 2003 Arvind Borde, Alan Guth, and Alexander Vilenkin closed it: any universe that has, on average, been expanding cannot be infinite in the past — it too must have a beginning. Vilenkin, who is not a believer, wrote the sentence plainly: "cosmologists can no longer hide behind a past-eternal universe. There is no escape: they have to face the problem of a cosmic beginning."
+
+Now run what the cause has to be. It made time, so it is timeless. It made space, so it is spaceless. It made matter, so it is immaterial. It must be unimaginably powerful. And here is the subtle move: how do you get a temporal effect — a universe with a first moment — from a cause that exists changelessly outside time? The most coherent answer is a WILL: an agent who can choose to bring about a new effect without any prior change, the way a person decides. Spaceless, timeless, immaterial, powerful, personal. The argument doesn't hand you the whole Trinity. But it hands you Someone that looks nothing like the blind universe and a great deal like the God of Genesis 1:1.
+
+The Bible never argues the point; it assumes it. "In the beginning, God created the heavens and the earth." Not "in the beginning was matter." The first four words already place God before time, and the Kalam is simply the long philosophical footnote a curious mind can now check for itself.`
+  },
+  {
+    id: 'sci-second-law-entropy',
+    category: 'science',
+    title: 'The Universe Is Running Down',
+    year: 1850,
+    eyebrow: 'PHYSICS · THE SECOND LAW OF THERMODYNAMICS · CLAUSIUS, 1850',
+    summary: `Everything winds down: heat spreads, order decays, stars burn out. The universe is spending a finite battery of usable energy and can never recharge it. A machine still running but running down cannot have been running forever — it had to be wound up, and wound up in a state of staggering order.`,
+    scripture: 'Isaiah 51:6; Psalm 102:25-27; Hebrews 1:10-11; Romans 8:20-21',
+    source: `Rudolf Clausius (1850, 1865); Arthur Eddington, "The Nature of the Physical World" (1928); Roger Penrose, "The Emperor's New Mind" (1989); Sean Carroll, "From Eternity to Here" (2010)`,
+    impactScore: 8,
+    image: '',
+    detail: `The second law of thermodynamics is the most quietly certain law in physics. Arthur Eddington said it best: if your theory contradicts the second law, "there is nothing for it but to collapse in deepest humiliation." Rudolf Clausius stated it in 1850 and coined the word "entropy" — the measure of unusable, dispersed energy — in 1865. His two sentences summarizing the cosmos are still on the wall of physics: the energy of the universe is constant; the entropy of the universe tends toward a maximum. Translation: the total amount of energy stays the same, but the amount you can actually USE runs steadily, irreversibly downhill.
+
+You watch this every day. Hot coffee cools; it never spontaneously reheats. Buildings crumble; rubble never reassembles into buildings. Stars fuse their fuel and die; the ash never re-lights itself. Left alone, everything moves from order toward disorder, from concentrated energy toward useless sameness. Physicists call the endpoint "heat death" — a cold, uniform, feature-less universe where nothing can happen because there are no differences left to drive anything.
+
+Here is the argument hiding in the physics. If the universe had already existed for infinite time, it would have hit heat death an infinity ago — the battery would be flat, the coffee stone cold, the stars long dark. But the stars are still burning; usable energy still remains. A car with fuel still in the tank has not been driving forever. The universe is a machine still running and demonstrably running DOWN — which means it was, at some finite point in the past, wound UP. Something started it, fully charged.
+
+And it started in a state of almost unbelievable order. Roger Penrose calculated the precision of the universe's low-entropy beginning at one part in 10^(10^123) — the most fine-tuned initial condition in all of science. Entropy has been climbing ever since, which means it began at the bottom of the hill, wound to a maximum of usable order that everything since has been spending. Low entropy is exactly what you cannot get by accident; it is the fingerprint of a setup.
+
+Isaiah saw the direction three thousand years ago: "the heavens will vanish like smoke, the earth will wear out like a garment" (Isaiah 51:6). The psalmist told God, "they will all wear out like a garment... but you remain the same" (Psalm 102:26-27). A wearing-out universe points past itself to One who does not wear out — the winder of the spring, who "in the beginning laid the foundations of the earth."`
+  },
+  {
+    id: 'sci-cambrian-explosion',
+    category: 'science',
+    title: 'The Explosion in the Rocks',
+    year: 1909,
+    eyebrow: `PALEONTOLOGY · THE CAMBRIAN "BIG BANG OF BIOLOGY" · BURGESS SHALE, 1909`,
+    summary: `In a geological blink, almost every major animal body plan appears in the fossil record — abruptly, fully formed, without the long chain of gradual ancestors Darwin's theory predicted. Darwin himself called it a serious objection. A century of digging has sharpened the puzzle, not solved it.`,
+    scripture: 'Genesis 1:20-21; Psalm 104:24-25; Job 12:7-9',
+    source: `Charles Darwin, "On the Origin of Species," ch. 10 (1859); Charles Walcott, Burgess Shale discovery (1909); Stephen Jay Gould, "Wonderful Life" (1989); J.Y. Chen et al., Chengjiang fauna reports (1990s-2000s); Stephen Meyer, "Darwin's Doubt" (2013)`,
+    impactScore: 8,
+    image: '',
+    detail: `Roughly 540 million years ago, in what geologists call the Cambrian, the fossil record does something it is not supposed to do. In a window paleontologists once put at 5-10 million years — a heartbeat in geological time — the majority of the major animal body plans (the "phyla": arthropods, mollusks, chordates, and more) appear, abruptly, already complex, already equipped with eyes, guts, limbs, and nervous systems. Beneath that layer: mostly microbes and a few enigmatic soft blobs. Above it: the animal kingdom, essentially all at once. Scientists nickname it the "Cambrian explosion" or the "biological Big Bang."
+
+The honest man who first flagged the problem was Darwin. In On the Origin of Species he admitted the sudden appearance of whole animal groups "may be truly urged as a valid argument against" his theory, because his mechanism required "numerous, successive, slight modifications" over vast time. He bet that the missing ancestors would turn up as paleontology matured — a fair scientific promissory note. The Burgess Shale (1909) and later the exquisitely preserved Chengjiang beds in China let us cash it in. The result surprised almost everyone: the lower we dug, the more the explosion held. The gradual pre-Cambrian lineages Darwin needed largely aren't there; the phyla still appear near the bottom, near-simultaneously.
+
+Take the mainstream responses seriously, because the science is genuinely debated. The window may be somewhat longer than the old "5 million years." Soft-bodied ancestors may have left few fossils. Molecular-clock estimates push some divergences earlier. Developmental-gene toolkits (Hox genes) may have enabled rapid diversification. These are real proposals — and notice what none of them has yet produced: a fossil series showing the step-by-step assembly of these body plans from simpler ones. The explosion has been described, dated, and studied to death; it has not been dissolved into a gradual ramp.
+
+The deeper problem is not just TIME but INFORMATION. A new body plan isn't a tweak to an existing animal; it requires new organs, new cell types, and above all vast quantities of new genetic information, expressed in the right sequence during early development — precisely where mutations are most often lethal. Building the arthropod or the chordate from scratch is an information problem, and the Cambrian gives you very little runway to solve it by trial and error.
+
+The first chapter of Genesis describes life appearing not by slow accumulation but by command, in bursts, "according to their kinds": "Let the waters swarm with swarms of living creatures" (Genesis 1:20). One does not have to force the rocks to fit the text to notice the shape they share — sudden, abundant, kind after kind. The Cambrian doesn't prove Genesis. It does embarrass the confident story that everything crept in by imperceptible degrees, and it invites the older question back to the table: where did all that information come from, that fast?`
+  },
+  {
+    id: 'sci-irreducible-complexity',
+    category: 'science',
+    title: 'The Machine That Needs All Its Parts',
+    year: 1996,
+    eyebrow: 'BIOCHEMISTRY · IRREDUCIBLE COMPLEXITY · BEHE, 1996',
+    summary: `Some molecular machines only work when every part is present — remove one and the whole thing fails, so there is no useful "halfway" version for natural selection to build on. The bacterial flagellum, a rotary outboard motor inside a living cell, is the famous test case, and the debate over it is still live.`,
+    scripture: 'Psalm 139:14; Genesis 1:31; Romans 1:20',
+    source: `Michael Behe, "Darwin's Black Box" (1996) and "Darwin Devolves" (2019); Kenneth Miller, "Finding Darwin's God" (1999); the Kitzmiller v. Dover trial record (2005)`,
+    impactScore: 7,
+    image: '',
+    detail: `Michael Behe, a biochemist at Lehigh University, coined "irreducible complexity" in his 1996 book Darwin's Black Box. His illustration was homely: a mousetrap. It needs a base, a spring, a hammer, a catch, and a hold-down bar — all at once. Remove any one and you don't get a trap that works worse; you get a trap that doesn't work at all. Such a system can't be built by adding one useful piece at a time, because none of the intermediate stages does the job. Darwinian evolution advances by keeping small improvements that help RIGHT NOW — so a machine with no functional halfway point is a genuine problem for it.
+
+Behe argued the cell is full of such machines, and his star witness is the bacterial flagellum: a literal rotary motor. It has a drive shaft, a rotor, a stator, bushings, a universal joint, and a whip-like propeller, spinning at up to 100,000 rpm and reversing direction in a quarter-turn. It is assembled from around forty precisely coordinated protein parts; knock out the genes for the key components and the motor doesn't limp — it doesn't run. Cell biologists themselves, with no theological motive, routinely describe these systems in the language of engineering: motors, pumps, turbines, transport trucks, proofreading machines.
+
+Now the honest other side, because this one has been fought hard in public. Behe's critics — Kenneth Miller, a Christian biologist, chief among them — argue the flagellum is NOT a dead end: a subset of its proteins forms the "Type III secretion system," a working molecular syringe some bacteria use to inject toxins. If part of the machine has a different function on its own, then selection could have co-opted and recombined pre-existing parts ("exaptation") rather than needing the whole motor at once. Behe answers that borrowing a few parts is a long way from explaining the coordinated assembly, regulation, and remaining components of the full motor. The argument was central at the 2005 Dover trial, where the court ruled against teaching intelligent design in public-school science class — a legal verdict about a policy, worth knowing, but not itself a refutation of the biochemistry.
+
+So hold it honestly: irreducible complexity is a serious, contested argument, not a knockout proof, and its strongest form is a challenge — SHOW the plausible, step-by-step, function-at-every-stage Darwinian path for these machines. For the hardest cases, that path has been asserted more often than it has been demonstrated. What is not in dispute is the sheer machine-like sophistication inside every living cell, which even Darwin's defenders describe in an engineer's vocabulary.
+
+Scripture's response to the intricacy is not an argument but awe: "I praise you, for I am fearfully and wonderfully made" (Psalm 139:14). Paul wrote that God's "invisible attributes... have been clearly perceived, ever since the creation of the world, in the things that have been made" (Romans 1:20). You can debate the mechanism honestly and still find it hard, standing over a rotary motor forty parts strong inside a germ, to call it an accident.`
+  },
+  {
+    id: 'phil-math-effectiveness',
+    category: 'philosophy',
+    title: 'The Language the Universe Obeys',
+    year: 1960,
+    eyebrow: 'PHILOSOPHY OF SCIENCE · THE UNREASONABLE EFFECTIVENESS OF MATHEMATICS · WIGNER, 1960',
+    summary: `Mathematics is invented in the quiet of the human mind — and then, decades later, turns out to describe how galaxies move and particles behave, to absurd precision. Why should abstract thought map reality at all? The physicist who named the puzzle called it a gift we neither understand nor deserve.`,
+    scripture: 'Proverbs 8:22-30; Colossians 1:16-17; Job 38:33; Jeremiah 33:25',
+    source: `Eugene Wigner, "The Unreasonable Effectiveness of Mathematics in the Natural Sciences," Communications in Pure and Applied Mathematics 13 (1960); Galileo Galilei, "Il Saggiatore" (1623); Paul Dirac (1931); Albert Einstein, letters (1936)`,
+    impactScore: 7,
+    image: '',
+    detail: `In 1960 Eugene Wigner, a Nobel-winning physicist, published an essay with a title that has haunted the field ever since: "The Unreasonable Effectiveness of Mathematics in the Natural Sciences." His point was not that math is useful — everyone knows that. His point was that its usefulness is bizarre and unexplained. Mathematicians chase abstract patterns for their own beauty, with no thought of the physical world. Then, again and again, physicists reach for exactly that abstract structure and find the universe was running on it all along. Wigner called it "a wonderful gift which we neither understand nor deserve."
+
+The examples are stranger than fiction. Non-Euclidean geometry was pure mathematical play in the 1800s — until Einstein needed precisely that geometry to describe gravity as curved spacetime. Paul Dirac wrote down an equation for the electron in 1928 purely to make the math consistent, and the equation insisted there must be antimatter — a substance no one had seen; it was discovered four years later. Complex numbers, imaginary and "unreal," turned out to be the native language of quantum mechanics. Time after time, the universe's deepest behavior was already written in a mathematical grammar that human minds had discovered in the abstract, sometimes centuries early.
+
+Why should this be? There is no reason to EXPECT it. A cosmos that was just churning atoms owes us no elegance. It could have been a lawless mess, or lawful in ways too ugly and irregular for any equation to catch. Instead, from Galileo — "the book of nature is written in the language of mathematics" — to today's physicists hunting for ever more beautiful unifying equations, the universe keeps turning out to be not just orderly but MATHEMATICALLY orderly, rational to its roots, and rational in a way that a mind can read. Einstein, no orthodox believer, said the one incomprehensible thing about the universe is that it is comprehensible.
+
+The naturalist can shrug and call it a lucky brute fact, or hope evolution tuned our brains to reality (though evolution tunes for survival on the savanna, not for grasping quantum field theory or black-hole thermodynamics, which help no ancestor eat or escape). Each response is available; each also concedes how odd the situation is. The theist has a cleaner account: the universe is mathematical because it is the product of a rational Mind, and our minds can read that math because they are made in the image of that Mind. Two rationalities match because they share a source.
+
+The Bible personifies exactly this ordering wisdom present at creation: "When he established the heavens, I was there... when he marked out the foundations of the earth, then I was beside him, like a master workman" (Proverbs 8:27-30). Paul says of Christ that "in him all things hold together" (Colossians 1:17) — the cohering logic under the equations. The deep readability of the cosmos is not proof. But a rational universe legible to rational minds is precisely what you'd expect if a Logos wrote it, and a genuine surprise if no one did.`
+  },
+  {
+    id: 'phil-consciousness',
+    category: 'philosophy',
+    title: 'The Ghost the Atoms Can’t Explain',
+    year: 1995,
+    eyebrow: 'PHILOSOPHY OF MIND · THE HARD PROBLEM OF CONSCIOUSNESS · CHALMERS, 1995',
+    summary: `Science can map every neuron firing when you see red — and still not explain why there is something it is LIKE to see red at all. That inner light of first-person experience is the one thing physics has never reduced to physics. Even atheist philosophers admit it may not fit the materialist story.`,
+    scripture: 'Genesis 2:7; Genesis 1:27; Job 32:8; Zechariah 12:1',
+    source: `David Chalmers, "Facing Up to the Problem of Consciousness" (1995) and "The Conscious Mind" (1996); Thomas Nagel, "What Is It Like to Be a Bat?" (1974) and "Mind and Cosmos" (2012); Frank Jackson, "Epiphenomenal Qualia" (1982)`,
+    impactScore: 8,
+    image: '',
+    detail: `In 1995 the philosopher David Chalmers drew a line that reorganized the whole field. The "easy" problems of the mind — how the brain processes signals, stores memories, controls behavior — are hard engineering, but they're the kind of thing neuroscience knows how to chip at. The "HARD problem" is different in kind: why is any of that processing accompanied by INNER EXPERIENCE? Why is there something it is like, from the inside, to taste coffee, feel pain, or see the particular redness of red? A camera detects wavelengths and reacts; it doesn't (we assume) experience anything. Your brain detects wavelengths — and the lights are on inside. Where does the felt quality come from?
+
+Thomas Nagel framed it unforgettably in 1974: "What Is It Like to Be a Bat?" You could know every fact about a bat's echolocating brain — every neuron, every chemical — and still not know what it is LIKE to be the bat, to experience sonar from the inside. Frank Jackson sharpened it with Mary, a scientist who knows every physical fact about color while living in a black-and-white room; the day she steps out and sees red for the first time, she plainly learns something new. But if she already knew ALL the physical facts, then the new thing — the experience itself — is a fact that isn't physical. Consciousness looks like something over and above the atoms.
+
+This is not a religious argument being smuggled in; the sharpest voices raising it are atheists. Nagel, an avowed atheist, wrote a 2012 book — Mind and Cosmos — whose subtitle says it all: "Why the Materialist Neo-Darwinian Conception of Nature Is Almost Certainly False." His reason was consciousness: he could not see how mere matter in motion, however arranged, ever adds up to a subject who experiences. Chalmers, also no theist, takes the problem so seriously he floats treating consciousness as a fundamental feature of reality, not something you build out of physics. When atheist philosophers start saying the physical story might be incomplete, the problem is not Christian wishful thinking.
+
+The reductionist has answers — maybe consciousness just IS certain brain processes (but that renames the mystery rather than solving it); maybe it's an illusion (but the one thing you cannot be wrong that you're HAVING is an experience — doubting it is an experience). These moves are live options, and honest people hold them. What none of them has done is bridge the gap Chalmers named: from objective, third-person physics to subjective, first-person feel. That gap has stood for thirty years against the full weight of neuroscience.
+
+Genesis locates the difference at the source: "the LORD God formed the man of dust from the ground, and breathed into his nostrils the breath of life, and the man became a living soul" (Genesis 2:7). Dust plus breath — matter, and something more, given from outside it. "The Spirit of God has made me," said Job's friend, "and the breath of the Almighty gives me life" (Job 33:4). You are not merely a very good computer made of meat. The inner light no instrument can find is exactly what you'd expect if a conscious God breathed something of Himself into the dust — and exactly what the atoms, on their own, were never going to explain.`
+  },
+  {
+    id: 'sci-time-space-matter',
+    category: 'science',
+    title: 'Ten Words That Got the Physics Right',
+    year: -1400,
+    eyebrow: 'COSMOLOGY · TIME, SPACE & MATTER · GENESIS 1:1',
+    summary: `Modern physics says time, space, and matter are a bound trio that must begin together — you cannot have one without the others. The Bible's opening sentence names all three, in order, in ten words, millennia before Einstein: "In the beginning" (time), "God created the heavens" (space), "and the earth" (matter).`,
+    scripture: 'Genesis 1:1; John 1:1-3; Hebrews 11:3; 2 Timothy 1:9',
+    source: `Albert Einstein, general relativity (1915); Stephen Hawking & George Ellis, "The Large Scale Structure of Space-Time" (1973); Henry Morris, "The Genesis Record" (1976); Hugh Ross, "The Creator and the Cosmos" (1993)`,
+    impactScore: 8,
+    image: '',
+    detail: `Here is a question that sounds like a child's and stumps a lot of adults: "If God made everything, who made God?" The Christian answer isn't a dodge; it's a point about categories, and modern physics is what makes it clear. Time, space, and matter form a single package. Einstein's relativity fused space and time into one fabric — spacetime — and tied it to matter and energy so tightly that you cannot pull one thread out. Ask the package apart and it collapses into nonsense: if there were matter but no space, WHERE would you put it? If there were matter and space but no time, WHEN would it exist? They cannot come one at a time. They begin together or not at all — and cosmology says they began, in a finite past, at the beginning of the universe.
+
+Now read the first sentence of the Bible with that in hand. "In the beginning" — there is TIME, a starting line. "God created the heavens" — there is SPACE, the expanse. "And the earth" — there is MATTER, the stuff. Ten words in Hebrew, and they name the exact trio physics says must arrive together, in the exact order a beginning requires: time, then the space it unfolds in, then the matter that fills it. Whoever wrote Genesis 1:1 — by the traditional dating, well over three thousand years ago — had no telescope, no field equations, no notion of spacetime. The sentence had no business being that precise.
+
+This reframes the "who made God?" question completely. Everything INSIDE the package — every begin-to-exist thing — needs a cause, because it had a beginning. But the CAUSE of time, space, and matter cannot itself be made of time, space, or matter, or it would be part of the thing it explains and need a maker of its own. The cause must be OUTSIDE the package: timeless, therefore without a beginning; spaceless; immaterial. Asking "who created the eternal, uncreated cause of time?" is like asking what is north of the North Pole. It isn't a deep question science hasn't answered yet; it's a category mistake. By definition, the uncaused first cause is the one thing that doesn't get made.
+
+The apologist Frank Turek puts the same logic in the plain two-step of the Kalam: everything that BEGINS to exist has a cause; the universe began to exist; so the universe has a cause — spaceless, timeless, immaterial, powerful, and personal enough to choose to create. God did not begin to exist, so God needs no cause. The honest question was never "who made God?" It's whether an eternal, uncreated Someone exists at all — and time, space, and matter all pointing back to a single beginning is a heavy thumb on the scale.
+
+Scripture says it flatly and repeatedly: "Before the mountains were brought forth, or ever you had formed the earth and the world, from everlasting to everlasting you are God" (Psalm 90:2). "By faith we understand that the universe was created by the word of God, so that what is seen was not made out of things that are visible" (Hebrews 11:3). The One who made time lives outside it — "from everlasting to everlasting" — which is precisely why the question stops with Him.`
   }
 ];
 

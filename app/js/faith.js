@@ -10849,9 +10849,21 @@ function mjOpenQuestions(){
       '</div>' +
     '</div>';
   }).join('');
+  // Footer door → the fuller "Man's Questions, God's Answers" surface
+  // (35+ questions, the Top 10, stat graphs). Only shown when that surface
+  // is actually available — honest null, no dead link. fzOpenDest handles
+  // the takeover (hides Meet Jesus, opens the questions dest).
+  var moreDoor = '';
+  if(typeof window.renderMansQuestions === 'function' && typeof fzOpenDest === 'function'){
+    moreDoor =
+      '<button type="button" class="jq-more" onclick="fzOpenDest(\'questions\')">' +
+        '<span class="jq-more-txt">More honest questions</span>' +
+        '<span class="jq-more-sub">Man’s Questions, God’s Answers &mdash; the Top 10 &amp; more</span>' +
+      '</button>';
+  }
   host.innerHTML =
     '<button type="button" class="mj-back" onclick="_mjRenderLanding()">&larr; Meet Jesus</button>' +
-    '<div class="jq-list">' + items + '</div>';
+    '<div class="jq-list">' + items + '</div>' + moreDoor;
 }
 // Single-open: opening one closes the others (Growth Profile
 // accordion precedent — no FAQ-pamphlet chrome, no badges).

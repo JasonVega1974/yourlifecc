@@ -10661,8 +10661,8 @@
          (bfTab for in-tab panels; showSection for standalone sections like
          CLG / Flashcards / Worship). -->
     <div class="topic-card-grid" style="margin-bottom:1.1rem;">
-      <div class="topic-card accent-violet" onclick="bfTab('jesus')">
-        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(167,139,250,.22));"><img class="topic-card-hero" data-card-id="bf-jesus" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Bloch-SermonOnTheMount.jpg/1280px-Bloch-SermonOnTheMount.jpg" alt="Who Is Jesus?"></div>
+      <div class="topic-card accent-gold" onclick="bfTab('jesus')">
+        <div class="topic-card-hero-wrap" style="background:linear-gradient(135deg,rgba(251,191,36,.16));"><img class="topic-card-hero" data-card-id="bf-jesus" loading="lazy" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Bloch-SermonOnTheMount.jpg/1280px-Bloch-SermonOnTheMount.jpg" alt="Who Is Jesus?"></div>
         <div class="topic-card-title">Who Is Jesus?</div>
         <div class="topic-card-desc">Life · teachings · red-letter words</div>
       </div>
@@ -11225,9 +11225,20 @@
         font-family:var(--fm); font-size:.78rem; font-weight:700;
       }
       #jesusMeetHost .jq-deeper:hover{ background:rgba(159,18,57,.08); }
+      /* Footer door → Man's Questions, God's Answers (gold register — it
+         leads to the gold surface, not the wine red-letter reader). */
+      #jesusMeetHost .jq-more{
+        display:flex; flex-direction:column; gap:.2rem; text-align:left; width:100%;
+        margin-top:1rem; padding:.9rem 1.05rem; min-height:44px; cursor:pointer;
+        background:var(--card-bg); border:1px solid rgba(251,191,36,.28);
+        border-left:3px solid #fbbf24; border-radius:14px; color:var(--tx); font-family:var(--fm);
+      }
+      #jesusMeetHost .jq-more:hover{ border-color:rgba(251,191,36,.5); background:rgba(251,191,36,.06); }
+      #jesusMeetHost .jq-more-txt{ font-size:.9rem; font-weight:800; }
+      #jesusMeetHost .jq-more-sub{ font-size:.76rem; color:var(--tx2); line-height:1.4; }
       #jesusMeetHost .mj-door:focus-visible, #jesusMeetHost .mj-back:focus-visible,
       #jesusMeetHost .jw-nav-btn:focus-visible, #jesusMeetHost .jq-q:focus-visible,
-      #jesusMeetHost .jq-deeper:focus-visible{ outline:2px solid #fbbf24; outline-offset:2px; }
+      #jesusMeetHost .jq-deeper:focus-visible, #jesusMeetHost .jq-more:focus-visible{ outline:2px solid #fbbf24; outline-offset:2px; }
       /* Light mode — paper surfaces; the hero stays its warm-dark
          scene-lite self (text-hero precedent); wine holds on white. */
       :root.light #jesusMeetHost .mj-door{ background:#ffffff; border-color:rgba(15,23,42,.10); }
@@ -11237,6 +11248,8 @@
       :root.light #jesusMeetHost .jw-nav-btn{ background:#ffffff; border-color:rgba(15,23,42,.12); }
       :root.light #jesusMeetHost .jq-item{ background:#ffffff; border-color:rgba(15,23,42,.10); }
       :root.light #jesusMeetHost .jq-ref{ color:#92400e; }
+      :root.light #jesusMeetHost .jq-more{ background:#ffffff; border-color:rgba(180,83,9,.3); border-left-color:#b45309; }
+      :root.light #jesusMeetHost .jq-more:hover{ background:rgba(180,83,9,.06); border-color:rgba(180,83,9,.5); }
       :root.light #jesusMeetHost .mj-hero-ref{ color:rgba(251,191,36,.8); }
 
       /* ── The Story — scrollytelling (2026-07-05) ─────────────────
@@ -11262,16 +11275,19 @@
           radial-gradient(1px 1px at 68% 14%, rgba(251,191,36,.5), transparent 60%),
           radial-gradient(1px 1px at 84% 42%, rgba(255,247,224,.4), transparent 60%),
           radial-gradient(1.2px 1.2px at 40% 56%, rgba(251,191,36,.35), transparent 60%),
-          linear-gradient(180deg,#090d1f 0%,#10122b 55%,#191534 100%);
+          linear-gradient(180deg,#090d1f 0%,#0e1428 55%,#141c38 100%);
         background-size:280px 240px,340px 300px,300px 260px,380px 320px,cover;
         background-repeat:repeat,repeat,repeat,repeat,no-repeat;
       }
-      /* Ch2 Hidden Years — night easing to pre-dawn indigo. */
+      /* Ch2 Hidden Years — night easing to pre-dawn steel blue.
+         2026-07-08 — retinted off the violet-indigo stops (#1a1738/
+         #241d40 read as a purple box on open) onto the deep-navy
+         register the Journey Home scene already owns. */
       .jsy-bg2{
         background-image:
           radial-gradient(1px 1px at 30% 30%, rgba(255,247,224,.3), transparent 60%),
           radial-gradient(1px 1px at 75% 55%, rgba(251,191,36,.22), transparent 60%),
-          linear-gradient(180deg,#10122b 0%,#1a1738 55%,#241d40 100%);
+          linear-gradient(180deg,#0e1428 0%,#16203c 55%,#1c2846 100%);
         background-size:320px 280px,360px 300px,cover;
         background-repeat:repeat,repeat,no-repeat;
       }
@@ -11296,7 +11312,7 @@
       .jsy-bg6{ background:linear-gradient(180deg,#241c14 0%,#1a140f 60%,#120e0b 100%); }
       /* Ch7 Risen — pre-dawn base; .jsy-dawn floods warm gold up from
          the bottom edge on first entry. */
-      .jsy-bg7{ background:linear-gradient(180deg,#191534 0%,#241d40 45%,#3a2a14 100%); }
+      .jsy-bg7{ background:linear-gradient(180deg,#141c38 0%,#1c2846 45%,#3a2a14 100%); }
       /* The Cross veil — quantized stops (no per-pixel banding); the
          .92 ceiling over #120e0b keeps a discernible silhouette, never
          a true full black (reverence, not horror). Floor #050508. */

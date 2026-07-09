@@ -11,8 +11,15 @@
 //
 // Shape consumed by mans-questions-ui.js:
 //   MQ_CATEGORIES:  { id, label, icon, sub }
-//   MANS_QUESTIONS: { id, category, question, hook, answer[], scriptures[{ref,text}], goDeeper? }
+//   MANS_QUESTIONS: { id, category, question, hook, answer[], scriptures[{ref,text}], goDeeper?, top10?, charts? }
 //   goDeeper (optional): 'dest:proof' | 'dest:walk' | 'dest:jesus' | 'dest:mystery'
+//     or 'proof:<id>' to open a specific Proofs & Prophecy entry (honest-null if absent).
+//   top10 (optional): 1-10 — the ten most-asked questions get a numbered
+//     "THE TOP 10" tier at the top of the list, ordered by this rank.
+//   charts (optional): visual data blocks rendered under the answer.
+//     Each: { kind:'facts', title, cells:[{big,label}] }
+//         | { kind:'bars',  title, note?, bars:[{label,display,value,max}] }
+//         | { kind:'gauge', title, pct, note? }
 
 const MQ_CATEGORIES = [
   { id:'is-it-true',  label:'Is It Even True?',          icon:'🔍', sub:'The evidence, the resurrection, and whether any of it holds up.' },
@@ -23,8 +30,29 @@ const MQ_CATEGORIES = [
 const MANS_QUESTIONS = [
   // ── IS IT EVEN TRUE? ────────────────────────────────────
   {
+    id:'who-created-god',
+    category:'is-it-true',
+    top10:1,
+    question:'If God created man, who created God?',
+    hook:'The question assumes the wrong kind of God.',
+    answer:[
+      "Your question — \"Who created God?\" — quietly assumes you're thinking of the wrong God. The God of the Bible is not affected by time, space, or matter. If He were affected by them, He wouldn't be God; He'd be one more thing inside the universe that needs explaining.",
+      "And here's the part most people miss: time, space, and matter must have come into existence together. If there were matter but no space, where would you put it? If there were matter and space but no time, when would you put it? They all had to begin at once. The Bible answers this in its first ten words: \"In the beginning\" (time), \"God created the heavens\" (space), \"and the earth\" (matter).",
+      "So the reasoning goes: time began with \"In the beginning.\" Space is \"the heavens.\" Matter is \"the earth.\" Because God created time, space, and matter, He must exist outside of them — which means He never had a beginning the way created things do. Asking \"Who created God?\" is really asking \"Who created the One who created time?\" If He stands outside of time, He doesn't experience a start or a stop at all.",
+      "The philosopher Frank Turek puts the same point in plain logic: if space, time, and matter had a beginning, then their cause must be spaceless, timeless, and immaterial — powerful enough to create a universe, and personal enough to choose to. That matches exactly what Scripture already says: \"Before the mountains were born or You brought forth the earth and the world, from everlasting to everlasting, You are God\" (Psalm 90:2).",
+      "A simple way to hold it: everything that BEGINS to exist has a cause. The universe began to exist, so it has a cause. But God did not begin to exist. If He made time itself, He can't be trapped inside it. So the real question was never \"Who created God?\" — it's whether an eternal, uncreated cause exists at all. Christianity's answer is yes, and His name is God.",
+    ],
+    scriptures:[
+      { ref:'Genesis 1:1', text:"In the beginning, God created the heavens and the earth." },
+      { ref:'Psalm 90:2', text:"Before the mountains were brought forth, or ever you had formed the earth and the world, from everlasting to everlasting you are God." },
+      { ref:'Revelation 1:8', text:"“I am the Alpha and the Omega,” says the Lord God, “who is and who was and who is to come, the Almighty.”" },
+    ],
+    goDeeper:'proof:sci-time-space-matter',
+  },
+  {
     id:'does-god-exist',
     category:'is-it-true',
+    top10:3,
     question:'Is there actually any reason to believe God exists?',
     hook:'Not blind faith — reasons.',
     answer:[
@@ -55,17 +83,34 @@ const MANS_QUESTIONS = [
   {
     id:'bible-reliable',
     category:'is-it-true',
-    question:"Hasn't the Bible been copied and changed so many times we can't trust it?",
-    hook:'Telephone, or transmission?',
+    top10:10,
+    question:'How can I know the Bible is actually true?',
+    hook:'Unity, manuscripts, and what the numbers really mean.',
     answer:[
-      "This assumes a game of telephone — one line of whispers drifting over centuries. That's not how it worked. There are thousands of ancient manuscript copies, from many places and dates, and scholars compare them to reconstruct the original with remarkable confidence. When copies disagree, it's usually spelling or word order, not the message.",
-      "You don't have to take that on faith either — it's the ordinary work of textual scholarship, the same discipline applied to any ancient text, and the Bible is by far the best-attested of them all.",
+      "Start with something people rarely stop to notice: the Bible wasn't written like a normal book. It was written over roughly 1,500 years, by about 40 different authors — kings, shepherds, fishermen, prophets, a physician, a tax collector — on three continents (Asia, Africa, Europe), in three languages (Hebrew, Aramaic, Greek). Most of them never met. And yet it tells one unified story: God's plan to rescue humanity through Jesus of Nazareth. That kind of unity across that much distance is, at minimum, worth explaining. Christians have long argued it points to one Author behind the many.",
+      "Then there's the \"copied and changed\" worry — the game-of-telephone assumption. That's not how it worked. There are over 5,800 Greek New Testament manuscripts, and when you add the ancient translations into Latin, Coptic, Syriac and others, more than 24,000 manuscripts and portions survive. Scholars compare them to reconstruct the original wording with very high confidence — often summarized as about 99.5% textual reliability. Almost all the differences are spelling, word order, or copyist slips, and none of them unsettle a core Christian belief.",
+      "Be precise about what that 99.5% means, because it gets misused: it's about TEXTUAL RECONSTRUCTION — how confidently we can recover what was originally written — not \"95% of the Bible has been historically proven.\" Those are different claims, and honesty matters here.",
+      "On top of the text sits the archaeology. Real people, cities, and events keep turning up in the ground — Pontius Pilate, King David (named on the Tel Dan Stele), Jerusalem, Jericho, Nazareth, Capernaum. Archaeology has corroborated many of the Bible's historical details, though of course not every event can be independently dug up. Add the fulfilled prophecies Christians point to in Jesus' life, death, and resurrection, and you get a book that keeps inviting investigation rather than fearing it.",
+      "Put simply: the Bible was written over 1,500 years by around 40 authors on three continents in three languages, and still tells one consistent story of redemption. It's backed by thousands of ancient manuscripts that let scholars reconstruct the New Testament with roughly 99.5% textual confidence, its setting is confirmed by numerous archaeological finds, and its unity and fulfilled prophecy are why many conclude it's more than a human book. You don't have to close the case today — but it's a case with real evidence to weigh.",
+    ],
+    charts:[
+      { kind:'facts', title:'One book, impossible spread', cells:[
+        { big:'~1,500', label:'years to write' },
+        { big:'~40', label:'authors' },
+        { big:'3', label:'continents' },
+        { big:'3', label:'languages' },
+      ] },
+      { kind:'bars', title:'Manuscript evidence', note:'More surviving copies than any other work of antiquity — by a wide margin.', bars:[
+        { label:'Greek NT manuscripts', display:'5,800+', value:5800, max:24000 },
+        { label:'Total incl. ancient translations', display:'24,000+', value:24000, max:24000 },
+      ] },
+      { kind:'gauge', title:'Textual reliability', pct:99.5, note:'How confidently the original wording can be reconstructed — not “95% historically proven.” Most variants are spelling or word order.' },
     ],
     scriptures:[
       { ref:'Isaiah 40:8', text:"The grass withers, the flower fades, but the word of our God will stand forever." },
       { ref:'Matthew 24:35', text:"Heaven and earth will pass away, but my words will not pass away." },
     ],
-    goDeeper:'dest:proof',
+    goDeeper:'proof:nt-manuscript-count',
   },
   {
     id:'jesus-historical',
@@ -157,6 +202,7 @@ const MANS_QUESTIONS = [
   {
     id:'hidden-god',
     category:'is-it-true',
+    top10:4,
     question:"If God is real, why doesn't he just show himself?",
     hook:'He did — in a person.',
     answer:[
@@ -187,6 +233,7 @@ const MANS_QUESTIONS = [
   {
     id:'science-explains',
     category:'is-it-true',
+    top10:5,
     question:"Doesn't science explain everything, leaving no room for God?",
     hook:'Different questions, not rivals.',
     answer:[
@@ -203,6 +250,7 @@ const MANS_QUESTIONS = [
   {
     id:'suffering',
     category:'what-about',
+    top10:2,
     question:'If God is good, why is there so much suffering?',
     hook:'The oldest, hardest question.',
     answer:[
@@ -218,6 +266,7 @@ const MANS_QUESTIONS = [
   {
     id:'hell',
     category:'what-about',
+    top10:9,
     question:'How can a loving God send people to hell?',
     hook:'A door locked from the inside.',
     answer:[
@@ -228,6 +277,24 @@ const MANS_QUESTIONS = [
       { ref:'2 Peter 3:9', text:"The Lord is… not wishing that any should perish, but that all should reach repentance." },
       { ref:'Ezekiel 33:11', text:"I have no pleasure in the death of the wicked, but that the wicked turn from his way and live." },
     ],
+  },
+  {
+    id:'free-will',
+    category:'what-about',
+    top10:8,
+    question:'If God knows everything, do we really have free will?',
+    hook:'Knowing what you’ll choose isn’t choosing it for you.',
+    answer:[
+      "It feels like a trap: if God already knows what you'll do tomorrow, then it's fixed, so how is it really your choice? But look closely — knowing something will happen isn't the same as forcing it to happen. If I watch a video of a game I've already seen, I know every play before it comes. My knowing doesn't reach back and control the players; they still made every move freely. God's knowledge is like that, except He sees all of time at once rather than replaying a tape.",
+      "That's the key most people miss: God isn't stuck inside time the way you are, waiting to find out. He made time. He sees your whole life — past, present, and future — in a single glance, the way you can see a whole parade from a rooftop while the marchers below only ever see the float in front of them. Seeing your free choice from above doesn't turn it into His choice. It stays yours.",
+      "And notice how seriously the Bible takes your choice. Over and over it pleads with people to decide — \"choose this day whom you will serve,\" \"whoever wishes, let him come.\" You don't beg someone to do what they can't help doing. God holds real knowledge and you hold a real will at the same time; they're not enemies. The love He wants from you only counts because you could have said no — and He knew that too.",
+    ],
+    scriptures:[
+      { ref:'Joshua 24:15', text:"Choose this day whom you will serve… as for me and my house, we will serve the LORD." },
+      { ref:'Deuteronomy 30:19', text:"I have set before you life and death… therefore choose life, that you and your offspring may live." },
+      { ref:'Revelation 22:17', text:"And let the one who is thirsty come; let the one who desires take the water of life without price." },
+    ],
+    goDeeper:'dest:walk',
   },
   {
     id:'never-heard',
@@ -246,6 +313,7 @@ const MANS_QUESTIONS = [
   {
     id:'other-religions',
     category:'what-about',
+    top10:7,
     question:'Aren\'t all religions basically the same path up the mountain?',
     hook:'They make opposite claims.',
     answer:[
@@ -360,6 +428,7 @@ const MANS_QUESTIONS = [
   {
     id:'why-evil-exists',
     category:'what-about',
+    top10:6,
     question:'If God could stop evil, why doesn\'t he?',
     hook:'Which evil should he start with?',
     answer:[
