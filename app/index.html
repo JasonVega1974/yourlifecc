@@ -7726,7 +7726,7 @@
     }
 
     /* Warm radial veil — a candle in a cathedral. Gold at center,
-       lavender mid, deep ink edges. */
+       deep navy mid, deep ink edges. */
     #s-scripture .well-gate__veil{
       position:absolute; inset:0;
       background:
@@ -8021,7 +8021,13 @@
        a brand hex into a tint that can't follow the theme. */
     #s-scripture{
       --fz-accent:        var(--g);                   /* faith gold */
-      --fz-purple:        var(--p);                   /* secondary  */
+      /* 2026-07-09 de-purple — this alias pointed at the app-wide violet
+         token (--p:#a78bfa) and drove 12+ Zone 1/2 rules (Convince Me
+         animated border, Dig Deeper CTA, sound pills, Explore toggle) —
+         the faith tab's LANDING zone. Re-aliased to gold-deep so it
+         matches the sweep's register. Name kept so the downstream var()
+         callsites don't churn. */
+      --fz-purple:        #d97706;                    /* secondary (gold-deep) */
       --fz-ok:            var(--gr);                  /* success    */
       --fz-c:             var(--c);                   /* app primary*/
       --fz-card-bg:       var(--card-bg);
@@ -8179,7 +8185,7 @@
     @media (prefers-reduced-motion: reduce){
       .cm-scroll-cue{ animation:none !important; }
     }
-    /* Animated gradient border — gold-purple-cyan sweep at 45% alpha */
+    /* Animated gradient border — gold-amber-cyan sweep at 45% alpha */
     .cm-card-face::before{
       content:''; position:absolute; inset:-1px; border-radius:22px;
       background:linear-gradient(135deg,
@@ -9672,20 +9678,23 @@
     :root.light .hc-emotion{ background:#ffffff; border-color:rgba(15,23,42,.10); }
     :root.light .hc-emotion:hover{ background:#fdfbf6; }
     :root.light .hc-slider{ background:linear-gradient(90deg, var(--hc-band,#0f766e) var(--hc-fill,50%), rgba(15,23,42,.10) var(--hc-fill,50%)); }
+    /* 2026-07-09 — light-mode 5-way ramp de-collided (heavy==storm and
+       stirred==gold shared hexes after the de-purple remap). Each band
+       is now a unique warm value, teal anchor kept. */
     :root.light .hc-slider[data-band="calm"]{    --hc-band:#0f766e; }
-    :root.light .hc-slider[data-band="stirred"]{ --hc-band:#b45309; }
-    :root.light .hc-slider[data-band="heavy"]{   --hc-band:#92400e; }
-    :root.light .hc-slider[data-band="storm"]{   --hc-band:#92400e; }
-    :root.light .hc-slider[data-band="gold"]{    --hc-band:#b45309; }
+    :root.light .hc-slider[data-band="stirred"]{ --hc-band:#d97706; }
+    :root.light .hc-slider[data-band="heavy"]{   --hc-band:#b45309; }
+    :root.light .hc-slider[data-band="storm"]{   --hc-band:#7c2d12; }
+    :root.light .hc-slider[data-band="gold"]{    --hc-band:#a16207; }
     :root.light .hc-slider::-webkit-slider-thumb{ border-color:rgba(15,23,42,.25); }
     :root.light .hc-delta{ background:#ffffff; border-color:rgba(15,23,42,.10); }
     :root.light .hc-delta-improved{ border-color:rgba(180,120,20,.45); }
     :root.light .hc-insight{ background:#ffffff; border-color:rgba(15,23,42,.10); }
     :root.light .hc-dot{ background:#ffffff; }
     :root.light .hc-dot-calm{    --hc-dotc:#0f766e; }
-    :root.light .hc-dot-stirred{ --hc-dotc:#b45309; }
-    :root.light .hc-dot-heavy{   --hc-dotc:#92400e; }
-    :root.light .hc-dot-storm{   --hc-dotc:#92400e; }
+    :root.light .hc-dot-stirred{ --hc-dotc:#d97706; }
+    :root.light .hc-dot-heavy{   --hc-dotc:#b45309; }
+    :root.light .hc-dot-storm{   --hc-dotc:#7c2d12; }
     :root.light .hc-pray-ring{ background:conic-gradient(#f5c842 var(--hc-arc,0deg), rgba(15,23,42,.10) var(--hc-arc,0deg)); }
     :root.light .hc-breath-ring{ border-color:#0f766e; background:rgba(15,118,110,.12); }
     @media (prefers-reduced-motion: reduce){

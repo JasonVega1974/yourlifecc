@@ -192,9 +192,11 @@ function _fzRenderDots(){
 
 // V1 Rebuild · Session 4 — per-category flip glow color for the
 // convinceMeFlipEffect celebration. Keyed by card.cat.
+// 2026-07-09 de-purple — Mystery/Philosophy moved off the violet family
+// (#7b68ee/#a29bfe) onto warm hues; the rest were already non-purple.
 var _CM_CAT_COLORS = {
-  'Mystery':'#7b68ee', 'Evidence':'#4ecdc4', 'Science':'#45b7d1',
-  'Prophecy':'#ffd700', 'Philosophy':'#a29bfe', 'Challenge':'#ff6b6b'
+  'Mystery':'#e0a83a', 'Evidence':'#4ecdc4', 'Science':'#45b7d1',
+  'Prophecy':'#ffd700', 'Philosophy':'#d97706', 'Challenge':'#ff6b6b'
 };
 
 function cmFlip(){
@@ -231,7 +233,7 @@ function cmFlip(){
     // (spam-protected so re-flips don't re-fire). Pre-flip glow
     // fires BEFORE the .flipped class so the glow leads the flip.
     if (firstFlip && typeof convinceMeFlipEffect === 'function'){
-      var glowColor = _CM_CAT_COLORS[card.cat] || '#7b68ee';
+      var glowColor = _CM_CAT_COLORS[card.cat] || '#f5c842';
       convinceMeFlipEffect(glowColor);
     }
     firstFlipForFx = firstFlip;

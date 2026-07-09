@@ -10232,8 +10232,11 @@ function ppOpenModal(id){
       ? ' <span style="color:var(--tx3);">·</span> <span style="color:var(--tx2);">' + (proof.year < 0 ? (Math.abs(proof.year) + ' BC') : (proof.year + (proof.year > 1000 ? ' AD' : ' AD'))) + '</span>'
       : '';
     body.innerHTML = ''
+      // 2026-07-09 — IMPACT n/10 dropped from the modal meta too (same
+      // reason the card stars went: 71/117 sat at 8-9, differentiating
+      // nothing). Category + year carry the line.
       + '<div style="font-family:\'Oswald\',var(--fm);font-size:.68rem;color:' + accent + ';text-transform:uppercase;letter-spacing:.18em;font-weight:600;margin-bottom:.85rem;">'
-      +   _ppEsc(catLabel) + ' <span style="color:var(--tx3);">·</span> ' + 'IMPACT ' + impact + '/10' + yearBit
+      +   _ppEsc(catLabel) + yearBit
       + '</div>'
       // Named-authority byline — only when the entry carries a `voice`
       // (the apologetics deep-dives do). Makes "who says this" prominent

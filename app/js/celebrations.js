@@ -317,7 +317,7 @@ function realLifeWinCelebration(winText) {
 function convinceMeFlipEffect(categoryColor) {
   if (typeof document === 'undefined') return;
   if (_ylccPrefersReducedMotion()) return;
-  screenFlash(categoryColor || '#7b68ee', 150);
+  screenFlash(categoryColor || '#f5c842', 150);
 }
 
 function revealBulletsSequentially(backFaceEl) {
