@@ -9975,26 +9975,15 @@ function ppPlaceholderHtml(proof){
   return '<div class="pp-card-placeholder" style="'
        +   'background:radial-gradient(ellipse at 30% 30%, '+ accent +'33, transparent 60%),'
        +   ' radial-gradient(ellipse at 75% 75%, '+ accent +'22, transparent 60%),'
-       +   ' linear-gradient(180deg, #181232 0%, #0a0d1a 100%);'
+       +   ' linear-gradient(180deg, #0a1628 0%, #0a0d1a 100%);'
        + '">'
        +   '<span class="pp-placeholder-icon" aria-hidden="true">'+ icon +'</span>'
        + '</div>';
 }
 
-function ppStarsInner(score){
-  // 10-segment gold star meter; one star per impactScore point.
-  const filled = Math.max(0, Math.min(10, parseInt(score,10)||0));
-  let html = '';
-  for(let i=0;i<10;i++){
-    html += '<span class="pp-star'+(i<filled?' on':'')+'">★</span>';
-  }
-  return html;
-}
-
-function ppStarsHtml(score){
-  const filled = Math.max(0, Math.min(10, parseInt(score,10)||0));
-  return '<span class="pp-stars" aria-label="Impact '+filled+' of 10">'+ ppStarsInner(score) +'</span>';
-}
+// ppStarsInner/ppStarsHtml removed 2026-07-09 — the 10-star impact meter
+// is gone from cards + the Convince deck (71/117 entries sat at 8-9, so
+// it differentiated nothing). impactScore still shows as text in the modal.
 
 // One-time migration from the legacy D.savedProofs cloud field into
 // the YLM 'proof' store. Runs once on first read; idempotent.
@@ -10070,25 +10059,28 @@ function ppCategorySoftRgba(cat){
   return 'rgba(' + r + ',' + g + ',' + b + ',';
 }
 
+// 2026-07-09 full pass — plain-term eyebrow (gold Oswald caps) is the
+// scannable label ABOVE the serif title; impactScore stars removed
+// (71/117 sat at 8-9 — differentiated nothing); Bebas dropped from the
+// surface (design skill: Oswald eyebrows, Georgia reading text).
 function ppCardHtml(proof){
   const accent = ppCategoryAccent(proof.category);
   const catLabel = ppCategoryLabel(proof.category);
   const saved = ppIsSaved(proof.id);
   return ''
     + '<button class="pl-card-v2 pp-card" data-proof-id="' + _ppEsc(proof.id) + '" onclick="ppOpenModal(this.dataset.proofId)" style="--accent:' + _ppEsc(accent) + ';display:flex;flex-direction:column;align-self:start;">'
-    + '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">'
-    +   '<span style="font-size:1.5rem;line-height:1;">' + ppCategoryIcon(proof.category) + '</span>'
-    +   '<div style="font-family:\'Bebas Neue\',var(--fh,var(--fm));font-size:1.1rem;letter-spacing:.04em;flex:1;text-align:left;">' + _ppEsc(proof.title) + '</div>'
-    +   '<span style="font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .55rem;border-radius:99px;color:' + _ppEsc(accent) + ';background:' + ppCategorySoftRgba(proof.category) + '0.18);">' + _ppEsc(catLabel) + '</span>'
+    + '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.45rem;">'
+    +   '<span style="font-size:1.3rem;line-height:1;">' + ppCategoryIcon(proof.category) + '</span>'
+    +   (proof.eyebrow ? '<div style="flex:1;text-align:left;font-family:\'Oswald\',var(--fm);font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;line-height:1.4;color:' + _ppEsc(accent) + ';">' + _ppEsc(proof.eyebrow) + '</div>' : '<span style="flex:1;"></span>')
+    +   '<span style="font-size:.62rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .55rem;border-radius:99px;color:' + _ppEsc(accent) + ';background:' + ppCategorySoftRgba(proof.category) + '0.14);">' + _ppEsc(catLabel) + '</span>'
     + '</div>'
-    + (proof.eyebrow ? '<div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:.25rem;">' + _ppEsc(proof.eyebrow) + '</div>' : '')
-    + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.88rem;color:var(--tx2);margin-bottom:.5rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">' + _ppEsc(proof.summary) + '</div>'
+    + '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:1.06rem;line-height:1.3;color:var(--tx);text-align:left;margin-bottom:.4rem;">' + _ppEsc(proof.title) + '</div>'
+    + '<div style="font-family:Georgia,serif;font-style:italic;font-size:.88rem;color:var(--tx2);margin-bottom:.5rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-align:left;">' + _ppEsc(proof.summary) + '</div>'
     + '<div style="display:flex;align-items:center;gap:.5rem;margin-top:auto;">'
-    +   ppStarsHtml(proof.impactScore)
+    +   '<span class="pp-readmore">Read More →</span>'
     +   '<span role="button" tabindex="0" style="margin-left:auto;cursor:pointer;font-size:1.1rem;color:' + (saved ? '#f59e0b' : 'var(--tx3)') + ';" onclick="event.stopPropagation();ppToggleBookmark(\'' + _ppEsc(proof.id) + '\',this)" aria-label="Bookmark">'
     +     (saved ? '★' : '☆')
     +   '</span>'
-    +   '<span style="color:var(--tx);font-size:.8rem;">Read More →</span>'
     + '</div>'
     + '</button>';
 }
@@ -10216,11 +10208,11 @@ function ppOpenModal(id){
   // overlay so text stays readable.
   const header = document.getElementById('ppModalHeader');
   if(header){
-    const overlay = 'linear-gradient(135deg, rgba(10,13,26,.86) 0%, rgba(26,18,51,.82) 100%)';
+    const overlay = 'linear-gradient(135deg, rgba(10,13,26,.86) 0%, rgba(10,22,40,.82) 100%)';
     if(img){
-      header.style.background = overlay + ', url("' + img.replace(/"/g,'\\"') + '") center/cover no-repeat, linear-gradient(135deg,#0a0d1a,#1a1233)';
+      header.style.background = overlay + ', url("' + img.replace(/"/g,'\\"') + '") center/cover no-repeat, linear-gradient(135deg,#0a0d1a,#0a1628)';
     } else {
-      header.style.background = 'linear-gradient(135deg,#0a0d1a 0%,#1a1233 100%)';
+      header.style.background = 'linear-gradient(135deg,#0a0d1a 0%,#0a1628 100%)';
     }
   }
   const iconEl = document.getElementById('ppModalIcon');
@@ -10240,7 +10232,7 @@ function ppOpenModal(id){
       ? ' <span style="color:var(--tx3);">·</span> <span style="color:var(--tx2);">' + (proof.year < 0 ? (Math.abs(proof.year) + ' BC') : (proof.year + (proof.year > 1000 ? ' AD' : ' AD'))) + '</span>'
       : '';
     body.innerHTML = ''
-      + '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.72rem;color:' + accent + ';text-transform:uppercase;letter-spacing:.2em;font-weight:800;margin-bottom:.85rem;">'
+      + '<div style="font-family:\'Oswald\',var(--fm);font-size:.68rem;color:' + accent + ';text-transform:uppercase;letter-spacing:.18em;font-weight:600;margin-bottom:.85rem;">'
       +   _ppEsc(catLabel) + ' <span style="color:var(--tx3);">·</span> ' + 'IMPACT ' + impact + '/10' + yearBit
       + '</div>'
       // Named-authority byline — only when the entry carries a `voice`
@@ -10248,15 +10240,15 @@ function ppOpenModal(id){
       // instead of buried in the Source line at the bottom.
       + (proof.voice
           ? '<div style="display:inline-flex;align-items:center;gap:.5rem;background:' + soft + '0.1);border:1px solid ' + accent + '55;border-radius:999px;padding:.35rem .8rem .35rem .55rem;margin-bottom:1rem;font-family:var(--fm);font-size:.74rem;color:var(--tx2);line-height:1.3;">'
-              + '<span style="font-family:\'Bebas Neue\',var(--fm);font-weight:800;color:' + accent + ';letter-spacing:.14em;text-transform:uppercase;font-size:.6rem;flex-shrink:0;">Key voice</span>'
+              + '<span style="font-family:\'Oswald\',var(--fm);font-weight:600;color:' + accent + ';letter-spacing:.14em;text-transform:uppercase;font-size:.6rem;flex-shrink:0;">Key voice</span>'
               + '<span>' + _ppEsc(proof.voice) + '</span>'
             + '</div>'
           : '')
       + '<div style="margin-bottom:1rem;">' + paras + '</div>'
       + (proof.scripture
           ? '<div style="background:' + soft + '0.08);border-left:3px solid ' + accent + ';border-radius:0 10px 10px 0;padding:.85rem 1rem;margin-bottom:1rem;">'
-              + '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:.62rem;letter-spacing:.18em;color:' + accent + ';font-weight:800;text-transform:uppercase;margin-bottom:.35rem;">Scripture</div>'
-              + '<div style="font-family:\'Bebas Neue\',var(--fm);font-size:1.05rem;letter-spacing:.04em;color:var(--tx);">' + _ppEsc(proof.scripture) + '</div>'
+              + '<div style="font-family:\'Oswald\',var(--fm);font-size:.6rem;letter-spacing:.18em;color:' + accent + ';font-weight:600;text-transform:uppercase;margin-bottom:.35rem;">Scripture</div>'
+              + '<div style="font-family:\'Oswald\',var(--fm);font-size:.88rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tx);">' + _ppEsc(proof.scripture) + '</div>'
             + '</div>'
           : '')
       + (proof.source
@@ -10402,7 +10394,7 @@ function ppConvRender(){
       + '<div class="pp-conv-finale">'
       +   ppScaleSvg()
       +   '<div class="pp-conv-finale-title">The evidence is heavy.</div>'
-      +   '<div class="pp-conv-finale-text">Five proofs. Six categories. 100 reasons total. Still have questions? Ask the Bible directly, or keep exploring the full collection.</div>'
+      +   '<div class="pp-conv-finale-text">Five proofs. Seven categories. 117 reasons total. Still have questions? Ask the Bible directly, or keep exploring the full collection.</div>'
       +   '<div class="pp-conv-finale-actions">'
       +     '<button class="pp-conv-btn pp-conv-btn-next" onclick="ppCloseConvince();bfTab(\'bible\');">Ask the Bible →</button>'
       +     '<button class="pp-conv-btn pp-conv-btn-skip" onclick="ppCloseConvince()">Back to all proofs</button>'
@@ -10423,7 +10415,6 @@ function ppConvRender(){
     +     '<div class="pp-conv-eye">'+ _ppEsc(proof.eyebrow||'') +'</div>'
     +     '<div class="pp-conv-title">'+ _ppEsc(proof.title) +'</div>'
     +     '<div class="pp-conv-summary">'+ _ppEsc(proof.summary) +'</div>'
-    +     '<div class="pp-conv-stars">'+ ppStarsHtml(proof.impactScore) +'</div>'
     +     '<div class="pp-conv-actions">'
     +       '<button class="pp-conv-btn pp-conv-btn-skip" onclick="ppConvAdvance(\'left\')">Skip</button>'
     +       '<button class="pp-conv-btn pp-conv-btn-next" onclick="ppConvAdvance(\'right\')">Next proof →</button>'
@@ -10485,7 +10476,7 @@ function ppScaleSvg(){
     // Tiny feather
     +     '<path d="M105 64 Q110 60 115 64" stroke="#fef3c7" stroke-width="1.2" fill="none" opacity=".7"/>'
     +   '</g>'
-    +   '<text x="70" y="138" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" letter-spacing=".18em" fill="#fbbf24">EVIDENCE · DOUBT</text>'
+    +   '<text x="70" y="138" text-anchor="middle" font-family="Oswald,sans-serif" font-size="8" letter-spacing=".18em" fill="#fbbf24">EVIDENCE · DOUBT</text>'
     + '</svg>';
 }
 

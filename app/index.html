@@ -13839,8 +13839,8 @@
       #bf-proofProphecy .pp-hero{
         position:relative; padding:2.2rem 1.4rem 1.6rem;
         background:radial-gradient(ellipse at 30% 30%, rgba(251,191,36,.18), transparent 60%),
-                   radial-gradient(ellipse at 75% 75%, rgba(167,139,250,.16), transparent 60%),
-                   linear-gradient(180deg, #0a0d1a 0%, #181232 100%);
+                   radial-gradient(ellipse at 75% 75%, rgba(217,119,6,.14), transparent 60%),
+                   linear-gradient(180deg, #0a0d1a 0%, #0a1628 100%);
         border-radius:18px; margin-bottom:1rem; overflow:hidden;
         box-shadow:0 14px 40px rgba(15,23,42,.4), inset 0 1px 0 rgba(255,255,255,.06);
         text-align:center;
@@ -13860,8 +13860,8 @@
         margin-bottom:.5rem;
       }
       #bf-proofProphecy .pp-title{
-        position:relative; font-family:'Bebas Neue',var(--fm); font-size:2.4rem;
-        letter-spacing:.08em; line-height:1.05; font-weight:700;
+        position:relative; font-family:'Oswald',var(--fm); font-size:2rem;
+        letter-spacing:.1em; line-height:1.1; font-weight:600; text-transform:uppercase;
         background:linear-gradient(180deg,#fef3c7 0%,#fbbf24 55%,#d97706 100%);
         -webkit-background-clip:text; background-clip:text; color:transparent;
         text-shadow:0 0 30px rgba(251,191,36,.18);
@@ -13879,8 +13879,8 @@
         border-radius:14px;
       }
       #bf-proofProphecy .pp-counter-num{
-        font-family:'Bebas Neue',var(--fm); font-size:2rem; letter-spacing:.04em;
-        color:var(--pp-gold); font-weight:700; line-height:1;
+        font-family:'Oswald',var(--fm); font-size:1.8rem; letter-spacing:.04em;
+        color:var(--pp-gold); font-weight:600; line-height:1; font-feature-settings:"tnum";
       }
       #bf-proofProphecy .pp-counter-lbl{
         font-family:var(--fm); font-size:.58rem; letter-spacing:.2em; text-transform:uppercase;
@@ -13906,9 +13906,11 @@
       }
       #bf-proofProphecy .pp-search::placeholder{color:rgba(255,255,255,.4);}
 
+      /* 2026-07-09 — chips WRAP (2 rows if needed) so all 9 are visible
+         at once; the old overflow-x scroller hid Science/Philosophy
+         off-screen right. */
       #bf-proofProphecy .pp-subtabs{
-        display:flex; gap:.4rem; overflow-x:auto; padding:.4rem 0 .9rem;
-        scrollbar-width:thin; scrollbar-color:rgba(251,191,36,.35) transparent;
+        display:flex; flex-wrap:wrap; gap:.4rem; padding:.4rem 0 .9rem;
       }
       #bf-proofProphecy .pp-subtab{
         flex:0 0 auto; padding:.5rem .9rem; border-radius:10px; cursor:pointer;
@@ -13924,14 +13926,8 @@
       #bf-proofProphecy .pp-subtab .pp-subtab-count{
         margin-left:.35rem; opacity:.7; font-size:.68rem;
       }
-      #bf-proofProphecy .pp-stars{display:inline-flex; gap:1px;}
-      #bf-proofProphecy .pp-star{
-        font-size:.78rem; line-height:1; color:rgba(255,255,255,.18);
-      }
-      #bf-proofProphecy .pp-star.on{
-        color:var(--pp-gold);
-        text-shadow:0 0 8px rgba(251,191,36,.5);
-      }
+      /* impactScore stars removed 2026-07-09 — 71 of 117 entries sat at
+         8-9, so the meter differentiated nothing and read as clutter. */
       #bf-proofProphecy .pp-readmore{
         font-family:var(--fm); font-size:.7rem; font-weight:800; color:var(--pp-gold);
         letter-spacing:.06em;
@@ -13947,7 +13943,7 @@
          app.css now — same modal infrastructure as planDetailModal. The
          orphan `.pp-modal-*` rules below remain only as no-op fallbacks. */
       #ppModal .pp-modal-card{
-        background:linear-gradient(180deg,#181232 0%, #0a0d1a 100%);
+        background:linear-gradient(180deg,#0a1628 0%, #0a0d1a 100%);
         border:1px solid rgba(251,191,36,.22); border-radius:16px;
         max-width:680px; width:100%; overflow:hidden; position:relative;
         box-shadow:0 30px 80px rgba(0,0,0,.55);
@@ -13977,8 +13973,8 @@
         margin-bottom:.45rem; opacity:.9;
       }
       #ppModal .pp-modal-title{
-        font-family:'Bebas Neue',var(--fm); font-size:2rem;
-        line-height:1.1; letter-spacing:.04em; color:var(--pp-cream); font-weight:700;
+        font-family:Georgia,'Times New Roman',serif; font-size:1.5rem;
+        line-height:1.2; letter-spacing:.01em; color:var(--pp-cream); font-weight:400;
         margin-bottom:.8rem;
       }
       #ppModal .pp-modal-meta{
@@ -14001,8 +13997,8 @@
         margin-bottom:.3rem; opacity:.85;
       }
       #ppModal .pp-modal-scripture-ref{
-        font-family:'Bebas Neue',var(--fm); font-size:1.05rem; letter-spacing:.05em;
-        color:var(--pp-cream);
+        font-family:'Oswald',var(--fm); font-size:.9rem; letter-spacing:.08em;
+        text-transform:uppercase; color:var(--pp-cream);
       }
       #ppModal .pp-modal-source{
         font-family:var(--fm); font-size:.72rem; color:var(--tx3);
@@ -14043,7 +14039,7 @@
         margin-bottom:.85rem;
       }
       #ppConvinceModal .pp-conv-card{
-        background:linear-gradient(180deg,#1f1745 0%, #0a0d1a 100%);
+        background:linear-gradient(180deg,#0e1a33 0%, #0a0d1a 100%);
         border:1px solid rgba(251,191,36,.28); border-radius:18px;
         overflow:hidden; position:relative; min-height:480px;
         display:flex; flex-direction:column;
@@ -14065,15 +14061,14 @@
         margin-bottom:.5rem;
       }
       #ppConvinceModal .pp-conv-title{
-        font-family:'Bebas Neue',var(--fm); font-size:1.7rem;
-        line-height:1.1; color:var(--pp-cream); font-weight:700;
-        margin-bottom:.7rem; letter-spacing:.04em;
+        font-family:Georgia,'Times New Roman',serif; font-size:1.4rem;
+        line-height:1.2; color:var(--pp-cream); font-weight:400;
+        margin-bottom:.7rem; letter-spacing:.01em;
       }
       #ppConvinceModal .pp-conv-summary{
         font-family:Georgia,serif; font-style:italic; font-size:.92rem;
         line-height:1.65; color:#dbe2ed; flex:1;
       }
-      #ppConvinceModal .pp-conv-stars{margin:.85rem 0 .7rem;}
       #ppConvinceModal .pp-conv-actions{
         display:flex; gap:.6rem; margin-top:1rem;
       }
@@ -14093,7 +14088,7 @@
       }
       #ppConvinceModal .pp-conv-finale{
         text-align:center; padding:2rem 1.5rem;
-        background:linear-gradient(180deg,#1f1745 0%,#0a0d1a 100%);
+        background:linear-gradient(180deg,#0e1a33 0%,#0a0d1a 100%);
         border:1px solid rgba(251,191,36,.32); border-radius:18px;
         box-shadow:0 30px 80px rgba(0,0,0,.55);
       }
@@ -14101,7 +14096,7 @@
         margin:0 auto 1rem; width:140px; height:140px; display:block;
       }
       #ppConvinceModal .pp-conv-finale-title{
-        font-family:'Bebas Neue',var(--fm); font-size:1.8rem; letter-spacing:.06em;
+        font-family:Georgia,'Times New Roman',serif; font-size:1.5rem; letter-spacing:.01em;
         color:var(--pp-cream); margin-bottom:.5rem;
       }
       #ppConvinceModal .pp-conv-finale-text{
@@ -14131,7 +14126,7 @@
         <button class="pp-convince-btn" onclick="ppOpenConvince()">⚖️ Convince Me</button>
         <button class="pp-convince-btn" onclick="if(typeof oddsOpen==='function')oddsOpen()">🎲 The Odds Machine</button>
         <button class="pp-convince-btn" onclick="if(typeof skepticOpen==='function')skepticOpen()">🧑‍⚖️ Skeptic vs Evidence</button>
-        <input class="pp-search" id="ppSearch" type="text" placeholder="Search 100 proofs…" oninput="ppRenderGrid()" />
+        <input class="pp-search" id="ppSearch" type="text" placeholder="Search 117 proofs…" oninput="ppRenderGrid()" />
       </div>
     </div>
 
@@ -14146,11 +14141,11 @@
        block + source. Footer carries actions. -->
   <div id="ppModal" class="mo" onclick="if(event.target===this)ppCloseModal()">
     <div class="md" style="max-width:560px;padding:0;">
-      <div id="ppModalHeader" style="background:linear-gradient(135deg,#0a0d1a 0%,#1a1233 100%);padding:1.4rem 1.4rem 1.2rem;text-align:center;color:#fef3c7;border-radius:16px 16px 0 0;position:relative;overflow:hidden;">
+      <div id="ppModalHeader" style="background:linear-gradient(135deg,#0a0d1a 0%,#0a1628 100%);padding:1.4rem 1.4rem 1.2rem;text-align:center;color:#fef3c7;border-radius:16px 16px 0 0;position:relative;overflow:hidden;">
         <button class="pp-back-btn" onclick="ppCloseModal()" aria-label="Back">← Back</button>
         <button onclick="ppCloseModal()" aria-label="Close" style="position:absolute;top:.7rem;right:.7rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fef3c7;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.8rem;font-weight:800;z-index:5;">✕</button>
         <div id="ppModalIcon" style="position:relative;z-index:2;font-size:2.4rem;line-height:1;margin-bottom:.45rem;">⚖️</div>
-        <div id="ppModalTitle" style="position:relative;z-index:2;font-family:'Bebas Neue',var(--fm);font-size:1.6rem;letter-spacing:.05em;line-height:1.05;font-weight:700;background:linear-gradient(180deg,#fef3c7 0%,#fbbf24 55%,#d97706 100%);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:.45rem;">—</div>
+        <div id="ppModalTitle" style="position:relative;z-index:2;font-family:Georgia,'Times New Roman',serif;font-size:1.35rem;letter-spacing:.01em;line-height:1.2;font-weight:400;color:#fef3c7;margin-bottom:.45rem;">—</div>
         <div id="ppModalEye" style="position:relative;z-index:2;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:.82rem;color:#e2d6a8;opacity:.88;line-height:1.5;">—</div>
       </div>
       <div id="ppModalBody" style="padding:1rem 1.2rem;max-height:55vh;overflow-y:auto;"></div>

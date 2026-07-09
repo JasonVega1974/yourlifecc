@@ -15,14 +15,17 @@
             source, impactScore, image, detail }
 ============================================================= */
 
+// 2026-07-09 — category rainbow collapsed to ONE color language (user
+// ruling: gold/navy register, no per-category hues). Category identity
+// now carries on the icon + label chip alone; accents are all faith gold.
 const PROOF_PROPHECY_CATEGORIES = [
-  { key: 'archaeology',  label: 'Archaeology',  icon: '🏺', accent: '#d97706', short: 'Archaeology' },
-  { key: 'prophecy',     label: 'Prophecy',     icon: '📜', accent: '#a78bfa', short: 'Prophecy' },
-  { key: 'manuscripts',  label: 'Manuscripts',  icon: '📖', accent: '#0ea5e9', short: 'Manuscripts' },
-  { key: 'witnesses',    label: 'Witnesses',    icon: '⚖️', accent: '#fb923c', short: 'Witnesses' },
-  { key: 'science',      label: 'Science',      icon: '🔬', accent: '#34d399', short: 'Science' },
+  { key: 'archaeology',  label: 'Archaeology',  icon: '🏺', accent: '#fbbf24', short: 'Archaeology' },
+  { key: 'prophecy',     label: 'Prophecy',     icon: '📜', accent: '#fbbf24', short: 'Prophecy' },
+  { key: 'manuscripts',  label: 'Manuscripts',  icon: '📖', accent: '#fbbf24', short: 'Manuscripts' },
+  { key: 'witnesses',    label: 'Witnesses',    icon: '⚖️', accent: '#fbbf24', short: 'Witnesses' },
+  { key: 'science',      label: 'Science',      icon: '🔬', accent: '#fbbf24', short: 'Science' },
   { key: 'resurrection', label: 'Resurrection', icon: '✝️', accent: '#fbbf24', short: 'Resurrection' },
-  { key: 'philosophy',   label: 'Philosophy',   icon: '💭', accent: '#818cf8', short: 'Philosophy' }
+  { key: 'philosophy',   label: 'Philosophy',   icon: '💭', accent: '#fbbf24', short: 'Philosophy' }
 ];
 
 const PROOF_PROPHECY_FALLBACK_IMG = {
