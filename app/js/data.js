@@ -148,6 +148,10 @@ const DEF = {
   // streak increments once per local day the user engages at least one
   // card; faithCuriosityLastDate is the YYYY-MM-DD of the last credit.
   convinceMeSeen:[],
+  // 2026-07-08 — Man's Questions, God's Answers read-state: array of
+  // question ids the user has opened (drives the gold read-dot on the
+  // list). Must live in DEF or loadData() drops it on an offline reload.
+  mqRead:[],
   faithCuriosityStreak:0,
   faithCuriosityLastDate:'',
   // V1 Rebuild · Faith Tab Redesign — Zone 2 (Today). faithChallenges

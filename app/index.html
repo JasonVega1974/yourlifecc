@@ -10090,6 +10090,20 @@
           <div style="height:7px;"></div>
         </button>
 
+        <!-- 2026-07-08 — Man's Questions, God's Answers: solo card directly
+             after featured MY WALK. data-fjdest="questions" auto-wires to
+             fzOpenDest via the generic [data-fjdest] loop. fj-questions
+             admin photo key (placeholder ⚖️ until a photo is uploaded). -->
+        <button type="button" class="fjp-card" data-fjdest="questions">
+          <div class="fjp-hero">
+            <div class="fjp-ph" aria-hidden="true">⚖️</div>
+            <img class="fjp-img" data-card-id="fj-questions" loading="lazy" alt="" onerror="this.style.display='none'">
+            <div class="fjp-shade" aria-hidden="true"></div>
+          </div>
+          <div class="fjp-title">MAN'S QUESTIONS, GOD'S ANSWERS</div>
+          <div class="fjp-sub">35 honest questions — answered from the Word.</div>
+        </button>
+
         <!-- 2026-07-03 — MEET JESUS: single wide half-height card balancing
              the featured MY WALK above. Legacy photo key bf-jesus. -->
         <div class="fj-eyebrow">MEET JESUS</div>
@@ -22779,6 +22793,11 @@
      verse + prayer + action. Pure data; read by faith-zones.js. -->
 <script defer src="/app/js/data/heart-check-data.js"></script>
 <script defer src="/app/js/data/faith-zones-data.js"></script>
+<!-- Man's Questions, God's Answers (2026-07-08) — data: 35 Qs + 3
+     categories. Pure data (window.MANS_QUESTIONS / MQ_CATEGORIES), read
+     by mans-questions-ui.js. Loads after faith-zones-data.js, before
+     faith-zones.js. -->
+<script defer src="/app/js/data/mans-questions.js"></script>
 <!-- V1 Rebuild · Session 4 — Pure fun engine. 10 celebration helpers
      exposed on window (megaConfetti / screenFlash / traitExplosion /
      realLifeWinCelebration / convinceMeFlipEffect /
@@ -22796,6 +22815,11 @@
      called by quick-prayers.js card actions; load after both. -->
 <script defer src="/app/js/prayer-focus.js"></script>
 <script defer src="/app/js/faith-zones.js"></script>
+<!-- Man's Questions, God's Answers (2026-07-08) — reading surface renderer.
+     Opened via fzOpenDest('questions') (faith-zones.js) into #mqHost;
+     routes goDeeper doors via bfTab/ppOpenModal (faith.js) + fzOpenDest,
+     all loaded above. -->
+<script defer src="/app/js/mans-questions-ui.js"></script>
 <!-- My Walk with God pathway engine (renderWalkPath). Loads after faith-zones.js
      so it can hand tool routes to fzOpenDest at runtime. Dark launch — nothing
      renders until renderWalkPath() is called; no doorway wired yet. -->

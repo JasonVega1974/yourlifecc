@@ -1902,6 +1902,15 @@ function fzOpenDest(dest){
         window.renderMyWalkTabs('mwHost', { startTab:'faith', startSpoke: dest });
       }
     }
+  } else if (dest === 'questions'){
+    // Man's Questions, God's Answers (2026-07-08) — a reading surface:
+    // 35 honest questions in 3 categories, answered from Scripture.
+    // renderMansQuestions (mans-questions-ui.js) builds the category list
+    // into #mqHost; tapping a question does an in-host answer takeover.
+    // typeof-guarded so a module-load failure falls back to an empty panel.
+    titleEl.textContent = "Man's Questions, God's Answers";
+    bodyEl.innerHTML = '<div id="mqHost"></div>';
+    if (typeof window.renderMansQuestions === 'function') window.renderMansQuestions('mqHost');
   }
 
   setTimeout(function(){ destEl.scrollIntoView({ behavior:'smooth', block:'start' }); }, 60);

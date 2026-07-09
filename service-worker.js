@@ -1,7 +1,7 @@
 // YourLifeCC Service Worker
 // Version bump this string whenever you deploy a major update
 // to force old caches to clear.
-const CACHE_NAME = 'yourlifecc-v506';
+const CACHE_NAME = 'yourlifecc-v507';
 
 // Core assets to pre-cache on install — the app shell + key Well modules
 // + the shared modal/save/share + prayer focus + Quick Prayer library
@@ -66,6 +66,9 @@ const PRECACHE_ASSETS = [
   '/app/js/walk-story.js',
   // My Walk two-tab shell (2026-07-07) — Pathway + My Faith Life.
   '/app/js/my-walk-tabs.js',
+  // Man's Questions, God's Answers (2026-07-08) — data + reading renderer.
+  '/app/js/data/mans-questions.js',
+  '/app/js/mans-questions-ui.js',
   // Contextual faith videos — data + renderer + full-screen player.
   '/app/js/data/faith-videos.js',
   '/app/js/faith-videos.js',
