@@ -88,18 +88,30 @@
   function renderMansQuestions(hostId){
     _mqHostId = hostId;
     _mqListScroll = 0;
+    _mqLastOpenedId = null;
+    // Oswald (eyebrows/labels/refs) is lazy-loaded. Every path in passes
+    // through Journey Home (which loads it), but call the ensure helper
+    // directly too so a future direct entry point doesn't silently fall
+    // back to Inter. Guarded — no-op if the helper isn't present.
+    try{
+      if(typeof _fjEnsureFonts === 'function') _fjEnsureFonts();
+      else if(typeof _ccEnsureFonts === 'function') _ccEnsureFonts();
+    }catch(_e){}
     _injectCss();
     mqRenderList();
   }
+  var _mqLastOpenedId = null;
 
   // ── LIST ─────────────────────────────────────────────────
   function mqRenderList(){
     var host = _host();
     if(!host) return;
     var cats = _cats(), all = _list();
+    // The takeover header (#fzDestTitle) already shows the title, so the
+    // hero here is an epigraph, not a second copy of the title (UX review:
+    // a restated title in two faces ~40px apart is a hierarchy failure).
     var h = '<div class="mq-wrap">'+
       '<div class="mq-hero">'+
-        '<div class="mq-eyebrow">MAN\'S QUESTIONS, GOD\'S ANSWERS</div>'+
         '<div class="mq-hero-sub">Every question here has been asked for thousands of years. None of them scare God.</div>'+
         '<div class="mq-rule" aria-hidden="true"></div>'+
       '</div>';
@@ -113,7 +125,7 @@
           '<div class="mq-cat-hd">'+
             '<span class="mq-cat-icon" aria-hidden="true">'+_esc(cat.icon||'')+'</span>'+
             '<span class="mq-cat-hd-txt">'+
-              '<span class="mq-cat-label">'+_esc(cat.label||'')+'</span>'+
+              '<h2 class="mq-cat-label">'+_esc(cat.label||'')+'</h2>'+
               (cat.sub ? '<span class="mq-cat-sub">'+_esc(cat.sub)+'</span>' : '')+
             '</span>'+
           '</div>'+
@@ -121,9 +133,10 @@
           '<div class="mq-qlist">';
         qs.forEach(function(q){
           var read = _isRead(q.id);
-          h += '<button type="button" class="mq-row'+(read?' mq-read':'')+'" onclick="mqOpenAnswer(\''+_esc(q.id)+'\')">'+
+          h += '<button type="button" class="mq-row'+(read?' mq-read':'')+'" data-mq-id="'+_esc(q.id)+'" onclick="mqOpenAnswer(\''+_esc(q.id)+'\')">'+
             '<span class="mq-dot" aria-hidden="true"></span>'+
             '<span class="mq-row-txt">'+
+              (read ? '<span class="mq-vh">Read. </span>' : '')+
               '<span class="mq-q">'+_esc(q.question||'')+'</span>'+
               (q.hook ? '<span class="mq-hook">'+_esc(q.hook)+'</span>' : '')+
             '</span>'+
@@ -136,7 +149,18 @@
     h += '</div>';
     host.innerHTML = h;
     var sc = _scrollEl(host);
-    if(sc){ var y = _mqListScroll || 0; requestAnimationFrame(function(){ try{ sc.scrollTop = y; }catch(_e){} }); }
+    var y = _mqListScroll || 0;
+    var focusId = _mqLastOpenedId;
+    requestAnimationFrame(function(){
+      try{ if(sc) sc.scrollTop = y; }catch(_e){}
+      // Returning from an answer — restore keyboard focus to the row that
+      // was opened, not <body> (UX review: focus was lost on the back path).
+      if(focusId){
+        var row = host.querySelector('.mq-row[data-mq-id="'+focusId+'"]');
+        if(row && row.focus){ try{ row.focus({ preventScroll:true }); }catch(_e){} }
+        _mqLastOpenedId = null;
+      }
+    });
   }
 
   // ── ANSWER (takeover) ────────────────────────────────────
@@ -145,9 +169,10 @@
     if(!host) return;
     var q = _byId(id);
     if(!q) return;
-    // Stash list scroll so the back pill restores it.
+    // Stash list scroll + the id so the back pill restores both.
     var sc = _scrollEl(host);
     _mqListScroll = sc ? sc.scrollTop : 0;
+    _mqLastOpenedId = id;
     _markRead(id);
     // Reading is SETTLE at most — one low bell, no XP/confetti.
     try{ if(window.sfx && typeof window.sfx.settle === 'function') window.sfx.settle(); }catch(_e){}
@@ -256,8 +281,7 @@
     _cssDone = true;
     var css =
     '#mqHost .mq-wrap{max-width:640px;margin:0 auto;padding:.2rem 0 2rem;}'+
-    // hero
-    '#mqHost .mq-eyebrow{font-family:\'Oswald\',var(--fm);font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#fbbf24;}'+
+    // hero (epigraph only — the takeover header carries the title)
     '#mqHost .mq-hero-sub{font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:.95rem;line-height:1.6;color:var(--tx2);margin-top:.5rem;max-width:34rem;}'+
     '#mqHost .mq-rule{width:56px;height:1px;background:rgba(251,191,36,.55);margin:1rem 0;}'+
     // category section
@@ -265,8 +289,8 @@
     '#mqHost .mq-cat-hd{display:flex;align-items:center;gap:.7rem;}'+
     '#mqHost .mq-cat-icon{font-size:1.5rem;line-height:1;flex-shrink:0;}'+
     '#mqHost .mq-cat-hd-txt{display:flex;flex-direction:column;min-width:0;}'+
-    '#mqHost .mq-cat-label{font-family:\'Oswald\',var(--fm);font-size:1rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#fbbf24;}'+
-    '#mqHost .mq-cat-sub{font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:.8rem;line-height:1.4;color:var(--tx3);margin-top:.1rem;}'+
+    '#mqHost .mq-cat-label{font-family:\'Oswald\',var(--fm);font-size:1rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#fbbf24;margin:0;}'+
+    '#mqHost .mq-cat-sub{font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:.8rem;line-height:1.4;color:var(--tx2);margin-top:.1rem;}'+
     '#mqHost .mq-cat-rule{height:1px;background:rgba(251,191,36,.3);margin:.6rem 0 .3rem;}'+
     // question rows
     '#mqHost .mq-qlist{display:flex;flex-direction:column;}'+
@@ -276,13 +300,16 @@
     '#mqHost .mq-dot{flex-shrink:0;width:7px;height:7px;border-radius:50%;background:transparent;margin-top:.45rem;transition:background .2s;}'+
     '#mqHost .mq-row.mq-read .mq-dot{background:#fbbf24;box-shadow:0 0 6px rgba(251,191,36,.5);}'+
     '#mqHost .mq-row-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:.15rem;}'+
+    // Visually-hidden read marker for screen readers (the gold dot is
+    // aria-hidden and sight-only).
+    '#mqHost .mq-vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}'+
     '#mqHost .mq-q{font-family:Georgia,\'Times New Roman\',serif;font-size:.98rem;line-height:1.35;color:var(--tx);}'+
-    '#mqHost .mq-hook{font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:.78rem;line-height:1.4;color:var(--tx3);}'+
+    '#mqHost .mq-hook{font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:.78rem;line-height:1.4;color:var(--tx2);}'+
     '#mqHost .mq-arrow{flex-shrink:0;color:rgba(251,191,36,.6);font-size:.9rem;margin-top:.2rem;}'+
     '#mqHost .mq-empty{text-align:center;padding:2rem 1rem;color:var(--tx2);font-style:italic;font-family:Georgia,serif;}'+
     // answer view
-    '#mqHost .mq-answer{max-width:640px;margin:0 auto;padding:.2rem 0 2rem;}'+
-    '#mqHost .mq-back{display:inline-flex;align-items:center;gap:.4rem;min-height:44px;padding:.5rem .9rem;margin-bottom:1rem;border:1px solid rgba(251,191,36,.4);border-radius:999px;background:rgba(251,191,36,.1);color:#fbbf24;font:600 .8rem/1 \'Oswald\',var(--fm);letter-spacing:.04em;cursor:pointer;}'+
+    '#mqHost .mq-answer{max-width:600px;margin:0 auto;padding:.2rem 0 2rem;}'+
+    '#mqHost .mq-back{display:inline-flex;align-items:center;gap:.4rem;min-height:44px;padding:.5rem .9rem;margin-bottom:1rem;border:1px solid rgba(251,191,36,.4);border-radius:999px;background:rgba(251,191,36,.1);color:#fbbf24;font:600 .8rem/1 var(--fm);letter-spacing:.04em;cursor:pointer;}'+
     '#mqHost .mq-back:hover{background:rgba(251,191,36,.18);}'+
     '#mqHost .mq-back:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}'+
     '#mqHost .mq-a-eyebrow{font-family:\'Oswald\',var(--fm);font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#fbbf24;margin-bottom:.4rem;}'+
@@ -296,18 +323,18 @@
     '#mqHost .mq-scr-ref{font-family:\'Oswald\',var(--fm);font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fbbf24;margin-top:.3rem;}'+
     // go-deeper door
     '#mqHost .mq-door-slot:empty{display:none;}'+
-    '#mqHost .mq-door{display:inline-flex;align-items:center;min-height:44px;margin:.6rem 0 0;padding:.55rem 1.1rem;border:1px solid rgba(251,191,36,.5);border-radius:999px;background:rgba(251,191,36,.09);color:#fbbf24;font:700 .82rem/1 \'Oswald\',var(--fm);letter-spacing:.04em;cursor:pointer;}'+
+    '#mqHost .mq-door{display:inline-flex;align-items:center;min-height:44px;margin:.6rem 0 0;padding:.55rem 1.1rem;border:1px solid rgba(251,191,36,.5);border-radius:999px;background:rgba(251,191,36,.09);color:#fbbf24;font:700 .82rem/1 var(--fm);letter-spacing:.04em;cursor:pointer;}'+
     '#mqHost .mq-door:hover{background:rgba(251,191,36,.18);}'+
     '#mqHost .mq-door:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}'+
     // prev/next
     '#mqHost .mq-nav{display:flex;justify-content:space-between;gap:.5rem;margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.08);}'+
     '#mqHost .mq-nav-sp{flex:0 0 auto;}'+
-    '#mqHost .mq-nav-btn{min-height:44px;padding:.5rem 1rem;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:none;color:var(--tx2);font:600 .78rem/1 \'Oswald\',var(--fm);letter-spacing:.03em;cursor:pointer;}'+
+    '#mqHost .mq-nav-btn{min-height:44px;padding:.5rem 1rem;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:none;color:var(--tx2);font:600 .78rem/1 var(--fm);letter-spacing:.03em;cursor:pointer;}'+
     '#mqHost .mq-nav-btn:hover{border-color:rgba(251,191,36,.5);color:#fbbf24;}'+
     '#mqHost .mq-nav-btn:focus-visible{outline:2px solid #fbbf24;outline-offset:2px;}'+
     '#mqHost .mq-review-note{margin-top:1.6rem;font-size:.66rem;font-style:italic;color:var(--tx3);text-align:center;}'+
     // ── light mode ──
-    ':root.light #mqHost .mq-eyebrow,:root.light #mqHost .mq-cat-label,:root.light #mqHost .mq-a-eyebrow,:root.light #mqHost .mq-scr-ref{color:#92400e;}'+
+    ':root.light #mqHost .mq-cat-label,:root.light #mqHost .mq-a-eyebrow,:root.light #mqHost .mq-scr-ref{color:#92400e;}'+
     ':root.light #mqHost .mq-rule{background:rgba(146,64,14,.5);}'+
     ':root.light #mqHost .mq-cat-rule{background:rgba(146,64,14,.28);}'+
     ':root.light #mqHost .mq-row.mq-read .mq-dot{background:#92400e;box-shadow:none;}'+
@@ -318,6 +345,13 @@
     ':root.light #mqHost .mq-door{color:#92400e;border-color:rgba(180,83,9,.4);background:rgba(180,83,9,.08);}'+
     ':root.light #mqHost .mq-door:hover{background:rgba(180,83,9,.14);}'+
     ':root.light #mqHost .mq-nav-btn:hover{border-color:rgba(180,83,9,.5);color:#92400e;}'+
+    // Structural hairlines — dark uses white low-alpha; repaint them for
+    // paper or the 35-row list has NO separators in light mode (no card
+    // backgrounds anywhere, so the border is the only divider).
+    ':root.light #mqHost .mq-row{border-bottom-color:rgba(146,64,14,.16);}'+
+    ':root.light #mqHost .mq-row:hover{background:rgba(146,64,14,.06);}'+
+    ':root.light #mqHost .mq-nav{border-top-color:rgba(146,64,14,.2);}'+
+    ':root.light #mqHost .mq-nav-btn{border-color:rgba(146,64,14,.22);}'+
     // reduced motion
     '@media (prefers-reduced-motion: reduce){#mqHost .mq-row,#mqHost .mq-dot{transition:none;}}';
     var st = document.createElement('style');
