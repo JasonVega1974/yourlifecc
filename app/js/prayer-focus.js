@@ -69,6 +69,11 @@
       // a low-opacity cross silhouette. All decorative layers are
       // pointer-events:none so the backdrop click still dismisses.
       + '#prayerFocusOverlay{'
+      // 2026-07-09 de-purple — the overlay was driven by the app-wide
+      // violet token via ~10 color-mix(var(--p)) calls. Override --p to
+      // faith gold LOCALLY (overlay scope only) so the whole surface
+      // shifts register without touching the global token.
+      +   '--p:#f5c842;'
       +   'position:fixed;inset:0;z-index:100070;display:none;'
       +   'background:radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--p) 22%, transparent) 0%, transparent 55%),'
       +   ' linear-gradient(180deg, #0b0a1f 0%, #0a0d1a 60%, #07070f 100%);'
@@ -99,7 +104,7 @@
       +   'position:relative;z-index:2;'
       +   'width:100%;max-width:32rem;'
       +   'display:flex;flex-direction:column;align-items:center;text-align:center;'
-      +   'color:#f5f3ff;'
+      +   'color:#fef3c7;'
       +   'animation:pfTextIn .9s cubic-bezier(.2,.7,.2,1) both;'
       // Longer prayers must scroll inside the overlay on small phones
       // rather than spill behind the close button or the swipe hint.
@@ -119,7 +124,7 @@
       + '.pf-title{'
       +   'font-family:var(--fm);'
       +   'font-size:.66rem;font-weight:800;letter-spacing:.32em;text-transform:uppercase;'
-      +   'color:color-mix(in srgb, var(--p) 60%, #f5f3ff);'
+      +   'color:color-mix(in srgb, var(--p) 60%, #fef3c7);'
       +   'opacity:.85;margin:0 0 1.6rem;'
       + '}'
       + '.pf-text{'
@@ -129,8 +134,8 @@
       +   'text-shadow:0 0 24px color-mix(in srgb, var(--p) 22%, transparent);'
       + '}'
       + '.pf-verse{'
-      +   'font-family:"Bebas Neue",var(--fm);'
-      +   'font-size:.95rem;letter-spacing:.18em;font-weight:700;'
+      +   'font-family:"Oswald",var(--fm);'
+      +   'font-size:.9rem;letter-spacing:.16em;font-weight:600;text-transform:uppercase;'
       +   'color:color-mix(in srgb, var(--p) 75%, #fbbf24);'
       +   'opacity:.85;margin:2.2rem 0 0;'
       + '}'
@@ -139,7 +144,7 @@
       +   'position:absolute;top:1rem;right:1rem;z-index:3;'
       +   'width:44px;height:44px;border-radius:50%;'
       +   'background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);'
-      +   'color:#f5f3ff;font-size:1rem;font-weight:800;cursor:pointer;'
+      +   'color:#fef3c7;font-size:1rem;font-weight:800;cursor:pointer;'
       +   'display:flex;align-items:center;justify-content:center;font-family:var(--fm);'
       +   'transition:background .15s,border-color .15s;'
       + '}'
@@ -147,7 +152,7 @@
       // Amen — primary action at bottom of card.
       + '.pf-amen{'
       +   'margin-top:2.2rem;'
-      +   'background:linear-gradient(135deg, color-mix(in srgb, var(--p) 80%, #7c3aed), color-mix(in srgb, var(--p) 50%, #a78bfa));'
+      +   'background:linear-gradient(135deg, color-mix(in srgb, var(--p) 80%, #d97706), color-mix(in srgb, var(--p) 50%, #fbbf24));'
       +   'color:#0b0a1f;border:none;border-radius:99px;'
       +   'padding:.95rem 2.4rem;font-family:var(--fh,var(--fm));'
       +   'font-size:1rem;font-weight:900;letter-spacing:.18em;cursor:pointer;'

@@ -2168,7 +2168,7 @@ body{top:0!important;}
 :root.light #ddmVerse { color: #475569 !important; }
 /* Devotional card sub-boxes — `rgba(<color>,.04)` backgrounds vanish on
    light page bg; bump alpha so they read as cards, not phantom borders. */
-:root.light #bf-devotional [style*="rgba(167,139,250,.04)"]{background:rgba(167,139,250,.14) !important;}
+:root.light #bf-devotional [style*="rgba(245,200,66,.04)"]{background:rgba(146,64,14,.10) !important;}
 :root.light #bf-devotional [style*="rgba(34,197,94,.04)"]{background:rgba(34,197,94,.10) !important;}
 :root.light #bf-devotional [style*="rgba(244,114,182,.04)"]{background:rgba(244,114,182,.10) !important;}
 /* Story Mode card (F4-G) — dark gradient is intentional for the
@@ -2549,6 +2549,9 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
 :root.light .ff-search-input{ background:#fbf8f2; color:#0f172a; border-color:rgba(0,0,0,.15); }
 :root.light .ff-search-title{ color:#0f172a; }
 :root.light .ff-search-item{ border-bottom-color:rgba(0,0,0,.06); }
+:root.light .ff-search-item:hover{ background:rgba(146,64,14,.06); }
+:root.light .ff-search-group-label{ color:#92400e; }
+:root.light .ff-search-input:focus{ border-color:rgba(146,64,14,.45); }
 
 /* Global modal close button */
 :root.light .modal-close-btn{ background:rgba(0,0,0,.07); color:#1a1b1e; }
@@ -6606,7 +6609,7 @@ body.modal-open .navbar{
   display:flex;flex-direction:column;
   padding:1.4rem 1.4rem 1.5rem;
   border-radius:18px;
-  background:linear-gradient(180deg,#111827 0%,#100a26 100%);
+  background:linear-gradient(180deg,#111827 0%,#0a1628 100%);
   border:1px solid rgba(251,191,36,.48);
   box-shadow:
     0 0 40px rgba(251,191,36,.30),
@@ -6875,11 +6878,11 @@ body.modal-open .navbar{
 }
 .fc-play-again-btn:active, .fc-new-round-btn:active{transform:scale(.97);}
 .fc-new-round-btn{
-  background:linear-gradient(135deg,#a78bfa,#8b5cf6);
-  color:#fff;
-  box-shadow:0 4px 18px rgba(167,139,250,.45);
+  background:linear-gradient(135deg,#f5c842,#d97706);
+  color:#1a0f00;
+  box-shadow:0 4px 18px rgba(245,200,66,.45);
 }
-.fc-new-round-btn:hover{box-shadow:0 6px 26px rgba(167,139,250,.65);}
+.fc-new-round-btn:hover{box-shadow:0 6px 26px rgba(245,200,66,.65);}
 
 @media (max-width: 640px){
   .fc-stage{padding:1.2rem .9rem 1.4rem;min-height:480px;}
@@ -10146,7 +10149,15 @@ html[data-faith-free="1"] #mBarAvatarBtn { display: none !important; }
   font-family: var(--fs, sans-serif);
 }
 .ff-search-input::placeholder { color: #64748b; }
-.ff-search-input:focus { border-color: rgba(56,189,248,.4); background: rgba(255,255,255,.09); }
+/* 2026-07-09 overhaul — faith gold register (was brand cyan). */
+.ff-search-input:focus { border-color: rgba(245,200,66,.5); background: rgba(255,255,255,.09); }
+.ff-search-input::-webkit-search-decoration,
+.ff-search-input::-webkit-search-cancel-button { -webkit-appearance: none; }
+/* Matched-keyword highlight — the bare <mark> was falling through to the
+   browser default (system-yellow block), the "highlights white / looks
+   terrible" bug. Gold text, no block. */
+#ffSearchOverlay mark { background: transparent; color: #f5c842; font-weight: 800; }
+:root.light #ffSearchOverlay mark { color: #92400e; }
 .ff-search-clear {
   background: none;
   border: none;
@@ -10192,19 +10203,29 @@ html[data-faith-free="1"] #mBarAvatarBtn { display: none !important; }
   font-weight: 800;
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: #475569;
+  color: #f5c842;
   padding: .6rem .95rem .3rem;
 }
 .ff-search-item {
+  /* Rendered as a <button> — reset UA button chrome or every result row
+     paints as a default white/gray button (the other half of the
+     "looks terrible" bug). */
   display: flex;
+  width: 100%;
   align-items: center;
   gap: .7rem;
   padding: .65rem .95rem;
   cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   border-bottom: 1px solid rgba(255,255,255,.04);
   transition: background .12s;
 }
-.ff-search-item:hover { background: rgba(255,255,255,.05); }
+.ff-search-item:hover { background: rgba(245,200,66,.06); }
+.ff-search-item:focus-visible { outline: 2px solid #f5c842; outline-offset: -2px; }
 .ff-search-item:last-child { border-bottom: none; }
 .ff-search-icon {
   font-size: 1.25rem;

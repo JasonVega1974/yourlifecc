@@ -501,11 +501,11 @@ async function renderFeaturedContentCard(){
   };
   const typeColors = {
     verse:'rgba(251,191,36,.18)', devotional:'rgba(56,189,248,.14)',
-    challenge:'rgba(34,197,94,.14)', study_prompt:'rgba(167,139,250,.14)', announcement:'rgba(248,113,113,.12)'
+    challenge:'rgba(34,197,94,.14)', study_prompt:'rgba(245,200,66,.14)', announcement:'rgba(248,113,113,.12)'
   };
   const typeBorders = {
     verse:'rgba(251,191,36,.35)', devotional:'rgba(56,189,248,.3)',
-    challenge:'rgba(34,197,94,.3)', study_prompt:'rgba(167,139,250,.3)', announcement:'rgba(248,113,113,.28)'
+    challenge:'rgba(34,197,94,.3)', study_prompt:'rgba(245,200,66,.3)', announcement:'rgba(248,113,113,.28)'
   };
   const bg  = typeColors[content.content_type]  || typeColors.verse;
   const bdr = typeBorders[content.content_type] || typeBorders.verse;
@@ -566,13 +566,13 @@ function renderDailyAiDevotional(){
   }
   var _sklA = window.matchMedia('(prefers-reduced-motion:reduce)').matches ? 'none' : '_devSk 1.6s ease-in-out infinite';
   var _sklGrad = 'linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 75%)';
-  root.innerHTML = '<div role="status" aria-label="Loading today\'s devotional" style="background:rgba(67,56,202,.04);border:1px solid rgba(67,56,202,.12);border-radius:16px;padding:1rem 1.1rem;">'
+  root.innerHTML = '<div role="status" aria-label="Loading today\'s devotional" style="background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.12);border-radius:16px;padding:1rem 1.1rem;">'
     + '<div style="height:.55rem;width:58%;background:'+_sklGrad+';background-size:200% 100%;border-radius:6px;margin-bottom:.65rem;animation:'+_sklA+'"></div>'
     + '<div style="height:1.1rem;width:82%;background:'+_sklGrad+';background-size:200% 100%;border-radius:6px;margin-bottom:.5rem;animation:'+_sklA+'"></div>'
     + '<div style="height:.75rem;width:100%;background:'+_sklGrad+';background-size:200% 100%;border-radius:4px;margin-bottom:.28rem;animation:'+_sklA+'"></div>'
     + '<div style="height:.75rem;width:88%;background:'+_sklGrad+';background-size:200% 100%;border-radius:4px;margin-bottom:.28rem;animation:'+_sklA+'"></div>'
     + '<div style="height:.75rem;width:70%;background:'+_sklGrad+';background-size:200% 100%;border-radius:4px;margin-bottom:.9rem;animation:'+_sklA+'"></div>'
-    + '<div style="height:3.4rem;background:rgba(167,139,250,.03);border:1px solid rgba(167,139,250,.06);border-radius:10px;margin-bottom:.5rem;"></div>'
+    + '<div style="height:3.4rem;background:rgba(245,200,66,.03);border:1px solid rgba(245,200,66,.06);border-radius:10px;margin-bottom:.5rem;"></div>'
     + '<div style="height:3.4rem;background:rgba(251,191,36,.02);border:1px solid rgba(251,191,36,.05);border-radius:10px;"></div>'
     + '</div>';
 
@@ -601,13 +601,13 @@ function _renderDailyDevPreview(root, dev){
   var dateLabel = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric'});
   var sentences = (dev.devotional||'').match(/[^.!?]+[.!?]+/g) || [(dev.devotional||'')];
   var preview = sentences.slice(0,3).join(' ').trim();
-  var html = '<div style="background:rgba(67,56,202,.04);border:1px solid rgba(67,56,202,.12);border-radius:14px;padding:.85rem 1rem;">';
-  html += '<div style="font-size:.6875rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#4338ca;opacity:.85;margin-bottom:.25rem;">✨ DAILY DEVOTIONAL · '+escapeHtml(dateLabel)+'</div>';
+  var html = '<div style="background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.12);border-radius:14px;padding:.85rem 1rem;">';
+  html += '<div style="font-size:.6875rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#f5c842;opacity:.85;margin-bottom:.25rem;">✨ DAILY DEVOTIONAL · '+escapeHtml(dateLabel)+'</div>';
   html += '<div style="font-size:.95rem;font-weight:900;color:var(--tx);margin-bottom:.4rem;line-height:1.3;">'+(dev.icon||'✨')+' '+escapeHtml(dev.title||'')+'</div>';
   html += '<div style="font-family:Georgia,serif;font-style:italic;font-size:.84rem;line-height:1.55;color:var(--tx);margin-bottom:.18rem;">"'+escapeHtml(dev.scripture||'')+'"</div>';
-  html += '<div style="font-size:.7rem;font-weight:800;color:#4338ca;margin-bottom:.5rem;">— '+escapeHtml(dev.scriptureRef||'')+'</div>';
+  html += '<div style="font-size:.7rem;font-weight:800;color:#f5c842;margin-bottom:.5rem;">— '+escapeHtml(dev.scriptureRef||'')+'</div>';
   html += '<div style="font-size:.8rem;color:var(--tx2);line-height:1.65;margin-bottom:.55rem;">'+escapeHtml(preview)+'</div>';
-  html += '<button type="button" onclick="bfTab(\'dailyDevotional\')" style="background:rgba(67,56,202,.1);border:1px solid rgba(67,56,202,.25);color:#4338ca;border-radius:8px;padding:.3rem .7rem;font-size:.75rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Read more →</button>';
+  html += '<button type="button" onclick="bfTab(\'dailyDevotional\')" style="background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);color:#f5c842;border-radius:8px;padding:.3rem .7rem;font-size:.75rem;font-weight:800;cursor:pointer;font-family:var(--fm);">Read more →</button>';
   html += '</div>';
   root.innerHTML = html;
 }
@@ -625,14 +625,14 @@ function renderDailyDevFull(){
 
 function _renderDailyDevContent(root, dev){
   var dateLabel = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric'});
-  var html = '<div style="background:rgba(67,56,202,.04);border:1px solid rgba(67,56,202,.12);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.85rem;">';
-  html += '<div style="font-size:.6875rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#4338ca;opacity:.85;margin-bottom:.3rem;">✨ DAILY DEVOTIONAL · '+escapeHtml(dateLabel)+'</div>';
+  var html = '<div style="background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.12);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.85rem;">';
+  html += '<div style="font-size:.6875rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#f5c842;opacity:.85;margin-bottom:.3rem;">✨ DAILY DEVOTIONAL · '+escapeHtml(dateLabel)+'</div>';
   html += '<div style="font-size:1rem;font-weight:900;color:var(--tx);margin-bottom:.5rem;line-height:1.3;">'+(dev.icon||'✨')+' '+escapeHtml(dev.title||'')+'</div>';
   html += '<div style="font-family:Georgia,serif;font-style:italic;font-size:.88rem;line-height:1.6;color:var(--tx);margin-bottom:.2rem;">"'+escapeHtml(dev.scripture||'')+'"</div>';
-  html += '<div style="font-size:.72rem;font-weight:800;color:#4338ca;margin-bottom:.7rem;">— '+escapeHtml(dev.scriptureRef||'')+'</div>';
+  html += '<div style="font-size:.72rem;font-weight:800;color:#f5c842;margin-bottom:.7rem;">— '+escapeHtml(dev.scriptureRef||'')+'</div>';
   html += '<div style="font-size:.82rem;color:var(--tx2);line-height:1.7;margin-bottom:.7rem;">'+escapeHtml(dev.devotional||'')+'</div>';
-  html += '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.12);border-radius:10px;padding:.55rem .75rem;margin-bottom:.6rem;">';
-  html += '<div style="font-size:.6875rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem;">💭 Reflect</div>';
+  html += '<div style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.12);border-radius:10px;padding:.55rem .75rem;margin-bottom:.6rem;">';
+  html += '<div style="font-size:.6875rem;font-weight:800;color:#f5c842;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.18rem;">💭 Reflect</div>';
   html += '<div style="font-size:.8rem;color:var(--tx);line-height:1.5;">'+escapeHtml(dev.question||'')+'</div>';
   html += '</div>';
   html += '<div style="background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:10px;padding:.55rem .75rem;margin-bottom:.75rem;">';
@@ -1258,7 +1258,7 @@ async function faithSearch(q){
   res.innerHTML =
     '<div style="font-size:.72rem;color:var(--tx3);margin-bottom:.75rem;">' + total + ' result' + (total>1?'s':'') + ' for "' + escapeHtml(q) + '"</div>' +
     renderGroup('Devotionals', devotionalHits, '#38bdf8') +
-    renderGroup('Bible Study', studyHits, '#a78bfa') +
+    renderGroup('Bible Study', studyHits, '#f5c842') +
     renderGroup('Academy', academyHits, '#22c55e') +
     renderGroup('Proof & Prophecy', proofHits, '#fbbf24') +
     renderGroup('Group Lessons', groupHits, '#fb923c');
@@ -1448,7 +1448,7 @@ function vcRender(){
   if(tpl === 'ocean'){
     const g = ctx.createLinearGradient(0,0,W,H);
     g.addColorStop(0, '#38bdf8');
-    g.addColorStop(1, '#a78bfa');
+    g.addColorStop(1, '#f5c842');
     ctx.fillStyle = g;
     ctx.fillRect(0,0,W,H);
     // Subtle radial highlight
@@ -1661,7 +1661,7 @@ function planFilter(cat, btn){
 // Used by both the catalog grid and the day cards. Brand colors map
 // to the gradient + accent the user picked for each category.
 const PLAN_CAT_BRAND = {
-  'topical':           { color:'#a78bfa', soft:'rgba(167,139,250,', name:'Violet' },
+  'topical':           { color:'#f5c842', soft:'rgba(245,200,66,',  name:'Gold'   },
   'beginner':          { color:'#38bdf8', soft:'rgba(56,189,248,',  name:'Cyan'   },
   'through-the-bible': { color:'#fbbf24', soft:'rgba(251,191,36,',  name:'Amber'  },
   'family':            { color:'#22c55e', soft:'rgba(34,197,94,',   name:'Green'  },
@@ -1952,7 +1952,7 @@ function openPlanDetail(planId){
   // F4-H — Mini-map for plans tied to a Bible Lands route. Renders the
   // polyline + a marker at progress = (currentDay-1) / totalDays.
   const routeMapHtml = (p.routeId && (typeof window !== 'undefined' && window.BIBLICAL_ROUTES))
-    ? `<div id="planMiniMap" style="height:200px;border-radius:14px;overflow:hidden;margin-bottom:.85rem;border:1px solid rgba(167,139,250,.25);box-shadow:0 8px 24px rgba(15,23,42,.25);background:#0d1117;"></div>`
+    ? `<div id="planMiniMap" style="height:200px;border-radius:14px;overflow:hidden;margin-bottom:.85rem;border:1px solid rgba(245,200,66,.25);box-shadow:0 8px 24px rgba(15,23,42,.25);background:#0d1117;"></div>`
     : '';
   body.innerHTML = ''
     + routeMapHtml
@@ -2022,7 +2022,7 @@ function _planMiniMapInit(plan, prog){
   // Route polyline (full path, slightly faded so the marker pops).
   const latlngs = points.map(p => [p.lat, p.lng]);
   const poly = L.polyline(latlngs, {
-    color: route.color || plan.brandColor || '#a78bfa',
+    color: route.color || plan.brandColor || '#f5c842',
     weight: 4, opacity: .55, lineJoin: 'round', lineCap: 'round',
   }).addTo(_planMiniMap);
 
@@ -2033,7 +2033,7 @@ function _planMiniMapInit(plan, prog){
       radius: last ? 6 : 4,
       color: '#fff',
       weight: 2,
-      fillColor: route.color || plan.brandColor || '#a78bfa',
+      fillColor: route.color || plan.brandColor || '#f5c842',
       fillOpacity: .95,
     }).addTo(_planMiniMap).bindTooltip(pt.label || '', { direction: 'top', offset:[0,-6] });
   });
@@ -2045,7 +2045,7 @@ function _planMiniMapInit(plan, prog){
   const markerLatLng = _interpAlongPath(points, progFrac);
   const completed = (dayDone >= totalDays);
   const emoji = plan.markerEmoji || '📍';
-  const ringColor = route.color || plan.brandColor || '#a78bfa';
+  const ringColor = route.color || plan.brandColor || '#f5c842';
   const markerIcon = L.divIcon({
     className: 'plan-mini-marker',
     html: '<div style="position:relative;width:42px;height:42px;display:flex;align-items:center;justify-content:center;">' +
@@ -2344,9 +2344,9 @@ function renderEsvBookGrid(){
     const icon = ESV_ICONS[name]||'📖';
     const book = BIBLE_BOOKS.find(b=>b.name===name);
     const ch = book ? book.ch : 1;
-    const borderColor = isNT ? 'rgba(56,189,248,.25)'  : 'rgba(167,139,250,.25)';
-    const badgeBg     = isNT ? 'rgba(56,189,248,.12)'  : 'rgba(167,139,250,.12)';
-    const badgeColor  = isNT ? '#38bdf8' : '#a78bfa';
+    const borderColor = isNT ? 'rgba(56,189,248,.25)'  : 'rgba(245,200,66,.25)';
+    const badgeBg     = isNT ? 'rgba(56,189,248,.12)'  : 'rgba(245,200,66,.12)';
+    const badgeColor  = isNT ? '#38bdf8' : '#f5c842';
     return `<div onclick="quickOpenEsvBook('${name.replace(/'/g,"\\'")}',${ch})" style="background:rgba(255,255,255,.04);border:1px solid ${borderColor};border-radius:14px;padding:.85rem 1rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.65rem;" onmouseenter="this.style.background='rgba(255,255,255,.08)';this.style.transform='translateY(-2px)'" onmouseleave="this.style.background='rgba(255,255,255,.04)';this.style.transform=''">
       <span style="font-size:1.5rem;flex-shrink:0;">${icon}</span>
       <div style="flex:1;min-width:0;">
@@ -2418,7 +2418,7 @@ async function openEsvReader(){
       <select onchange="navigateEsvChapter('${book.replace(/'/g,"\\'")}',parseInt(this.value),${totalCh})" style="flex:1;margin:0 .4rem;padding:.3rem .5rem;border-radius:8px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);color:var(--tx);font-size:.75rem;text-align:center;">
         ${chapterOpts}
       </select>
-      <button onclick="navigateEsvChapter('${book.replace(/'/g,"\\'")}',${chNum+1},${totalCh})" ${nextDisabled?'disabled style="opacity:.3;cursor:not-allowed;"':''} style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.4rem .8rem;font-size:.75rem;font-weight:700;cursor:pointer;">Next ›</button>
+      <button onclick="navigateEsvChapter('${book.replace(/'/g,"\\'")}',${chNum+1},${totalCh})" ${nextDisabled?'disabled style="opacity:.3;cursor:not-allowed;"':''} style="background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:8px;padding:.4rem .8rem;font-size:.75rem;font-weight:700;cursor:pointer;">Next ›</button>
     </div>
     <div class="esv-chrome" style="display:flex;gap:.4rem;margin-bottom:.6rem;flex-wrap:wrap;">
       <button onclick="esvListenChapter('${book.replace(/'/g,"\\'")}',${chNum})" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);color:#38bdf8;border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🎧 Listen</button>
@@ -2472,7 +2472,7 @@ function jumpToEsvVerse(verseNum){
   if(target){
     target.scrollIntoView({behavior:'smooth', block:'center'});
     // Briefly highlight the verse
-    target.style.background = 'rgba(167,139,250,.3)';
+    target.style.background = 'rgba(245,200,66,.3)';
     target.style.borderRadius = '3px';
     target.style.padding = '0 2px';
     setTimeout(()=>{ target.style.background=''; target.style.padding=''; }, 1500);
@@ -2542,7 +2542,7 @@ function renderEsvPassage(text, book, chNum){
       const hlBg = hl && hl.color ? hl.color : 'transparent';
       const hlAttr = hl && hl.color ? `background:${hl.color};color:#0b1220;border-radius:3px;padding:0 3px;` : '';
       html += `<span class="esv-v" data-verse="${verseNum}" data-book="${escapeHtml(book)}" data-chapter="${chNum}" onclick="esvVerseTap(${verseNum})" style="cursor:pointer;${hlAttr}">`;
-      html += `<sup id="esv-v-${verseNum}" style="color:#a78bfa;font-size:.65em;font-weight:700;">${bm ? '🔖' : ''}[${verseNum}]</sup>`;
+      html += `<sup id="esv-v-${verseNum}" style="color:#f5c842;font-size:.65em;font-weight:700;">${bm ? '🔖' : ''}[${verseNum}]</sup>`;
       if(nt) html += '<span title="You wrote a note on this verse" style="font-size:.7em;margin-left:2px;">📝</span>';
       openVerse = true;
       firstSeen = true;
@@ -2565,7 +2565,7 @@ function renderEsvPassage(text, book, chNum){
   html = html.replace(/(>)([^<]+)(<)/g, function(_, open, txt, close){
     return open + txt.replace(placeRegex, function(m){
       const id = ESV_PLACE_MAP[m];
-      return `<span data-place="${id}" style="border-bottom:1px dotted rgba(167,139,250,.55);cursor:pointer;color:#a78bfa;" title="Open ${m} in Biblical Archaeology">${m}</span>`;
+      return `<span data-place="${id}" style="border-bottom:1px dotted rgba(245,200,66,.55);cursor:pointer;color:#f5c842;" title="Open ${m} in Biblical Archaeology">${m}</span>`;
     }) + close;
   });
 
@@ -2902,8 +2902,8 @@ async function runEsvSearch(){
       </div>`;
     });
     localBookmarks.slice(0,5).forEach(function(b){
-      html += `<div onclick="esvJumpFromSearch('${encodeURIComponent(b.book)}',${b.chapter},${b.verse})" style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-radius:8px;padding:.5rem .65rem;margin-bottom:.3rem;cursor:pointer;">
-        <div style="font-size:.7rem;font-weight:800;color:#a78bfa;">🔖 ${escapeHtml(b.book)} ${b.chapter}:${b.verse}</div>
+      html += `<div onclick="esvJumpFromSearch('${encodeURIComponent(b.book)}',${b.chapter},${b.verse})" style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.18);border-radius:8px;padding:.5rem .65rem;margin-bottom:.3rem;cursor:pointer;">
+        <div style="font-size:.7rem;font-weight:800;color:#f5c842;">🔖 ${escapeHtml(b.book)} ${b.chapter}:${b.verse}</div>
       </div>`;
     });
   }
@@ -3154,7 +3154,7 @@ function renderBibleResumeCard(){
 
 // ── JESUS & GOD'S PURPOSE ────────────────────────────────────
 const JESUS_LESSONS = [
-  {icon:'✝️',title:'Who Is Jesus?',color:'#a78bfa',
+  {icon:'✝️',title:'Who Is Jesus?',color:'#f5c842',
     body:`<h4>The Central Figure of History</h4><p>Jesus of Nazareth is the most influential person who ever lived. Every calendar date is measured from his birth. But who did he claim to be?</p><p>Jesus claimed to be the Son of God — not just a good teacher, but God himself in human form. In John 14:6 he said, <i>"I am the way and the truth and the life."</i> In John 10:30, <i>"I and the Father are one."</i></p><h4>Liar, Lunatic, or Lord</h4><p>C.S. Lewis wrote that Jesus was either a <b>liar</b> (he knew he wasn't God and said it anyway), a <b>lunatic</b> (he genuinely believed it but was delusional), or he was telling the truth — he is <b>Lord</b>. What he cannot be is "just a nice teacher." Nice teachers don't claim to be God.</p><p>Christians believe Jesus is fully God and fully human — born of a virgin, lived a perfect life, performed miracles, was crucified, died, and rose from the dead three days later.</p>`},
   {icon:'🌍',title:'Why Did Jesus Come?',color:'#22c55e',
     body:`<h4>The Problem</h4><p>God created humans for relationship with him. But humans chose their own way — the Bible calls this sin. Sin separates us from a holy God the way darkness is separated from light.</p><h4>The Solution</h4><p>God could have left us in that separation. Instead, he entered the mess himself. Jesus came to live the perfect life we couldn't live, and to die the death we deserved.</p><p>On the cross, he took the punishment for every sin — past, present, and future — so that anyone who trusts in him can be forgiven and restored to relationship with God.</p><h4>What It Means for You</h4><p>You don't have to earn God's love. You can't. It's a gift — grace. <i>"For it is by grace you have been saved, through faith"</i> (Ephesians 2:8). All you have to do is receive it.</p>`},
@@ -3172,7 +3172,7 @@ const JESUS_LESSONS = [
     body:`<h4>What Is the Church?</h4><p>The church is not a building — it's people. Every believer is part of one global family. The church exists to worship God together, learn together, serve together, and hold each other accountable.</p><h4>Why You Need It</h4><p>Faith was never meant to be a solo journey. You need people who will pray for you when you're struggling, celebrate with you when you're winning, and tell you the truth when you're off track. <i>"As iron sharpens iron, so one person sharpens another"</i> (Proverbs 27:17).</p><h4>Finding Your Place</h4><p>No church is perfect because churches are full of imperfect people. Look for a community that teaches the Bible, genuinely cares for people, and challenges you to grow. Your involvement doesn't have to start big — just show up consistently.</p>`},
   {icon:'🌊',title:'Baptism & Communion — What They Mean',color:'#22d3ee',
     body:`<h4>Baptism</h4><p>Baptism is a public declaration of an internal decision. When you go under the water, it symbolizes dying to your old life. When you come up, it symbolizes rising to new life in Christ. It doesn't save you — faith does — but it's an act of obedience and a powerful statement to the world.</p><h4>Communion (The Lord's Supper)</h4><p>Jesus shared bread and wine with his disciples the night before he was crucified. The bread represents his body, broken for us. The cup represents his blood, shed for our forgiveness. Communion is a regular reminder of what Jesus did and why it matters.</p><h4>Why They Matter</h4><p>Both are acts of remembrance and obedience. They connect you to 2,000 years of believers who did the same things. They're not rituals — they're responses to grace.</p>`},
-  {icon:'🔮',title:'Heaven, Hell, and Eternity',color:'#8b5cf6',
+  {icon:'🔮',title:'Heaven, Hell, and Eternity',color:'#f5c842',
     body:`<h4>What the Bible Says</h4><p>The Bible teaches that physical death is not the end. Every person will spend eternity somewhere. Heaven is described as being in God's presence forever — no pain, no tears, no death. Hell is described as eternal separation from God.</p><h4>Who Goes Where?</h4><p>The Bible is clear: salvation is through faith in Jesus, not through good works. <i>"For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life"</i> (John 3:16). It's not about being good enough — it's about trusting the One who is.</p><h4>Why It Matters Now</h4><p>If eternity is real, it changes how you live today. It means your choices have weight beyond this life. It means every person you meet has an eternal soul. And it means the most important question you'll ever answer is: What will you do with Jesus?</p>`},
   {icon:'📖',title:'The Bible — God\'s Word to You',color:'#f59e0b',
     body:`<h4>What Is the Bible?</h4><p>The Bible is not just an ancient religious text — Christians believe it is God's direct communication to humanity. <i>"All Scripture is God-breathed and is useful for teaching, rebuking, correcting and training in righteousness"</i> (2 Timothy 3:16). God used approximately 40 human authors over 1,500 years — yet the message is unified.</p><h4>Why It Still Matters</h4><p>The Bible outsells every book in history every year. But more than popularity — it is the only book that has been proven historically accurate through archaeology, fulfilled prophecy, and manuscript evidence. The New Testament alone has over 5,800 Greek manuscripts, far more than any other ancient text.</p><h4>How to Read It</h4><p>Don't start at Genesis. Start with John — it tells you who Jesus is clearly. Then Proverbs for daily wisdom. Then Romans to understand the gospel deeply. Let it speak to your specific situation: search for what you need. It speaks to every human experience.`},
@@ -3193,7 +3193,7 @@ const JESUS_LESSONS = [
 const LEARN_BIBLE_LESSONS = [
   {icon:'📚',title:'Old Testament vs New Testament',color:'#38bdf8',
     body:`<h4>The Big Picture</h4><p>The Bible has 66 books by about 40 authors over 1,500 years. It's divided into two sections:</p><p><b>Old Testament (39 books):</b> Written before Jesus. Covers creation, Israel's history, God's laws, poetry and wisdom (Psalms, Proverbs), and prophecies about the coming Messiah.</p><p><b>New Testament (27 books):</b> Written after Jesus. The four Gospels tell Jesus's life story. Acts records the early church. The Letters teach Christian living. Revelation describes the end times.</p><h4>How They Connect</h4><p>The Old Testament is the promise. The New Testament is the fulfillment. Everything in the OT points toward Jesus.</p>`},
-  {icon:'🔍',title:'How to Interpret Scripture',color:'#a78bfa',
+  {icon:'🔍',title:'How to Interpret Scripture',color:'#f5c842',
     body:`<h4>Context Is Everything</h4><p>The #1 mistake: pulling a single verse out of context. Before applying it to your life, ask:</p><p><b>Who wrote this?</b> Paul writing to a church vs. David writing a song vs. Moses recording history.</p><p><b>Who were they writing to?</b> First-century Christians vs. ancient Israelites.</p><p><b>What type of writing is it?</b> History? Poetry? Prophecy? Law? Letter?</p><h4>Practical Steps</h4><p>Read the whole chapter, not just one verse. Compare with other passages on the same topic. Use a study Bible with notes. Ask: "What did this mean to the original audience?" THEN ask: "What principle applies to my life?"</p>`},
   {icon:'✍️',title:'Taking Notes & Journaling Scripture',color:'#22c55e',
     body:`<h4>Why Write It Down</h4><p>You retain 10% of what you read and 70% of what you write. Writing notes about scripture processes it deeper and helps you remember and apply it.</p><h4>The SOAP Method</h4><p><b>S — Scripture:</b> Write out the verse that stood out.<br><b>O — Observation:</b> What does it say? What words stand out?<br><b>A — Application:</b> How does this apply to MY life TODAY?<br><b>P — Prayer:</b> Write a prayer based on what you read.</p><h4>Color Coding</h4><p>Many people highlight with colors: <span style="background:#fef08a;color:#000;padding:0 .3rem;border-radius:3px;">Yellow = promises</span> <span style="background:#bbf7d0;color:#000;padding:0 .3rem;border-radius:3px;">Green = growth</span> <span style="background:#bfdbfe;color:#000;padding:0 .3rem;border-radius:3px;">Blue = God's character</span> <span style="background:#fecaca;color:#000;padding:0 .3rem;border-radius:3px;">Red = warning</span> <span style="background:#e9d5ff;color:#000;padding:0 .3rem;border-radius:3px;">Purple = prophecy</span></p>`},
@@ -3209,11 +3209,11 @@ const LEARN_BIBLE_LESSONS = [
     body:`<h4>Is the Bible Reliable?</h4><p>The Bible has more manuscript evidence than any other ancient text. Over 5,800 Greek manuscripts of the New Testament exist, the earliest dating within decades of the originals. For comparison, most ancient texts have fewer than 10 copies.</p><h4>What About Contradictions?</h4><p>Most "contradictions" are differences in perspective (like eyewitness accounts of the same event). Some are translation nuances. Serious study resolves most. Some remain mysteries — and that's okay. Faith doesn't require understanding everything.</p><h4>Is It All Literal?</h4><p>The Bible contains multiple genres: history (meant literally), poetry (meant metaphorically), prophecy (symbolic imagery), proverbs (general wisdom, not promises), and letters (practical instruction). Reading everything the same way misses the point. Context determines how to read each passage.</p>`},
   {icon:'💬',title:'Memorizing Scripture — Why and How',color:'#10b981',
     body:`<h4>Why Memorize?</h4><p>When anxiety hits at 2am, you can't Google fast enough. When temptation comes, you need truth already loaded. When a friend is hurting, the right verse at the right time changes everything. Scripture in your memory is available anytime, anywhere.</p><h4>How to Do It</h4><p><b>Start with 5 power verses:</b> John 3:16, Philippians 4:13, Proverbs 3:5-6, Romans 8:28, Jeremiah 29:11. These cover love, strength, trust, purpose, and hope.</p><p><b>The method:</b> Write the verse on a card. Read it aloud 5 times. Cover it and try to recite. Review yesterday's verse before adding a new one. After a week, you'll know it for life.</p><p><b>Make it stick:</b> Set it as your phone wallpaper. Write it on your bathroom mirror. Say it before meals. Teach it to someone else — teaching is the fastest way to memorize.</p>`},
-  {icon:'🌟',title:'Applying the Bible to Real Life',color:'#8b5cf6',
+  {icon:'🌟',title:'Applying the Bible to Real Life',color:'#f5c842',
     body:`<h4>The Bridge</h4><p>Reading the Bible without applying it is like reading a recipe without cooking. The goal is not knowledge — it is transformation. Every time you read, ask: "So what? What do I DO with this?"</p><h4>Practical Examples</h4><p><b>Read about forgiveness?</b> → Text that person you've been avoiding. <b>Read about generosity?</b> → Give something away this week. <b>Read about patience?</b> → Next time you're frustrated, pause for 10 seconds before responding. <b>Read about loving enemies?</b> → Pray (actually pray) for someone who wronged you.</p><h4>The Transformation Cycle</h4><p><b>Read → Understand → Apply → Reflect → Repeat.</b> The Bible changes you not by reading more, but by doing what you've already read. Start with one thing this week. Just one. And watch what happens.</p>`},
   {icon:'🗺️',title:'The Story of the Bible in One Page',color:'#f59e0b',
     body:`<h4>One Unified Story</h4><p>The Bible is not a random collection of writings — it is one story told across 66 books. That story has four acts:</p><p><b>Creation:</b> God makes a perfect world and humans to share it with. They are made in His image with purpose and dignity. <b>Fall:</b> Humans choose independence from God. Sin, suffering, and death enter the world. Everything breaks.</p><p><b>Redemption:</b> God immediately begins a rescue plan. He calls Abraham, forms a nation (Israel), gives the Law, sends prophets — all pointing toward the ultimate rescue: Jesus. Jesus lives, dies, and rises to restore what was broken. <b>Restoration:</b> One day, everything is made new. No more suffering, death, or separation from God. The story ends where it began — humans and God together in a perfect world.</p><h4>Where You Are in the Story</h4><p>You are living in Act 3, between the resurrection and the final restoration. You are part of the rescue mission — a new creation called to bring glimpses of the restored world into the broken one.`},
-  {icon:'🔑',title:'Key Verses Everyone Should Know',color:'#a78bfa',
+  {icon:'🔑',title:'Key Verses Everyone Should Know',color:'#f5c842',
     body:`<h4>The Gospel in One Verse</h4><p><b>John 3:16 —</b> "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."</p><h4>Identity</h4><p><b>Psalm 139:14 —</b> "I am fearfully and wonderfully made." <b>2 Corinthians 5:17 —</b> "If anyone is in Christ, the new creation has come."</p><h4>Strength and Peace</h4><p><b>Philippians 4:13 —</b> "I can do all this through him who gives me strength." <b>Philippians 4:6-7 —</b> "Do not be anxious about anything... the peace of God will guard your hearts."</p><h4>Trust and Purpose</h4><p><b>Proverbs 3:5-6 —</b> "Trust in the LORD with all your heart and lean not on your own understanding." <b>Jeremiah 29:11 —</b> "For I know the plans I have for you — plans to give you hope and a future." <b>Romans 8:28 —</b> "In all things God works for the good of those who love him."</p>`},
   {icon:'📜',title:'The 10 Commandments — Still Relevant?',color:'#b45309',
     body:`<h4>The Original Ten</h4><p>God gave Moses ten commands that have shaped civilization more than any other document. They fall in two groups: the first four govern our relationship with God, the last six govern our relationships with people.</p><p><b>God-focused:</b> No other gods. No idols. Don't misuse God's name. Keep the Sabbath. <b>People-focused:</b> Honor your parents. Don't murder. Don't commit adultery. Don't steal. Don't lie. Don't covet.</p><h4>Jesus's Summary</h4><p>Jesus compressed all ten into two: Love God with everything you have. Love your neighbor as yourself. If you do both, all ten are covered.</p><h4>Are They Still Binding?</h4><p>Christians are not under the Law as a means of salvation — Jesus fulfilled the Law. But the moral principles (don't murder, don't steal, etc.) reflect God's unchanging character and are reinforced in the New Testament. They show us what love looks like in action.`},
@@ -3326,7 +3326,7 @@ function renderFaithMilestones(){
   const studyNotes = (D.scrNotes||[]).length;
   
   const milestones = [
-    {icon:'🕊️',label:'Devotionals Read',count:devotionalsRead,target:365,color:'#a78bfa'},
+    {icon:'🕊️',label:'Devotionals Read',count:devotionalsRead,target:365,color:'#f5c842'},
     {icon:'📕',label:'Bible Readings',count:bibleReadings,target:20,color:'#60a5fa'},
     {icon:'🙏',label:'Prayers Written',count:prayers,target:15,color:'#f472b6'},
     {icon:'✅',label:'Prayers Answered',count:answered,target:5,color:'#22c55e'},
@@ -3909,7 +3909,7 @@ function renderDevotionals(){
 
   // All 30 as cards
   const el = document.getElementById('devList'); if(!el) return;
-  const devColors = ['#a78bfa','#60a5fa','#22c55e','#fbbf24','#f472b6','#fb923c','#38bdf8','#ef4444','#06b6d4','#e879f9'];
+  const devColors = ['#f5c842','#60a5fa','#22c55e','#fbbf24','#f472b6','#fb923c','#38bdf8','#ef4444','#06b6d4','#e879f9'];
   el.innerHTML = DEVOTIONALS.map((d,i)=>{
     const isToday = i===todayIdx;
     const c = devColors[i % devColors.length];
@@ -3921,7 +3921,7 @@ function renderDevotionals(){
           ${isToday?'<span style="font-size:.45rem;background:#f5a623;color:#000;padding:.06rem .25rem;border-radius:3px;font-weight:700;">TODAY</span>':''}
         </div>
       </div>
-      <div style="font-size:.65rem;color:var(--p);font-style:italic;">${d.verse}</div>
+      <div style="font-size:.65rem;color:#f5c842;font-style:italic;">${d.verse}</div>
       <div style="font-size:.62rem;color:var(--tx3);margin-top:.15rem;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${d.body}</div>
     </div>`;
   }).join('');
@@ -4354,7 +4354,7 @@ function renderStudyNotes(){
   el.innerHTML = notes.map(n=>`
     <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:.7rem .8rem;margin-bottom:.4rem;${n.highlight?'border-left:4px solid '+n.highlight:''}">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.25rem;">
-        <span style="font-size:.6rem;font-weight:700;color:var(--p);">Day ${n.day} · ${n.ref}</span>
+        <span style="font-size:.6rem;font-weight:700;color:#f5c842;">Day ${n.day} · ${n.ref}</span>
         <span style="font-size:.55rem;color:var(--tx3);">${n.date}</span>
       </div>
       <div style="font-size:.72rem;font-style:italic;color:var(--tx2);margin-bottom:.3rem;line-height:1.5;${n.highlight?'background:'+n.highlight+'20;padding:.2rem .3rem;border-radius:4px;':''}"><span style="font-size:.55rem;">📖</span> "${n.verse.substring(0,80)}${n.verse.length>80?'...':''}"</div>
@@ -4518,7 +4518,7 @@ function renderScrCalendar(){
     const read = D.scrReadDays && D.scrReadDays[day.ds];
     const isToday = day.ds === today;
     const isPast = day.ds < today;
-    return `<div style="width:${size};height:${size};border-radius:${_scrCalFilter==='all'?'2px':'6px'};background:${read?'#22c55e':isToday?'rgba(139,92,246,.3)':isPast?'rgba(239,68,68,.1)':'rgba(255,255,255,.04)'};display:flex;align-items:center;justify-content:center;font-size:${fontSize};color:${read?'#fff':isToday?'#a78bfa':'var(--tx3)'};font-weight:${isToday?'700':'400'};" title="${day.ds}${read?' ✓':''}">${_scrCalFilter!=='all'?day.d:''}</div>`;
+    return `<div style="width:${size};height:${size};border-radius:${_scrCalFilter==='all'?'2px':'6px'};background:${read?'#22c55e':isToday?'rgba(245,200,66,.3)':isPast?'rgba(239,68,68,.1)':'rgba(255,255,255,.04)'};display:flex;align-items:center;justify-content:center;font-size:${fontSize};color:${read?'#fff':isToday?'#f5c842':'var(--tx3)'};font-weight:${isToday?'700':'400'};" title="${day.ds}${read?' ✓':''}">${_scrCalFilter!=='all'?day.d:''}</div>`;
   }).join('');
 }
 
@@ -4535,14 +4535,14 @@ function renderScrBrowse(){
     const isToday = (i+1) === today;
     const ds = new Date(new Date().getFullYear(),0,i+1).toISOString().slice(0,10);
     const read = D.scrReadDays && D.scrReadDays[ds];
-    el.innerHTML += `<div style="padding:.5rem .6rem;border-bottom:1px solid rgba(255,255,255,.04);${isToday?'background:rgba(139,92,246,.05);border-radius:8px;':''}">
+    el.innerHTML += `<div style="padding:.5rem .6rem;border-bottom:1px solid rgba(255,255,255,.04);${isToday?'background:rgba(245,200,66,.05);border-radius:8px;':''}">
       <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.15rem;">
-        <span style="font-size:.6rem;font-weight:700;color:${isToday?'#a78bfa':'var(--tx3)'};">Day ${i+1}</span>
+        <span style="font-size:.6rem;font-weight:700;color:${isToday?'#f5c842':'var(--tx3)'};">Day ${i+1}</span>
         ${read?'<span style="font-size:.55rem;color:#22c55e;">✅</span>':''}
-        ${isToday?'<span style="font-size:.5rem;background:#a78bfa;color:#fff;padding:.1rem .3rem;border-radius:3px;">TODAY</span>':''}
+        ${isToday?'<span style="font-size:.5rem;background:#f5c842;color:#fff;padding:.1rem .3rem;border-radius:3px;">TODAY</span>':''}
       </div>
       <div style="font-size:.78rem;font-style:italic;color:var(--tx);line-height:1.5;">${s[0]}</div>
-      <div style="font-size:.65rem;color:var(--p);font-weight:600;margin-top:.15rem;">— ${s[1]}</div>
+      <div style="font-size:.65rem;color:#f5c842;font-weight:600;margin-top:.15rem;">— ${s[1]}</div>
     </div>`;
   }
 }
@@ -5025,11 +5025,11 @@ async function renderPrayerWallPane(){
   }
   // Color per category — mirrors PRAY_FOR_CATEGORIES emoji set.
   const catColor = {
-    family:'#fb923c', friends:'#38bdf8', enemies:'#a78bfa',
+    family:'#fb923c', friends:'#38bdf8', enemies:'#f5c842',
     leaders:'#fbbf24', church:'#f472b6', nation:'#22c55e',
     'the-lost':'#fbbf24', 'the-suffering':'#ef4444',
-    yourself:'#a78bfa', 'the-world':'#06b6d4',
-    self:'#a78bfa', friend:'#38bdf8', world:'#06b6d4', general:'#fbbf24',
+    yourself:'#f5c842', 'the-world':'#06b6d4',
+    self:'#f5c842', friend:'#38bdf8', world:'#06b6d4', general:'#fbbf24',
   };
   // Own-vs-others distinction: prayer_requests has no name/email column
   // (just a bare user_id FK — nothing PII-bearing to leak), so "own" is
@@ -5382,7 +5382,7 @@ function _mvLib(){
   return (typeof window !== 'undefined' && window.MEMORY_VERSE_LIBRARY) ? window.MEMORY_VERSE_LIBRARY : [];
 }
 function _mvCatLookup(catId){
-  return _mvCats().find(c => c.id === catId) || { id:catId, label:catId, icon:'📖', color:'#a78bfa' };
+  return _mvCats().find(c => c.id === catId) || { id:catId, label:catId, icon:'📖', color:'#f5c842' };
 }
 function _mvTodayISO(){ return new Date().toISOString().slice(0,10); }
 
@@ -6188,7 +6188,7 @@ function _abRenderCrisis(){
         <a href="tel:988" style="background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:800;font-family:var(--fm);text-decoration:none;">📞 Call 988</a>
         <a href="sms:988" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--tx);border-radius:10px;padding:.55rem 1rem;font-size:.78rem;font-weight:700;font-family:var(--fm);text-decoration:none;">💬 Text 988</a>
       </div>
-      <div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;padding:.6rem .8rem;font-style:italic;color:var(--tx2);font-size:.82rem;line-height:1.6;">"The LORD is near to the brokenhearted and saves the crushed in spirit." — Psalm 34:18</div>
+      <div style="background:rgba(245,200,66,.05);border-left:3px solid #f5c842;border-radius:0 8px 8px 0;padding:.6rem .8rem;font-style:italic;color:var(--tx2);font-size:.82rem;line-height:1.6;">"The LORD is near to the brokenhearted and saves the crushed in spirit." — Psalm 34:18</div>
       <div style="font-size:.78rem;color:var(--tx2);margin-top:.7rem;line-height:1.55;">Please also reach out to a parent, pastor, school counselor, or trusted adult today. You don't have to carry this alone.</div>
     </div>
   `;
@@ -6264,8 +6264,8 @@ function _abRenderAnswer(question, data){
   }).join('');
 
   out.innerHTML = `
-    <div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.18);border-radius:14px;padding:.85rem 1rem;margin-bottom:.7rem;">
-      <div style="font-size:.66rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.3rem;">Pastoral Answer</div>
+    <div style="background:rgba(245,200,66,.05);border:1px solid rgba(245,200,66,.18);border-radius:14px;padding:.85rem 1rem;margin-bottom:.7rem;">
+      <div style="font-size:.66rem;font-weight:800;color:#f5c842;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.3rem;">Pastoral Answer</div>
       <div style="font-size:.92rem;line-height:1.7;color:var(--tx);">${escapeHtml(answer)}</div>
     </div>
     ${verses.length ? '<div style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.16em;margin:.5rem 0 .35rem;">Scripture (' + verses.length + ')</div>' + versesHtml : ''}
@@ -6526,7 +6526,7 @@ function renderSermonNotes(){
           <span onclick="event.stopPropagation();exportSermonNote(${s.id})" style="margin-left:auto;cursor:pointer;opacity:.6;font-size:.7rem;" title="Copy to clipboard">📋</span>
         </div>
         <div style="font-size:.85rem;line-height:1.5;color:var(--tx);font-weight:600;margin-bottom:${s.scriptures||s.actionStep?'.3rem':'0'};">⭐ ${escapeHtml(s.takeaway || '')}</div>
-        ${s.scriptures ? '<div style="font-size:.7rem;color:#a78bfa;font-weight:700;margin-bottom:.2rem;">📖 '+escapeHtml(s.scriptures)+'</div>' : ''}
+        ${s.scriptures ? '<div style="font-size:.7rem;color:#f5c842;font-weight:700;margin-bottom:.2rem;">📖 '+escapeHtml(s.scriptures)+'</div>' : ''}
         ${s.actionStep ? '<div style="font-size:.7rem;color:#10b981;font-weight:700;">🎯 '+escapeHtml(s.actionStep)+'</div>' : ''}
         ${podcast ? '<div style="margin-top:.3rem;padding-top:.3rem;border-top:1px solid rgba(255,255,255,.06);"><a href="'+escapeHtml(podcast.listenLink)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:.7rem;color:#38bdf8;text-decoration:none;font-weight:700;">🎧 Listen → '+escapeHtml(podcast.name)+'</a></div>' : ''}
       </div>`;
@@ -6703,7 +6703,7 @@ function _acEsc(s){
 // variable-length and the diploma = every lesson in the track.
 // Tracks are ordering + narrative, NOT locks: any lesson, any order.
 var _ACAD_TRACKS = [
-  { id:'foundations', name:'Foundations',    desc:'Who God is, the gospel, the Bible.',        cats:['theology','bible-study'],        accent:'#a78bfa' },
+  { id:'foundations', name:'Foundations',    desc:'Who God is, the gospel, the Bible.',        cats:['theology','bible-study'],        accent:'#f5c842' },
   { id:'defender',    name:'Defender',       desc:'Why we believe — evidence and history.',    cats:['apologetics','church-history'],  accent:'#fb923c' },
   { id:'walking',     name:'Walking It Out', desc:'Faith in real life, every day.',            cats:['christian-living'],              accent:'#38bdf8' }
 ];
@@ -6894,7 +6894,7 @@ function _acDiplomaRender(track, rec){
     var stat = _acTrackDone(track);
     // Night-navy ground (the academy SVG palette — no new navy).
     var g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, '#0a0d1a'); g.addColorStop(1, '#1a1233');
+    g.addColorStop(0, '#0a0d1a'); g.addColorStop(1, '#0a1628');
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     // Thin double gold border.
     ctx.strokeStyle = 'rgba(251,191,36,.85)'; ctx.lineWidth = 3;
@@ -7600,7 +7600,7 @@ function openAcademyLesson(courseId, lessonId){
   const isDone = !!store.lessons[lesson.id];
 
   const _acHdrEl = document.getElementById('charModalHeader');
-  _acHdrEl.style.background = 'linear-gradient(135deg,#0a0d1a 0%,#1a1233 100%)';
+  _acHdrEl.style.background = 'linear-gradient(135deg,#0a0d1a 0%,#0a1628 100%)';
   document.getElementById('charIcon').textContent = mod.icon;
   const _ctEl = document.getElementById('charTitle');
   if(_ctEl){ _ctEl.textContent = lesson.title; _ctEl.style.webkitTextFillColor = '#fbbf24'; _ctEl.style.color = '#fbbf24'; }
@@ -7612,7 +7612,7 @@ function openAcademyLesson(courseId, lessonId){
     escapeHtml(course.title + ' · ' + (lesson.duration || '')) +
     '</span>';
   const refsHtml = (lesson.scriptureRefs && lesson.scriptureRefs.length)
-    ? '<div style="background:rgba(167,139,250,.05);border-left:3px solid #a78bfa;border-radius:0 8px 8px 0;padding:.6rem .8rem;margin-top:1rem;font-size:.75rem;color:var(--tx2);"><strong style="color:#a78bfa;">📖 Scripture:</strong> ' + lesson.scriptureRefs.map(r => escapeHtml(r)).join(', ') + '</div>'
+    ? '<div style="background:rgba(245,200,66,.05);border-left:3px solid #f5c842;border-radius:0 8px 8px 0;padding:.6rem .8rem;margin-top:1rem;font-size:.75rem;color:var(--tx2);"><strong style="color:#f5c842;">📖 Scripture:</strong> ' + lesson.scriptureRefs.map(r => escapeHtml(r)).join(', ') + '</div>'
     : '';
   const reflectHtml = lesson.reflectionPrompt
     ? '<div style="background:rgba(16,185,129,.05);border-left:3px solid #10b981;border-radius:0 8px 8px 0;padding:.6rem .8rem;margin-top:.6rem;font-size:.78rem;color:var(--tx2);font-style:italic;line-height:1.6;"><strong style="color:#10b981;font-style:normal;">💭 Reflection:</strong> ' + escapeHtml(lesson.reflectionPrompt) + '</div>'
@@ -7733,7 +7733,7 @@ function _acRenderQuizQuestion(){
     `<button onclick="_acAnswerQuiz(${i})" style="text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tx);border-radius:10px;padding:.6rem .85rem;font-family:var(--fm);font-size:.82rem;line-height:1.45;cursor:pointer;width:100%;margin-bottom:.35rem;">${String.fromCharCode(65+i)}. ${escapeHtml(opt)}</button>`
   ).join('');
 
-  body.innerHTML = `<div style="font-size:.66rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.45rem;">Question ${_acQuizState.idx + 1} of ${total}</div>
+  body.innerHTML = `<div style="font-size:.66rem;font-weight:800;color:#f5c842;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.45rem;">Question ${_acQuizState.idx + 1} of ${total}</div>
     <div style="font-size:.95rem;line-height:1.55;color:var(--tx);font-weight:600;margin-bottom:.85rem;">${escapeHtml(q.q || '')}</div>
     <div>${optionsHtml}</div>`;
   footer.innerHTML = `<button onclick="acCloseQuiz()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:10px;padding:.5rem .85rem;font-size:.74rem;font-weight:700;cursor:pointer;font-family:var(--fm);">End Session</button>`;
@@ -7772,7 +7772,7 @@ function _acAnswerQuiz(choiceIdx){
     return `<div style="background:${bg};border:1px solid ${bd};color:var(--tx);border-radius:10px;padding:.6rem .85rem;font-family:var(--fm);font-size:.82rem;line-height:1.45;width:100%;margin-bottom:.35rem;">${String.fromCharCode(65+i)}. ${escapeHtml(opt)}${badge}</div>`;
   }).join('');
 
-  body.innerHTML = `<div style="font-size:.66rem;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.45rem;">Question ${_acQuizState.idx + 1} of ${total}</div>
+  body.innerHTML = `<div style="font-size:.66rem;font-weight:800;color:#f5c842;text-transform:uppercase;letter-spacing:.16em;margin-bottom:.45rem;">Question ${_acQuizState.idx + 1} of ${total}</div>
     <div style="font-size:.95rem;line-height:1.55;color:var(--tx);font-weight:600;margin-bottom:.85rem;">${escapeHtml(q.q || '')}</div>
     <div>${optionsHtml}</div>
     ${q.explanation ? '<div style="margin-top:.7rem;background:rgba(56,189,248,.06);border-left:3px solid #38bdf8;border-radius:0 8px 8px 0;padding:.6rem .8rem;font-size:.78rem;line-height:1.55;color:var(--tx2);"><strong style="color:#38bdf8;">Why:</strong> ' + escapeHtml(q.explanation) + '</div>' : ''}`;
@@ -7871,7 +7871,7 @@ function _acCertRender(course, mod, cp){
   ctx.strokeStyle = '#38bdf8';
   ctx.strokeRect(28, 28, W-56, H-56);
   ctx.lineWidth = 4;
-  ctx.strokeStyle = '#a78bfa';
+  ctx.strokeStyle = '#f5c842';
   ctx.strokeRect(56, 56, W-112, H-112);
 
   ctx.fillStyle = '#0f172a';
@@ -7895,7 +7895,7 @@ function _acCertRender(course, mod, cp){
   // Recipient name
   const recipient = (D && D.name) ? D.name : (D && D.profile && D.profile.parentName) ? D.profile.parentName : 'Faith Hub Member';
   ctx.font = '900 56px "Bebas Neue", Inter, sans-serif';
-  ctx.fillStyle = mod && mod.color ? mod.color : '#a78bfa';
+  ctx.fillStyle = mod && mod.color ? mod.color : '#f5c842';
   ctx.fillText(recipient, W/2, 360);
 
   // Course
@@ -8345,14 +8345,14 @@ function openBwSite(siteId){
     } else {
       photoEl.innerHTML = '📷 Photo coming when image library lands';
       photoEl.style.height = '140px';
-      photoEl.style.background = 'linear-gradient(135deg,rgba(56,189,248,.08),rgba(167,139,250,.08))';
+      photoEl.style.background = 'linear-gradient(135deg,rgba(56,189,248,.08),rgba(245,200,66,.08))';
       photoEl.style.padding = '';
     }
   }
   // Header gradient picks the FIRST matching era color for visual identity.
   const firstPeriod = periods.find(p => (s.eras || []).indexOf(p.id) !== -1);
   const c1 = '#38bdf8';
-  const c2 = firstPeriod ? firstPeriod.color : '#a78bfa';
+  const c2 = firstPeriod ? firstPeriod.color : '#f5c842';
   document.getElementById('bwSiteHeader').style.background = 'linear-gradient(135deg,'+c1+','+c2+')';
   // Scripture refs — render as cyan chips that jump into the Bible reader.
   const refsEl = document.getElementById('bwSiteRefs');
@@ -8515,7 +8515,7 @@ function openBwDiscovery(discId){
   if(metaEl){
     const relatedHtml = (d.relatedSiteIds || []).map(sid => {
       const site = _bwSiteById(sid);
-      return site ? '<button onclick="openBwSite(\''+sid+'\')" style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:99px;padding:.18rem .55rem;font-size:.6rem;font-weight:700;cursor:pointer;font-family:var(--fm);margin-right:.2rem;">📍 '+_bwEsc(site.name)+'</button>' : '';
+      return site ? '<button onclick="openBwSite(\''+sid+'\')" style="background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:99px;padding:.18rem .55rem;font-size:.6rem;font-weight:700;cursor:pointer;font-family:var(--fm);margin-right:.2rem;">📍 '+_bwEsc(site.name)+'</button>' : '';
     }).filter(Boolean).join('');
     metaEl.innerHTML =
       '<div><div style="font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;font-size:.58rem;margin-bottom:.15rem;">Currently At</div><div style="color:var(--tx);">'+_bwEsc(d.currentLocation || '—')+'</div></div>'
@@ -8583,14 +8583,14 @@ function bwRenderPilgrimage(){
       showToast('🏆 ' + b.label + ' earned! +50 XP');
     }
     const pct = Math.min(100, Math.round((progress / target) * 100));
-    return '<div class="bw-card" style="border-left-color:'+(earned?'#fbbf24':'#a78bfa')+';cursor:default;'+(earned?'background:rgba(251,191,36,.06);':'')+'">'
+    return '<div class="bw-card" style="border-left-color:'+(earned?'#fbbf24':'#f5c842')+';cursor:default;'+(earned?'background:rgba(251,191,36,.06);':'')+'">'
       + '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;">'
       +   '<span style="font-size:1.5rem;">'+b.icon+'</span>'
       +   '<div style="flex:1;"><div class="bw-card-name">'+_bwEsc(b.label)+'</div>'
       +   '<div class="bw-card-meta" style="color:'+(earned?'#fbbf24':'var(--tx2)')+';">'+(earned?'🏆 Earned':progress + '/' + target)+'</div></div>'
       + '</div>'
       + '<div style="font-size:.74rem;color:var(--tx2);line-height:1.5;margin-bottom:.4rem;">'+_bwEsc(b.desc)+'</div>'
-      + '<div style="height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,'+(earned?'#fbbf24,#fb923c':'#38bdf8,#a78bfa')+');border-radius:99px;transition:width .5s;"></div></div>'
+      + '<div style="height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,'+(earned?'#fbbf24,#fb923c':'#38bdf8,#f5c842')+');border-radius:99px;transition:width .5s;"></div></div>'
       + '</div>';
   }).join('');
 }
@@ -8660,7 +8660,7 @@ function bwToggleRoute(routeId, btn){
   // Polyline.
   const latlngs = points.map(p => [p.lat, p.lng]);
   const polyline = L.polyline(latlngs, {
-    color: r.color || '#a78bfa',
+    color: r.color || '#f5c842',
     weight: 4,
     opacity: 0.92,
     lineJoin: 'round',
@@ -8690,7 +8690,7 @@ function bwToggleRoute(routeId, btn){
     setTimeout(() => {
       const wpIcon = L.divIcon({
         className: 'bw-route-waypoint',
-        html: '<div style="width:14px;height:14px;border-radius:50%;background:'+(r.color||'#a78bfa')+';border:2.5px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35);"></div>',
+        html: '<div style="width:14px;height:14px;border-radius:50%;background:'+(r.color||'#f5c842')+';border:2.5px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35);"></div>',
         iconSize: [14,14], iconAnchor: [7,7],
       });
       const m = L.marker([p.lat, p.lng], { icon: wpIcon }).addTo(_bwMap);
@@ -8707,7 +8707,7 @@ function bwToggleRoute(routeId, btn){
   // Style chip as active.
   if(btn){
     btn.classList.add('active');
-    btn.style.background = r.color || '#a78bfa';
+    btn.style.background = r.color || '#f5c842';
     btn.style.color = '#0b1220';
     btn.style.borderColor = 'transparent';
   }
@@ -8815,7 +8815,7 @@ openEsvReader = async function(){
     if(btnRow && !btnRow.querySelector('[data-bp-btn]')){
       const btn = document.createElement('button');
       btn.setAttribute('data-bp-btn','1');
-      btn.style.cssText = 'background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);';
+      btn.style.cssText = 'background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:8px;padding:.35rem .7rem;font-size:.7rem;font-weight:700;cursor:pointer;font-family:var(--fm);';
       btn.innerHTML = '📺 Watch Bible Project';
       btn.onclick = function(){ openBibleProjectVideo(book); };
       // Insert as third child so it appears next to Listen + Settings.
@@ -8844,8 +8844,8 @@ function playFx(type){
   let html = '', clearAfter = 2000;
   if(type === 'dove'){
     html = '<svg class="fx-dove" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">'
-      + '<path d="M44 12c-3 5-12 8-22 8 0 9 5 18 14 22 7 3 14 1 18-5 4-7 0-15-10-25z" fill="#fff" stroke="#a78bfa" stroke-width="1.2"/>'
-      + '<path d="M28 22c-6 4-12 12-12 24" stroke="#a78bfa" stroke-width="2" fill="none" stroke-linecap="round"/>'
+      + '<path d="M44 12c-3 5-12 8-22 8 0 9 5 18 14 22 7 3 14 1 18-5 4-7 0-15-10-25z" fill="#fff" stroke="#f5c842" stroke-width="1.2"/>'
+      + '<path d="M28 22c-6 4-12 12-12 24" stroke="#f5c842" stroke-width="2" fill="none" stroke-linecap="round"/>'
       + '<circle cx="46" cy="18" r="1.6" fill="#0f172a"/>'
       + '</svg>';
     clearAfter = 2700;
@@ -8870,7 +8870,7 @@ function playFx(type){
       + '</svg>';
     clearAfter = 1900;
   } else if(type === 'confetti'){
-    const colors = ['#38bdf8','#a78bfa','#10b981','#fbbf24','#f472b6','#fb923c'];
+    const colors = ['#38bdf8','#f5c842','#10b981','#fbbf24','#f472b6','#fb923c'];
     const pieces = [];
     for(let i = 0; i < 60; i++){
       const left = Math.random() * 100;
@@ -8960,7 +8960,7 @@ function playFx(type){
 // pulses at the present moment node. Scroll-reveal via IntersectionObserver.
 
 const TL_ERAS = [
-  { id:'patriarchs',       label:'Patriarchs',         range:'~2000-1500 BC',   color:'#a78bfa', glow:'rgba(167,139,250,.22)' },
+  { id:'patriarchs',       label:'Patriarchs',         range:'~2000-1500 BC',   color:'#f5c842', glow:'rgba(245,200,66,.22)' },
   { id:'exodus-conquest',  label:'Exodus & Conquest',  range:'~1450-1380 BC',   color:'#fbbf24', glow:'rgba(251,191,36,.22)' },
   { id:'judges',           label:'Judges',             range:'~1380-1050 BC',   color:'#c084fc', glow:'rgba(192,132,252,.22)' },
   { id:'united-kingdom',   label:'United Kingdom',     range:'~1050-931 BC',    color:'#10b981', glow:'rgba(16,185,129,.22)' },
@@ -8978,7 +8978,7 @@ const TL_ERAS = [
 // accents, silhouette compositions. Shared by every event within the era.
 const TL_ERA_SVGS = {
   'patriarchs': '<svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">'
-    + '<defs><linearGradient id="tlsvg-pat" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="55%" stop-color="#1a1233"/><stop offset="100%" stop-color="#3d2a5e"/></linearGradient>'
+    + '<defs><linearGradient id="tlsvg-pat" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0d1a"/><stop offset="55%" stop-color="#0a1628"/><stop offset="100%" stop-color="#24365e"/></linearGradient>'
     + '<radialGradient id="tlsvg-pat-glow" cx="50%" cy="35%" r="35%"><stop offset="0%" stop-color="rgba(251,191,36,.4)"/><stop offset="100%" stop-color="rgba(251,191,36,0)"/></radialGradient></defs>'
     + '<rect width="800" height="300" fill="url(#tlsvg-pat)"/>'
     + '<g fill="#fef3c7" opacity="0.85"><circle cx="80" cy="40" r="0.9"/><circle cx="142" cy="80" r="1.1"/><circle cx="220" cy="30" r="0.8"/><circle cx="320" cy="70" r="1.0"/><circle cx="420" cy="35" r="1.3"/><circle cx="500" cy="60" r="0.9"/><circle cx="580" cy="40" r="1.0"/><circle cx="660" cy="90" r="1.0"/><circle cx="720" cy="55" r="0.8"/></g>'
@@ -9330,7 +9330,7 @@ function scrollTimelineTo(eraId){
 function openTimelineEvent(eventId){
   const ev = _tlEventById(eventId);
   if(!ev){ if(typeof showToast==='function') showToast('Event not found'); return; }
-  const era = _tlEraById(ev.era) || { label:'—', color:'#a78bfa', glow:'rgba(167,139,250,.22)' };
+  const era = _tlEraById(ev.era) || { label:'—', color:'#f5c842', glow:'rgba(245,200,66,.22)' };
 
   // Header image — prefer: per-event photo → relatedSite heroPhoto → era photo → era SVG.
   const svgEl = document.getElementById('tlEventSvg');
@@ -10550,8 +10550,8 @@ function renderBibleStudyHub(activeTrack){
   + '#bibleStudyRoot .bs-q-list{list-style:none;padding:0;margin:0;display:grid;gap:.38rem;}'
   + '#bibleStudyRoot .bs-q-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.52rem .7rem;font-size:.78rem;color:var(--tx2);line-height:1.5;}'
   + '#bibleStudyRoot .bs-q-num{font-weight:700;color:#fbbf24;margin-right:.3rem;font-size:.68rem;}'
-  + '#bibleStudyRoot .bs-act{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);border-radius:10px;padding:.65rem .8rem;margin-bottom:.45rem;}'
-  + '#bibleStudyRoot .bs-act-title{font-size:.72rem;font-weight:700;color:#a78bfa;margin-bottom:.18rem;}'
+  + '#bibleStudyRoot .bs-act{background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:.65rem .8rem;margin-bottom:.45rem;}'
+  + '#bibleStudyRoot .bs-act-title{font-size:.72rem;font-weight:700;color:#f5c842;margin-bottom:.18rem;}'
   + '#bibleStudyRoot .bs-act-body{font-size:.76rem;color:var(--tx2);line-height:1.5;}'
   + '#bibleStudyRoot .bs-prayer{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.18);border-radius:10px;padding:.7rem .9rem;font-family:Georgia,serif;font-style:italic;font-size:.8rem;color:var(--tx2);line-height:1.65;margin-bottom:.8rem;}'
   + '#bibleStudyRoot .bs-tip{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.18);border-radius:8px;padding:.52rem .8rem;}'
@@ -11198,7 +11198,7 @@ function renderDenominationsCard(){
   if(!data){ el.innerHTML = '<p style="color:var(--tx2);font-size:.82rem;">Denominations data not available.</p>'; return; }
 
   var filterPills = ['All','Mainline','Evangelical','Charismatic','Liturgical','Anabaptist'].map(function(f,i){
-    return '<button class="denom-filter'+(i===0?' denom-filter-active':'')+'" onclick="filterDenomsBy(\''+f+'\',null)" data-filter="'+f+'" style="flex-shrink:0;font-size:.71rem;font-weight:700;padding:.2rem .55rem;border-radius:12px;border:1px solid rgba(167,139,250,.25);background:'+(i===0?'rgba(167,139,250,.2)':'none')+';color:var(--tx);cursor:pointer;white-space:nowrap;">'+f+'</button>';
+    return '<button class="denom-filter'+(i===0?' denom-filter-active':'')+'" onclick="filterDenomsBy(\''+f+'\',null)" data-filter="'+f+'" style="flex-shrink:0;font-size:.71rem;font-weight:700;padding:.2rem .55rem;border-radius:12px;border:1px solid rgba(245,200,66,.25);background:'+(i===0?'rgba(245,200,66,.2)':'none')+';color:var(--tx);cursor:pointer;white-space:nowrap;">'+f+'</button>';
   }).join('');
 
   el.innerHTML = '<div class="faith-card card-denominations" id="card-denominations" style="border-radius:12px;overflow:hidden;border:1px solid rgba(5,150,105,.2);">'
@@ -11247,7 +11247,7 @@ function filterDenomsBy(type, query){
     for(var i=0;i<pills.length;i++){
       var isActive = pills[i].getAttribute('data-filter') === type;
       pills[i].classList.toggle('denom-filter-active', isActive);
-      pills[i].style.background = isActive ? 'rgba(167,139,250,.2)' : 'none';
+      pills[i].style.background = isActive ? 'rgba(245,200,66,.2)' : 'none';
     }
   }
   var activePill = document.querySelector('#denomCardContainer .denom-filter-active');
@@ -11297,7 +11297,7 @@ function openDenomModal(denomId){
     +'<div style="display:flex;flex-wrap:wrap;gap:.25rem;">'+d.keyBranches.map(function(b){ return '<span style="font-size:.73rem;background:rgba(5,150,105,.09);color:#059669;border-radius:4px;padding:.12rem .35rem;">'+_jEsc(b)+'</span>'; }).join('')+'</div>' : '';
 
   var famousLeaders = d.famousLeaders && d.famousLeaders.length ? '<div style="font-size:.83rem;font-weight:700;margin:.8rem 0 .35rem;color:var(--tx);">Notable Figures</div>'
-    +'<div style="display:flex;flex-wrap:wrap;gap:.25rem;">'+d.famousLeaders.map(function(l){ return '<span style="font-size:.73rem;background:rgba(167,139,250,.1);color:#a78bfa;border-radius:4px;padding:.12rem .35rem;">'+_jEsc(l)+'</span>'; }).join('')+'</div>' : '';
+    +'<div style="display:flex;flex-wrap:wrap;gap:.25rem;">'+d.famousLeaders.map(function(l){ return '<span style="font-size:.73rem;background:rgba(245,200,66,.1);color:#f5c842;border-radius:4px;padding:.12rem .35rem;">'+_jEsc(l)+'</span>'; }).join('')+'</div>' : '';
 
   var keyVerses = d.keyVerses && d.keyVerses.length ? '<div style="font-size:.83rem;font-weight:700;margin:.8rem 0 .35rem;color:var(--tx);">Key Verses</div>'
     +'<div style="display:flex;flex-wrap:wrap;gap:.25rem;">'+d.keyVerses.map(function(v){ return '<span style="font-size:.73rem;background:rgba(192,57,43,.08);color:#c0392b;border-radius:4px;padding:.12rem .35rem;">'+_jEsc(v)+'</span>'; }).join('')+'</div>' : '';
@@ -11468,16 +11468,16 @@ function renderFJProfile(){
   var p = _fjGetProfile();
   var hasData = p.church_name || p.denomination || p.saved_date;
 
-  el.innerHTML = '<div style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.15);border-radius:12px;padding:.85rem 1rem;margin-bottom:1rem;">'
+  el.innerHTML = '<div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.15);border-radius:12px;padding:.85rem 1rem;margin-bottom:1rem;">'
     +'<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;">'
     +'<span style="font-size:1.1rem;">✝</span>'
     +'<span style="font-size:.88rem;font-weight:800;color:var(--tx);">My Faith Profile</span>'
-    +'<button onclick="openFaithProfileModal()" style="margin-left:auto;font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:99px;border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.1);color:var(--accent,#a78bfa);cursor:pointer;">'+(hasData?'Edit':'Set Up')+'</button>'
+    +'<button onclick="openFaithProfileModal()" style="margin-left:auto;font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:99px;border:1px solid rgba(245,200,66,.35);background:rgba(245,200,66,.1);color:var(--accent,#f5c842);cursor:pointer;">'+(hasData?'Edit':'Set Up')+'</button>'
     +'</div>'
     + (hasData
       ? (p.saved_date && _fjWalkingYears(p.saved_date)
-          ? '<div style="text-align:center;background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(59,130,246,.1));border-radius:8px;padding:.5rem .75rem;margin-bottom:.5rem;">'
-            +'<div style="font-size:.66rem;color:#a78bfa;font-weight:800;text-transform:uppercase;letter-spacing:.09em;margin-bottom:.15rem;">Walking with Jesus</div>'
+          ? '<div style="text-align:center;background:linear-gradient(135deg,rgba(245,200,66,.15),rgba(59,130,246,.1));border-radius:8px;padding:.5rem .75rem;margin-bottom:.5rem;">'
+            +'<div style="font-size:.66rem;color:#f5c842;font-weight:800;text-transform:uppercase;letter-spacing:.09em;margin-bottom:.15rem;">Walking with Jesus</div>'
             +'<div style="font-size:1.05rem;font-weight:900;color:var(--tx);">'+_jEsc(_fjWalkingYears(p.saved_date))+'</div>'
             +'</div>'
           : '')
@@ -11491,7 +11491,7 @@ function renderFJProfile(){
         + '</div>'
         + (p.spiritual_gifts && p.spiritual_gifts.length
           ? '<div style="margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.25rem;">'
-            + p.spiritual_gifts.map(function(g){ return '<span style="font-size:.7rem;background:rgba(167,139,250,.15);color:#a78bfa;border-radius:4px;padding:.1rem .35rem;">'+_jEsc(g)+'</span>'; }).join('')
+            + p.spiritual_gifts.map(function(g){ return '<span style="font-size:.7rem;background:rgba(245,200,66,.15);color:#f5c842;border-radius:4px;padding:.1rem .35rem;">'+_jEsc(g)+'</span>'; }).join('')
             +'</div>' : '')
       : '<div style="font-size:.8rem;color:var(--tx2);">Add your church, denomination, and faith story.</div>')
     +'</div>';
@@ -11533,7 +11533,7 @@ function openFaithProfileModal(){
 
   var giftChips = _FJ_SPIRITUAL_GIFTS.map(function(g){
     var sel = p.spiritual_gifts && p.spiritual_gifts.indexOf(g) !== -1;
-    return '<button type="button" class="fj-gift-chip'+(sel?' fj-gift-sel':'')+'" onclick="_fjToggleGift(this,\''+_jEsc(g)+'\')" style="font-size:.72rem;padding:.2rem .55rem;border-radius:12px;border:1px solid rgba(167,139,250,.3);background:'+(sel?'rgba(167,139,250,.25)':'none')+';color:var(--tx);cursor:pointer;transition:background .12s;">'+_jEsc(g)+'</button>';
+    return '<button type="button" class="fj-gift-chip'+(sel?' fj-gift-sel':'')+'" onclick="_fjToggleGift(this,\''+_jEsc(g)+'\')" style="font-size:.72rem;padding:.2rem .55rem;border-radius:12px;border:1px solid rgba(245,200,66,.3);background:'+(sel?'rgba(245,200,66,.25)':'none')+';color:var(--tx);cursor:pointer;transition:background .12s;">'+_jEsc(g)+'</button>';
   }).join('');
 
   var modal = document.createElement('div');
@@ -11541,41 +11541,41 @@ function openFaithProfileModal(){
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
   modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
-    +'<button type="button" onclick="closeFaithProfileModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<button type="button" onclick="closeFaithProfileModal()" style="background:rgba(245,200,66,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">My Faith Profile</span>'
     +'</div>'
 
     +'<div style="margin-bottom:.65rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Church Name</label>'
-    +'<input id="fjpChurch" type="text" value="'+_jEsc(p.church_name||'')+'" placeholder="e.g. Celebration Church" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjpChurch" type="text" value="'+_jEsc(p.church_name||'')+'" placeholder="e.g. Celebration Church" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
 
     +'<div style="margin-bottom:.65rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Pastor / Lead Pastor</label>'
-    +'<input id="fjpPastor" type="text" value="'+_jEsc(p.pastor_name||'')+'" placeholder="e.g. Pastor Tim" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjpPastor" type="text" value="'+_jEsc(p.pastor_name||'')+'" placeholder="e.g. Pastor Tim" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
 
     +'<div style="margin-bottom:.65rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Denomination / Tradition</label>'
-    +'<select id="fjpDenom" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;">'
+    +'<select id="fjpDenom" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;">'
     +'<option value="">Select...</option>'+denomOpts+'</select></div>'
 
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.65rem;">'
     +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Date Saved / Born Again</label>'
-    +'<input id="fjpSavedDate" type="date" value="'+_jEsc(p.saved_date||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjpSavedDate" type="date" value="'+_jEsc(p.saved_date||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
     +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Date Baptized</label>'
-    +'<input id="fjpBaptismDate" type="date" value="'+_jEsc(p.baptism_date||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjpBaptismDate" type="date" value="'+_jEsc(p.baptism_date||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
     +'</div>'
 
     +'<div style="margin-bottom:.65rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">My Salvation Story (optional)</label>'
-    +'<textarea id="fjpSavedDesc" rows="3" placeholder="How did you come to faith in Jesus?" style="width:100%;font-size:.82rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;resize:vertical;">'+_jEsc(p.saved_description||'')+'</textarea></div>'
+    +'<textarea id="fjpSavedDesc" rows="3" placeholder="How did you come to faith in Jesus?" style="width:100%;font-size:.82rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;resize:vertical;">'+_jEsc(p.saved_description||'')+'</textarea></div>'
 
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.65rem;">'
     +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Small Group</label>'
-    +'<input id="fjpSmallGroup" type="text" value="'+_jEsc(p.small_group||'')+'" placeholder="Group name / night" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjpSmallGroup" type="text" value="'+_jEsc(p.small_group||'')+'" placeholder="Group name / night" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
     +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Accountability Partner</label>'
-    +'<input id="fjpPartner" type="text" value="'+_jEsc(p.accountability_partner||'')+'" placeholder="Name" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjpPartner" type="text" value="'+_jEsc(p.accountability_partner||'')+'" placeholder="Name" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
     +'</div>'
 
     +'<div style="margin-bottom:1rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.4rem;">Spiritual Gifts</label>'
     +'<div style="display:flex;flex-wrap:wrap;gap:.3rem;" id="fjpGiftsRow">'+giftChips+'</div></div>'
 
-    +'<button onclick="saveFaithProfile()" style="width:100%;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;border:none;border-radius:10px;padding:.65rem;font-size:.88rem;font-weight:800;cursor:pointer;">Save Profile</button>'
+    +'<button onclick="saveFaithProfile()" style="width:100%;background:linear-gradient(135deg,#d97706,#d97706);color:#fff;border:none;border-radius:10px;padding:.65rem;font-size:.88rem;font-weight:800;cursor:pointer;">Save Profile</button>'
     +'</div>';
 
   document.body.appendChild(modal);
@@ -11584,7 +11584,7 @@ function openFaithProfileModal(){
 
 function _fjToggleGift(btn, gift){
   var sel = btn.classList.toggle('fj-gift-sel');
-  btn.style.background = sel ? 'rgba(167,139,250,.25)' : 'none';
+  btn.style.background = sel ? 'rgba(245,200,66,.25)' : 'none';
 }
 
 function saveFaithProfile(){
@@ -11658,8 +11658,8 @@ function renderFJMilestones(){
     var typeInfo = FJ_MILESTONE_TYPES.find(function(t){ return t.id === m.milestone_type; }) || {icon:'✨'};
     return '<div style="position:relative;padding-left:2rem;padding-bottom:.8rem;">'
       +'<div style="position:absolute;left:.1rem;top:.2rem;font-size:1rem;z-index:1;">'+typeInfo.icon+'</div>'
-      +(i < milestones.length-1 ? '<div style="position:absolute;left:.55rem;top:1.4rem;width:2px;height:calc(100% - .4rem);background:rgba(167,139,250,.2);"></div>' : '')
-      +'<div style="background:rgba(255,255,255,.03);border:1px solid rgba(167,139,250,.12);border-radius:10px;padding:.55rem .75rem;cursor:pointer;" onclick="_fjMilestoneDetail(\''+_jEsc(m.id)+'\')">'
+      +(i < milestones.length-1 ? '<div style="position:absolute;left:.55rem;top:1.4rem;width:2px;height:calc(100% - .4rem);background:rgba(245,200,66,.2);"></div>' : '')
+      +'<div style="background:rgba(255,255,255,.03);border:1px solid rgba(245,200,66,.12);border-radius:10px;padding:.55rem .75rem;cursor:pointer;" onclick="_fjMilestoneDetail(\''+_jEsc(m.id)+'\')">'
       +'<div style="display:flex;align-items:baseline;gap:.5rem;">'
       +'<span style="font-size:.83rem;font-weight:700;color:var(--tx);">'+_jEsc(m.title)+'</span>'
       +'<span style="font-size:.7rem;color:var(--tx2);margin-left:auto;white-space:nowrap;">'+_jEsc(m.date||'')+'</span>'
@@ -11672,7 +11672,7 @@ function renderFJMilestones(){
   el.innerHTML = '<div style="margin-bottom:1rem;">'
     +'<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;">'
     +'<span style="font-size:.88rem;font-weight:800;color:var(--tx);">Spiritual Milestones</span>'
-    +'<button onclick="openMilestoneModal(null)" style="margin-left:auto;font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:99px;border:none;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;cursor:pointer;">+ Add</button>'
+    +'<button onclick="openMilestoneModal(null)" style="margin-left:auto;font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:99px;border:none;background:linear-gradient(135deg,#d97706,#d97706);color:#fff;cursor:pointer;">+ Add</button>'
     +'</div>'
     +'<div>'+timelineHtml+'</div>'
     +'</div>';
@@ -11720,35 +11720,35 @@ function openMilestoneModal(editId){
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
   modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
-    +'<button type="button" onclick="closeMilestoneModal()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<button type="button" onclick="closeMilestoneModal()" style="background:rgba(245,200,66,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
     +'<span style="font-size:1rem;font-weight:800;color:var(--tx);">'+(editId?'Edit':'Add')+' Milestone</span>'
     +(editId ? '<button type="button" onclick="deleteMilestone(\''+_jEsc(editId)+'\')" style="margin-left:auto;background:rgba(239,68,68,.1);border:none;border-radius:8px;padding:.3rem .6rem;cursor:pointer;color:#ef4444;font-size:.75rem;">Delete</button>' : '')
     +'</div>'
     +'<input id="fjmEditId" type="hidden" value="'+_jEsc(editId||'')+'">'
 
     +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Milestone Type</label>'
-    +'<select id="fjmType" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;">'+typeOpts+'</select></div>'
+    +'<select id="fjmType" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;">'+typeOpts+'</select></div>'
 
     +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Title <span style="color:#ef4444;">*</span></label>'
-    +'<input id="fjmTitle" type="text" value="'+_jEsc(e.title||'')+'" placeholder="e.g. Water Baptism at Celebration Church" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjmTitle" type="text" value="'+_jEsc(e.title||'')+'" placeholder="e.g. Water Baptism at Celebration Church" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
 
     +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Date <span style="color:#ef4444;">*</span></label>'
-    +'<input id="fjmDate" type="date" value="'+_jEsc(e.date||new Date().toISOString().slice(0,10))+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjmDate" type="date" value="'+_jEsc(e.date||new Date().toISOString().slice(0,10))+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
 
     +'<div style="margin-bottom:.6rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Tell the Story</label>'
-    +'<textarea id="fjmDesc" rows="4" placeholder="What happened? How did you feel? What did God do?" style="width:100%;font-size:.82rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;resize:vertical;">'+_jEsc(e.description||'')+'</textarea></div>'
+    +'<textarea id="fjmDesc" rows="4" placeholder="What happened? How did you feel? What did God do?" style="width:100%;font-size:.82rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;resize:vertical;">'+_jEsc(e.description||'')+'</textarea></div>'
 
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem;">'
     +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Church</label>'
-    +'<input id="fjmChurch" type="text" value="'+_jEsc(e.church_name||p.church_name||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjmChurch" type="text" value="'+_jEsc(e.church_name||p.church_name||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
     +'<div><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Pastor / Leader</label>'
-    +'<input id="fjmPastor" type="text" value="'+_jEsc(e.pastor_name||p.pastor_name||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjmPastor" type="text" value="'+_jEsc(e.pastor_name||p.pastor_name||'')+'" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
     +'</div>'
 
     +'<div style="margin-bottom:1rem;"><label style="font-size:.77rem;font-weight:700;color:var(--tx2);display:block;margin-bottom:.25rem;">Who Was There (Witnesses)</label>'
-    +'<input id="fjmWitnesses" type="text" value="'+_jEsc((e.metadata&&e.metadata.witnesses)||'')+'" placeholder="e.g. Mom, Dad, Youth Group" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(167,139,250,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
+    +'<input id="fjmWitnesses" type="text" value="'+_jEsc((e.metadata&&e.metadata.witnesses)||'')+'" placeholder="e.g. Mom, Dad, Youth Group" style="width:100%;font-size:.83rem;padding:.4rem .55rem;border-radius:8px;border:1px solid rgba(245,200,66,.2);background:var(--bg);color:var(--tx);box-sizing:border-box;"></div>'
 
-    +'<button onclick="saveMilestone()" style="width:100%;background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;border:none;border-radius:10px;padding:.65rem;font-size:.88rem;font-weight:800;cursor:pointer;">Save Milestone</button>'
+    +'<button onclick="saveMilestone()" style="width:100%;background:linear-gradient(135deg,#d97706,#d97706);color:#fff;border:none;border-radius:10px;padding:.65rem;font-size:.88rem;font-weight:800;cursor:pointer;">Save Milestone</button>'
     +'</div>';
 
   document.body.appendChild(modal);
@@ -11822,13 +11822,13 @@ function _fjMilestoneDetail(id){
   modal.style.cssText = 'position:fixed;inset:0;z-index:9500;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;';
   modal.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:max(env(safe-area-inset-top),1rem) 1rem 3rem;">'
     +'<div style="display:flex;align-items:center;gap:.65rem;margin-bottom:1.2rem;padding-top:.4rem;">'
-    +'<button type="button" onclick="closeMilestoneDetail()" style="background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
-    +'<button type="button" onclick="closeMilestoneDetail();openMilestoneModal(\''+_jEsc(id)+'\')" style="margin-left:auto;background:rgba(167,139,250,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--accent,#a78bfa);font-size:.75rem;">Edit</button>'
+    +'<button type="button" onclick="closeMilestoneDetail()" style="background:rgba(245,200,66,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--tx);font-size:.8rem;">← Back</button>'
+    +'<button type="button" onclick="closeMilestoneDetail();openMilestoneModal(\''+_jEsc(id)+'\')" style="margin-left:auto;background:rgba(245,200,66,.1);border:none;border-radius:8px;padding:.32rem .65rem;cursor:pointer;color:var(--accent,#f5c842);font-size:.75rem;">Edit</button>'
     +'</div>'
     +'<div style="text-align:center;margin-bottom:1.2rem;">'
     +'<div style="font-size:3rem;margin-bottom:.4rem;">'+typeInfo.icon+'</div>'
     +'<div style="font-size:1.1rem;font-weight:900;color:var(--tx);margin-bottom:.2rem;">'+_jEsc(m.title)+'</div>'
-    +'<div style="font-size:.8rem;color:#a78bfa;">'+_jEsc(m.date||'')+'</div>'
+    +'<div style="font-size:.8rem;color:#f5c842;">'+_jEsc(m.date||'')+'</div>'
     +'</div>'
     +(m.description ? '<p style="font-size:.85rem;line-height:1.7;color:var(--tx2);margin-bottom:.8rem;white-space:pre-wrap;">'+_jEsc(m.description)+'</p>' : '')
     +(m.church_name ? '<div style="font-size:.78rem;color:var(--tx2);margin-bottom:.3rem;">⛪ '+_jEsc(m.church_name)+'</div>' : '')
@@ -12092,9 +12092,9 @@ function renderFJDisciplines(){
 
   var sectionsHtml = _FJ_DISCIPLINES.map(function(d){
     var paras = d.content.map(function(p){ return '<p style="margin:0 0 .65rem;font-size:.82rem;line-height:1.7;color:var(--tx2);">'+_jEsc(p)+'</p>'; }).join('');
-    var refs = d.scriptures.map(function(s){ return '<span style="font-size:.72rem;background:rgba(167,139,250,.1);color:#a78bfa;border-radius:4px;padding:.1rem .35rem;white-space:nowrap;">'+_jEsc(s)+'</span>'; }).join('');
+    var refs = d.scriptures.map(function(s){ return '<span style="font-size:.72rem;background:rgba(245,200,66,.1);color:#f5c842;border-radius:4px;padding:.1rem .35rem;white-space:nowrap;">'+_jEsc(s)+'</span>'; }).join('');
     return '<details style="margin-bottom:.5rem;">'
-      +'<summary style="cursor:pointer;padding:.6rem .75rem;background:rgba(167,139,250,.06);border-radius:8px;font-size:.85rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>'+d.icon+' '+_jEsc(d.title)+'</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
+      +'<summary style="cursor:pointer;padding:.6rem .75rem;background:rgba(245,200,66,.06);border-radius:8px;font-size:.85rem;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;"><span>'+d.icon+' '+_jEsc(d.title)+'</span><span style="font-size:.7rem;opacity:.5;">▼</span></summary>'
       +'<div style="padding:.75rem .5rem .3rem;">'
       +paras
       +'<div style="display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.5rem;">'+refs+'</div>'
@@ -12578,7 +12578,7 @@ function renderReadingPlansCard(){
     return;
   }
   var DIFF_LABELS = {beginner:'✦ Beginner', intermediate:'✦✦ Intermediate', advanced:'✦✦✦ Advanced'};
-  var DIFF_COLORS = {beginner:'#10b981', intermediate:'#38bdf8', advanced:'#a78bfa'};
+  var DIFF_COLORS = {beginner:'#10b981', intermediate:'#38bdf8', advanced:'#f5c842'};
 
   var activePlans = [];
   READING_PLANS.forEach(function(p){
@@ -12620,7 +12620,7 @@ function renderReadingPlansCard(){
     if(isDone) html += '<span style="font-size:.6rem;font-weight:800;background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:99px;padding:.08rem .4rem;">✓ Done</span>';
     else if(isActive) html += '<span style="font-size:.6rem;font-weight:800;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);border-radius:99px;padding:.08rem .4rem;">In Progress</span>';
     html += '</div><div style="font-size:.75rem;color:var(--tx2);line-height:1.4;margin-bottom:.28rem;">' + p.subtitle + '</div>';
-    html += '<div style="display:flex;align-items:center;gap:.4rem;"><span style="font-size:.6rem;font-weight:700;color:' + (DIFF_COLORS[p.difficulty]||'#a78bfa') + ';">' + (DIFF_LABELS[p.difficulty]||p.difficulty) + '</span><span style="font-size:.6rem;color:var(--tx3);">·</span><span style="font-size:.6rem;color:var(--tx3);font-weight:600;">' + p.days + ' days</span></div>';
+    html += '<div style="display:flex;align-items:center;gap:.4rem;"><span style="font-size:.6rem;font-weight:700;color:' + (DIFF_COLORS[p.difficulty]||'#f5c842') + ';">' + (DIFF_LABELS[p.difficulty]||p.difficulty) + '</span><span style="font-size:.6rem;color:var(--tx3);">·</span><span style="font-size:.6rem;color:var(--tx3);font-weight:600;">' + p.days + ' days</span></div>';
     html += '</div><span style="font-size:1.1rem;color:var(--tx3);flex-shrink:0;">' + (isActive ? '▶' : isDone ? '↺' : '+') + '</span></div></div>';
   });
   html += '</div></div>';
@@ -12814,8 +12814,8 @@ function _rpOpenDay(planId, justDay){
   }
 
   if(dayData.reflection){
-    html += '<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.18);border-radius:14px;padding:1rem;margin-bottom:.85rem;">';
-    html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#a78bfa;margin-bottom:.4rem;">💭 Reflection</div>';
+    html += '<div style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.18);border-radius:14px;padding:1rem;margin-bottom:.85rem;">';
+    html += '<div style="font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#f5c842;margin-bottom:.4rem;">💭 Reflection</div>';
     html += '<div style="font-size:.87rem;color:var(--tx2);line-height:1.65;font-style:italic;">' + dayData.reflection + '</div>';
     html += '</div>';
   }
@@ -12984,12 +12984,12 @@ function renderMoodPicker(){
     var map = {grateful:{e:'😊',l:'Grateful'},anxious:{e:'😟',l:'Anxious'},sad:{e:'😔',l:'Sad'},angry:{e:'😤',l:'Frustrated'},lost:{e:'😶',l:'Lost'}};
     var m = map[id];
     return '<button onclick="selectMood(\'' + id + '\')" style="background:none;border:2px solid rgba(255,255,255,.1);border-radius:14px;padding:.5rem .55rem;cursor:pointer;font-family:var(--fm);display:flex;flex-direction:column;align-items:center;gap:.25rem;min-width:3rem;transition:border-color .15s;" ' +
-      'onmouseover="this.style.borderColor=\'rgba(167,139,250,.5)\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,.1)\'">' +
+      'onmouseover="this.style.borderColor=\'rgba(245,200,66,.5)\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,.1)\'">' +
       '<span style="font-size:1.8rem;">' + m.e + '</span>' +
       '<span style="font-size:.6rem;font-weight:700;color:var(--tx2);">' + m.l + '</span>' +
       '</button>';
   }).join('');
-  overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#1a1233);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;">' +
+  overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#0a1628);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;">' +
     '<div style="width:36px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;margin:0 auto .9rem;"></div>' +
     '<div style="font-size:.85rem;font-weight:800;color:var(--tx);margin-bottom:.85rem;text-align:center;">How are you feeling today?</div>' +
     '<div style="display:flex;justify-content:center;gap:.7rem;margin-bottom:1rem;flex-wrap:wrap;">' + btns + '</div>' +
@@ -13031,11 +13031,11 @@ function renderMoodScripture(moodId){
   if(!overlay) return;
   var prayerSessionId = (MOOD_TO_PRAYER[moodId] || 'morning');
   var versesHtml = (moodData.verses || []).map(function(v){
-    return '<div style="background:rgba(255,255,255,.04);border-left:3px solid rgba(167,139,250,.45);border-radius:0 10px 10px 0;padding:.65rem .85rem;margin-bottom:.5rem;">' +
+    return '<div style="background:rgba(255,255,255,.04);border-left:3px solid rgba(245,200,66,.45);border-radius:0 10px 10px 0;padding:.65rem .85rem;margin-bottom:.5rem;">' +
       '<div style="font-size:.8rem;font-style:italic;line-height:1.55;color:var(--tx);margin-bottom:.25rem;">"' + escapeHtml(v.text) + '"</div>' +
       '<div style="display:flex;align-items:center;gap:.4rem;">' +
-      '<div style="font-size:.65rem;font-weight:800;color:#a78bfa;letter-spacing:.06em;flex:1;">' + escapeHtml(v.ref) + '</div>' +
-      '<button onclick="_msSpeakVerse(this)" style="background:none;border:1px solid rgba(167,139,250,.3);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:#a78bfa;cursor:pointer;">🔊</button>' +
+      '<div style="font-size:.65rem;font-weight:800;color:#f5c842;letter-spacing:.06em;flex:1;">' + escapeHtml(v.ref) + '</div>' +
+      '<button onclick="_msSpeakVerse(this)" style="background:none;border:1px solid rgba(245,200,66,.3);border-radius:4px;padding:.1rem .35rem;font-size:.65rem;color:#f5c842;cursor:pointer;">🔊</button>' +
       '</div>' +
       '</div>';
   }).join('');
@@ -13044,19 +13044,19 @@ function renderMoodScripture(moodId){
     '<div style="margin-top:.75rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem;">' +
     '<div style="font-size:.68rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;">Want to go deeper?</div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">' +
-    '<button type="button" onclick="_moodClose();startMeditation(\'' + _moodAudioMap.meditationId + '\')" style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.28);color:#a78bfa;border-radius:10px;padding:.55rem .4rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);line-height:1.3;">🧘 Meditate<br><span style="font-size:.65rem;opacity:.7;font-weight:500;">on this</span></button>' +
+    '<button type="button" onclick="_moodClose();startMeditation(\'' + _moodAudioMap.meditationId + '\')" style="background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.28);color:#f5c842;border-radius:10px;padding:.55rem .4rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);line-height:1.3;">🧘 Meditate<br><span style="font-size:.65rem;opacity:.7;font-weight:500;">on this</span></button>' +
     '<button type="button" onclick="_moodClose();playAmbientTrack(\'' + _moodAudioMap.ambientTrackId + '\')" style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);color:#38bdf8;border-radius:10px;padding:.55rem .4rem;font-size:.74rem;font-weight:800;cursor:pointer;font-family:var(--fm);line-height:1.3;">🎵 Just listen<br><span style="font-size:.65rem;opacity:.7;font-weight:500;">ambient audio</span></button>' +
     '</div></div>'
   ) : '';
-  overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#1a1233);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;max-height:80vh;overflow-y:auto;">' +
+  overlay.innerHTML = '<div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg2,#0a1628);border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;padding:1.1rem 1rem 2rem;animation:slideUp .22s ease-out;max-width:520px;margin:0 auto;max-height:80vh;overflow-y:auto;">' +
     '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.85rem;">' +
     '<button onclick="_moodClose()" style="background:none;border:none;color:var(--tx2);font-size:.95rem;cursor:pointer;padding:.2rem .3rem;font-family:var(--fm);">← Back</button>' +
-    '<div style="flex:1;font-size:.82rem;font-weight:800;color:var(--tx);">You\'re feeling <span style="color:#a78bfa;">' + escapeHtml(moodData.label || moodId) + '</span> today</div>' +
+    '<div style="flex:1;font-size:.82rem;font-weight:800;color:var(--tx);">You\'re feeling <span style="color:#f5c842;">' + escapeHtml(moodData.label || moodId) + '</span> today</div>' +
     '</div>' +
     '<div style="font-size:.7rem;color:var(--tx2);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.55rem;">Here\'s what God says:</div>' +
     versesHtml +
     '<div style="margin-top:.75rem;"><button onclick="if(typeof startPrayerSession===\'function\')startPrayerSession(\'' + prayerSessionId + '\');else bfTab(\'prayer\');_moodClose();" ' +
-    'style="width:100%;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🙏 Pray about this</button></div>' +
+    'style="width:100%;background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.35);color:#f5c842;border-radius:12px;padding:.6rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🙏 Pray about this</button></div>' +
     _moodDeeperHtml +
     '</div>';
   overlay.style.display = 'block';
@@ -13171,7 +13171,7 @@ function renderPrayerSessionView(session, stepIndex){
     '</div>' +
     '<div style="text-align:center;margin-bottom:1rem;">' +
     '<div style="font-size:2.4rem;font-weight:900;color:var(--tx);font-family:var(--fh,var(--fm));line-height:1;" id="psTimerCount">' + _psFormatTime(_psRemainingTime) + '</div>' +
-    '<div style="height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin:.55rem 0;"><div id="psTimerBar" style="height:100%;width:100%;background:linear-gradient(90deg,#a78bfa,#7c3aed);border-radius:99px;transition:width 1s linear;"></div></div>' +
+    '<div style="height:5px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin:.55rem 0;"><div id="psTimerBar" style="height:100%;width:100%;background:linear-gradient(90deg,#f5c842,#d97706);border-radius:99px;transition:width 1s linear;"></div></div>' +
     '<div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:.6rem;">' +
     '<button id="psTimerStartBtn" onclick="_psStartTimer()" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0b1220;border:none;border-radius:10px;padding:.55rem 1.2rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">▶ Start Timer</button>' +
     '<button onclick="_psSkipStep()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--tx2);border-radius:10px;padding:.55rem .9rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">' + nextLabel + '</button>' +
@@ -13571,7 +13571,7 @@ function _msSpeakVerse(btn){
   var card = btn.closest ? btn.closest('div[style*=”border-left”]') : btn.parentNode.parentNode;
   if(!card) return;
   var italicDiv = card.querySelector('div[style*=”italic”]');
-  var refDiv = card.querySelector('div[style*=”a78bfa”]');
+  var refDiv = card.querySelector('div[style*=”f5c842”]');
   var text = italicDiv ? italicDiv.textContent.replace(/^[“”]|[“”]$/g,'').trim() : '';
   var ref = refDiv ? refDiv.textContent.trim() : '';
   speakVerse(text, ref, btn);
@@ -13741,7 +13741,7 @@ window.addEventListener('popstate', function(){
 });
 var _ssWakeLock = null;
 
-var _MED_TYPE_COLOR = {scripture:'#38bdf8',reflection:'#a78bfa',prayer:'#10b981',opening:'#fde68a',close:'#fde68a',breath:'#38bdf8',silence:'#a78bfa',declaration:'#10b981',practice:'#a78bfa',cast:'#38bdf8'};
+var _MED_TYPE_COLOR = {scripture:'#38bdf8',reflection:'#f5c842',prayer:'#10b981',opening:'#fde68a',close:'#fde68a',breath:'#38bdf8',silence:'#f5c842',declaration:'#10b981',practice:'#f5c842',cast:'#38bdf8'};
 var _MED_TYPE_LABEL = {scripture:'SCRIPTURE',reflection:'REFLECTION',prayer:'PRAYER',opening:'TO BEGIN',close:'CLOSING',breath:'BREATHE',silence:'SILENCE',declaration:'DECLARE',practice:'PRACTICE',cast:'ACTION'};
 
 function _medTotStr(sec){
@@ -13762,16 +13762,16 @@ function renderAudioMeditationsCard(){
   html += '<div class="bf-section-hdr"><div class="bf-eyebrow">SCRIPTURE · BREATH · REST</div>';
   html += '<div class="bf-title">🧘 Audio Meditations</div>';
   html += '<div class="bf-sub">Scripture-led guided sessions. Each one speaks verses, reflection, and prayer — through your headphones.</div></div>';
-  html += '<button type="button" onclick="bfTab(\'createMeditation\')" style="width:100%;background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(56,189,248,.12));border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);margin-bottom:.75rem;letter-spacing:.02em;">✨ + Create Your Own Meditation</button>';
+  html += '<button type="button" onclick="bfTab(\'createMeditation\')" style="width:100%;background:linear-gradient(135deg,rgba(245,200,66,.18),rgba(56,189,248,.12));border:1px solid rgba(245,200,66,.35);color:#f5c842;border-radius:12px;padding:.6rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);margin-bottom:.75rem;letter-spacing:.02em;">✨ + Create Your Own Meditation</button>';
   html += '<div style="display:grid;gap:.55rem;">';
   AUDIO_MEDITATIONS.forEach(function(m){
     var safeT = escapeHtml(m.title); var safeThm = escapeHtml(m.theme);
-    html += '<div role="button" tabindex="0" onclick="startMeditation(\''+m.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();startMeditation(\''+m.id+'\');}" onfocus="this.style.outline=\'2px solid rgba(99,102,241,.7)\';this.style.outlineOffset=\'2px\'" onblur="this.style.outline=\'none\'" aria-label="Play '+safeT+', '+m.duration+' minutes, '+safeThm+'" style="background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;outline:none;">';
+    html += '<div role="button" tabindex="0" onclick="startMeditation(\''+m.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();startMeditation(\''+m.id+'\');}" onfocus="this.style.outline=\'2px solid rgba(99,102,241,.7)\';this.style.outlineOffset=\'2px\'" onblur="this.style.outline=\'none\'" aria-label="Play '+safeT+', '+m.duration+' minutes, '+safeThm+'" style="background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;outline:none;">';
     html += '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;" aria-hidden="true">'+m.icon+'</span>';
     html += '<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.1rem;">'+safeT+'</div>';
     html += '<div style="font-size:.73rem;color:var(--tx2);line-height:1.35;">'+safeThm+'</div></div>';
     html += '<div style="text-align:right;flex-shrink:0;" aria-hidden="true"><div style="font-size:.68rem;font-weight:800;color:var(--tx3);">'+m.duration+' min</div>';
-    html += '<div style="margin-top:.2rem;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.18rem .5rem;font-size:.7rem;font-weight:800;">▶</div></div>';
+    html += '<div style="margin-top:.2rem;background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:8px;padding:.18rem .5rem;font-size:.7rem;font-weight:800;">▶</div></div>';
     html += '</div>';
   });
   html += '</div>';
@@ -13912,7 +13912,7 @@ function _genMedBuildLibraryHtml(){
   var all = _genMedLoadLibrary();
   if(!all.length){
     return '<div id="genMedLibrary" style="margin-top:1rem;">'
-      + '<div style="text-align:center;padding:1.5rem 1rem;background:rgba(67,56,202,.04);border:1px solid rgba(67,56,202,.12);border-radius:14px;">'
+      + '<div style="text-align:center;padding:1.5rem 1rem;background:rgba(245,200,66,.04);border:1px solid rgba(245,200,66,.12);border-radius:14px;">'
       + '<div style="font-size:2.5rem;margin-bottom:.5rem;">✨</div>'
       + '<div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.3rem;">No meditations yet</div>'
       + '<div style="font-size:.75rem;color:var(--tx3);line-height:1.5;">Create your first AI meditation above to get started</div>'
@@ -13950,15 +13950,15 @@ function _genMedBuildLibraryHtml(){
     html += '<div style="font-size:.84rem;font-weight:800;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+safeTitle+'</div>';
     html += '<div style="font-size:.6875rem;color:var(--tx3);margin-top:.05rem;">';
     html += escapeHtml(m.theme||m.scriptureFocus||'')+(ago?' · '+ago:'');
-    html += playCount ? ' · <span style="color:#a78bfa;" aria-hidden="true">▶ '+playCount+(playCount===1?' play':' plays')+'</span>' : '';
+    html += playCount ? ' · <span style="color:#f5c842;" aria-hidden="true">▶ '+playCount+(playCount===1?' play':' plays')+'</span>' : '';
     html += '</div>';
     html += '</div>';
-    html += '<div style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;border-radius:8px;padding:.28rem .6rem;font-size:.74rem;font-weight:800;flex-shrink:0;" aria-hidden="true">▶ Play</div>';
+    html += '<div style="background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);color:#f5c842;border-radius:8px;padding:.28rem .6rem;font-size:.74rem;font-weight:800;flex-shrink:0;" aria-hidden="true">▶ Play</div>';
     html += '</div>';
     // Share + delete row
     html += '<div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;padding-top:.4rem;border-top:1px solid rgba(255,255,255,.05);">';
     html += '<label style="display:flex;align-items:center;gap:.3rem;cursor:pointer;flex:1;min-height:44px;" aria-label="Share '+safeTitle+' with community">';
-    html += '<input type="checkbox" '+(isPublic?'checked':'')+' onchange="_genMedTogglePublic(\''+_jEsc(m.id)+'\',this.checked)" style="accent-color:#a78bfa;cursor:pointer;" />';
+    html += '<input type="checkbox" '+(isPublic?'checked':'')+' onchange="_genMedTogglePublic(\''+_jEsc(m.id)+'\',this.checked)" style="accent-color:#f5c842;cursor:pointer;" />';
     html += '<span style="font-size:.6875rem;color:var(--tx3);">Share with community</span>';
     html += '</label>';
     html += '<button type="button" onclick="_genMedDeleteSaved(\''+_jEsc(m.id)+'\',this)" style="background:none;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:8px;min-width:44px;min-height:44px;font-size:.75rem;cursor:pointer;font-family:var(--fm);display:flex;align-items:center;justify-content:center;" aria-label="Delete meditation: '+safeTitle+'">🗑</button>';
@@ -13982,7 +13982,7 @@ function renderCreateMeditationCard(){
   html += '<div class="bf-section-hdr"><div class="bf-eyebrow">AI · PERSONALIZED · GUIDED</div>';
   html += '<div class="bf-title">✨ Create Your Meditation</div>';
   html += '<div class="bf-sub">Tell us what\'s on your heart. Claude writes a personalized guided session just for you — Scripture, reflection, prayer.</div></div>';
-  html += '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.12);border-radius:14px;padding:1rem 1.1rem;">';
+  html += '<div style="background:rgba(245,200,66,.05);border:1px solid rgba(245,200,66,.12);border-radius:14px;padding:1rem 1.1rem;">';
   // Theme
   html += '<div style="margin-bottom:.8rem;">';
   html += '<label for="genMedTheme" style="font-size:.66rem;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem;">What\'s on your heart?</label>';
@@ -14004,7 +14004,7 @@ function renderCreateMeditationCard(){
   html += '<div style="display:flex;gap:.65rem;">';
   [{v:'5',l:'5 min'},{v:'10',l:'10 min'},{v:'15',l:'15 min'}].forEach(function(opt,i){
     html += '<label style="display:flex;align-items:center;gap:.3rem;cursor:pointer;font-size:.82rem;color:var(--tx);">'
-      +'<input type="radio" name="genMedDuration" value="'+opt.v+'"'+(i===1?' checked':'')+' style="accent-color:#a78bfa;" /> '+opt.l+'</label>';
+      +'<input type="radio" name="genMedDuration" value="'+opt.v+'"'+(i===1?' checked':'')+' style="accent-color:#f5c842;" /> '+opt.l+'</label>';
   });
   html += '</div></div>';
   // Scripture
@@ -14013,7 +14013,7 @@ function renderCreateMeditationCard(){
   html += '<input id="genMedScripture" type="text" maxlength="60" placeholder="e.g. Psalm 23 or John 3:16" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--tx);border-radius:8px;padding:.5rem .65rem;font-size:.82rem;font-family:var(--fm);outline:none;" />';
   html += '</div>';
   // Generate button
-  html += '<button type="button" id="genMedBtn" onclick="generateMeditation()" style="width:100%;background:#4338ca;border:1px solid rgba(67,56,202,.5);color:#fff;border-radius:12px;padding:.75rem;font-size:.9rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✨ Generate Meditation</button>';
+  html += '<button type="button" id="genMedBtn" onclick="generateMeditation()" style="width:100%;background:#f5c842;border:1px solid rgba(245,200,66,.5);color:#fff;border-radius:12px;padding:.75rem;font-size:.9rem;font-weight:800;cursor:pointer;font-family:var(--fm);">✨ Generate Meditation</button>';
   html += '</div>';
   // Result area + library
   html += '<div id="genMedResult" role="status" aria-live="polite" style="margin-top:.75rem;"></div>';
@@ -14031,9 +14031,9 @@ function _genMedPickMood(btn, moodId){
   all.forEach(function(b){ b.style.background='rgba(255,255,255,.05)'; b.style.border='1px solid rgba(255,255,255,.1)'; b.style.color='var(--tx)'; b.setAttribute('aria-pressed','false'); });
   var hidden = document.getElementById('genMedMood');
   if(hidden && hidden.value === moodId){ hidden.value = ''; btn.setAttribute('aria-pressed','false'); return; }
-  btn.style.background = 'rgba(167,139,250,.2)';
-  btn.style.border = '1px solid rgba(167,139,250,.45)';
-  btn.style.color = '#a78bfa';
+  btn.style.background = 'rgba(245,200,66,.2)';
+  btn.style.border = '1px solid rgba(245,200,66,.45)';
+  btn.style.color = '#f5c842';
   btn.setAttribute('aria-pressed','true');
   if(hidden) hidden.value = moodId;
 }
@@ -14071,7 +14071,7 @@ async function generateMeditation(){
         +'<div style="font-size:.78rem;color:var(--tx);margin-bottom:.2rem;">'+(data.icon||'✨')+' '+escapeHtml(data.title||'My Meditation')+'</div>'
         +'<div style="font-size:.68rem;color:var(--tx3);margin-bottom:.65rem;">'+escapeHtml(data.scriptureFocus||data.theme||'')+'</div>'
         +'<div style="display:flex;gap:.5rem;">'
-        +'<button type="button" onclick="_genMedLaunch()" style="flex:1;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.4);color:#a78bfa;border-radius:10px;padding:.5rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);">▶ Play Now</button>'
+        +'<button type="button" onclick="_genMedLaunch()" style="flex:1;background:rgba(245,200,66,.2);border:1px solid rgba(245,200,66,.4);color:#f5c842;border-radius:10px;padding:.5rem;font-size:.82rem;font-weight:800;cursor:pointer;font-family:var(--fm);">▶ Play Now</button>'
         +'<button type="button" onclick="regenerateMeditation()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--tx2);border-radius:10px;padding:.5rem .75rem;font-size:.8rem;cursor:pointer;font-family:var(--fm);">🔄 Try Again</button>'
         +'</div></div>';
     }
@@ -14288,10 +14288,10 @@ function _medRenderPlayer(med){
   var seg = med.segments[_medSegIdx]||{};
   var totalSec = med.segments.reduce(function(a,s){ return a+s.duration; },0);
   var pct = Math.round((_medElapsed/Math.max(1,totalSec))*100);
-  var segColor = _MED_TYPE_COLOR[seg.type]||'#a78bfa';
+  var segColor = _MED_TYPE_COLOR[seg.type]||'#f5c842';
   var segLabel = _MED_TYPE_LABEL[seg.type]||(seg.type||'').toUpperCase();
   var dots = med.segments.map(function(s,i){
-    var bg = i<_medSegIdx?'rgba(167,139,250,.45)':(i===_medSegIdx?'#a78bfa':'rgba(255,255,255,.12)');
+    var bg = i<_medSegIdx?'rgba(245,200,66,.45)':(i===_medSegIdx?'#f5c842':'rgba(255,255,255,.12)');
     return '<div style="width:7px;height:7px;border-radius:99px;background:'+bg+';display:inline-block;margin:0 2px;transition:background .3s;"></div>';
   }).join('');
   overlay.innerHTML = [
@@ -14303,7 +14303,7 @@ function _medRenderPlayer(med){
     '</div>',
     '<div style="padding:0 1.1rem .7rem;flex-shrink:0;">',
     '<div style="height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-bottom:.35rem;">',
-    '<div id="medProgressBar" style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#a78bfa,#38bdf8);border-radius:99px;transition:width .6s;"></div></div>',
+    '<div id="medProgressBar" style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,#f5c842,#38bdf8);border-radius:99px;transition:width .6s;"></div></div>',
     '<div style="display:flex;justify-content:space-between;align-items:center;font-size:.6rem;color:rgba(255,255,255,.3);">',
     '<span id="medElapsedLbl">'+_medTotStr(_medElapsed)+'</span>',
     '<span id="ttsActiveVoiceLabel" style="font-size:.55rem;color:rgba(16,185,129,.5);"></span>',
@@ -14313,11 +14313,11 @@ function _medRenderPlayer(med){
     '<div id="medSegLabel" style="font-size:.6rem;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:'+segColor+';margin-bottom:.9rem;">'+segLabel+'</div>',
     '<div id="medSegText" style="font-family:Georgia,serif;font-size:1.05rem;line-height:1.8;color:rgba(255,255,255,.88);font-style:italic;margin-bottom:.75rem;">“'+escapeHtml(seg.text||'')+'”</div>',
     '<div id="medSegVerse" style="font-size:.72rem;font-weight:700;color:'+segColor+';letter-spacing:.06em;">'+escapeHtml(seg.verse||'')+'</div>',
-    '<div id="medGenIndicator" style="display:none;margin-top:.85rem;font-size:.65rem;font-weight:700;color:rgba(167,139,250,.7);letter-spacing:.1em;text-transform:uppercase;">⋯ Generating audio</div>',
+    '<div id="medGenIndicator" style="display:none;margin-top:.85rem;font-size:.65rem;font-weight:700;color:rgba(245,200,66,.7);letter-spacing:.1em;text-transform:uppercase;">⋯ Generating audio</div>',
     '</div></div>',
     '<div style="padding:0 1.1rem .45rem;flex-shrink:0;text-align:center;" id="medSegDots">'+dots+'</div>',
     '<div style="padding:.45rem 1.1rem;flex-shrink:0;display:flex;justify-content:center;gap:.55rem;">',
-    '<button type="button" id="medPauseBtn" onclick="_medTogglePause()" style="background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#a78bfa;border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⏸ Pause</button>',
+    '<button type="button" id="medPauseBtn" onclick="_medTogglePause()" style="background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.35);color:#f5c842;border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;font-weight:800;cursor:pointer;font-family:var(--fm);">⏸ Pause</button>',
     '<button type="button" onclick="_medSkip()" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.45);border-radius:12px;padding:.6rem 1.4rem;font-size:.84rem;cursor:pointer;font-family:var(--fm);">⏭ Skip</button>',
     '</div>',
     '<div style="padding:.3rem 1.1rem 1rem;flex-shrink:0;border-top:1px solid rgba(255,255,255,.05);">',
@@ -14381,7 +14381,7 @@ function _medUpdateSegmentUI(med, segIdx){
   if(pb) pb.style.width = pct+'%';
   var el = document.getElementById('medElapsedLbl');
   if(el) el.textContent = _medTotStr(_medElapsed);
-  var segColor = _MED_TYPE_COLOR[seg.type]||'#a78bfa';
+  var segColor = _MED_TYPE_COLOR[seg.type]||'#f5c842';
   var lbl = document.getElementById('medSegLabel');
   if(lbl){ lbl.textContent = _MED_TYPE_LABEL[seg.type]||(seg.type||'').toUpperCase(); lbl.style.color = segColor; }
   var txt = document.getElementById('medSegText');
@@ -14392,7 +14392,7 @@ function _medUpdateSegmentUI(med, segIdx){
   if(dotsEl){
     var kids = dotsEl.children;
     for(var i=0;i<kids.length;i++){
-      kids[i].style.background = i<segIdx?'rgba(167,139,250,.45)':(i===segIdx?'#a78bfa':'rgba(255,255,255,.12)');
+      kids[i].style.background = i<segIdx?'rgba(245,200,66,.45)':(i===segIdx?'#f5c842':'rgba(255,255,255,.12)');
     }
   }
 }
@@ -14474,16 +14474,16 @@ function renderSleepStoriesCard(){
   html += '<div style="display:grid;gap:.55rem;">';
   SLEEP_STORIES.forEach(function(s){
     var safeT = escapeHtml(s.title); var safeD = escapeHtml(s.description);
-    html += '<div role="button" tabindex="0" onclick="startSleepStory(\''+s.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();startSleepStory(\''+s.id+'\');}" onfocus="this.style.outline=\'2px solid rgba(99,102,241,.7)\';this.style.outlineOffset=\'2px\'" onblur="this.style.outline=\'none\'" aria-label="Play '+safeT+', '+s.duration+' minutes" style="background:rgba(15,10,40,.5);border:1px solid rgba(167,139,250,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;outline:none;">';
+    html += '<div role="button" tabindex="0" onclick="startSleepStory(\''+s.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();startSleepStory(\''+s.id+'\');}" onfocus="this.style.outline=\'2px solid rgba(99,102,241,.7)\';this.style.outlineOffset=\'2px\'" onblur="this.style.outline=\'none\'" aria-label="Play '+safeT+', '+s.duration+' minutes" style="background:rgba(8,14,26,.5);border:1px solid rgba(245,200,66,.1);border-radius:14px;padding:.85rem 1rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;outline:none;">';
     html += '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;" aria-hidden="true">'+s.icon+'</span>';
     html += '<div style="flex:1;min-width:0;"><div style="font-size:.88rem;font-weight:800;color:var(--tx);margin-bottom:.1rem;">'+safeT+'</div>';
     html += '<div style="font-size:.73rem;color:var(--tx2);line-height:1.35;">'+safeD+'</div></div>';
     html += '<div style="text-align:right;flex-shrink:0;" aria-hidden="true"><div style="font-size:.68rem;font-weight:800;color:var(--tx3);">'+s.duration+' min</div>';
-    html += '<div style="margin-top:.2rem;background:rgba(30,20,80,.6);border:1px solid rgba(167,139,250,.2);color:#a78bfa;border-radius:8px;padding:.18rem .5rem;font-size:.7rem;font-weight:800;">▶</div></div>';
+    html += '<div style="margin-top:.2rem;background:rgba(10,22,40,.6);border:1px solid rgba(245,200,66,.2);color:#f5c842;border-radius:8px;padding:.18rem .5rem;font-size:.7rem;font-weight:800;">▶</div></div>';
     html += '</div>';
   });
   html += '</div>';
-  html += '<div style="margin-top:.85rem;background:rgba(15,10,40,.4);border:1px solid rgba(167,139,250,.08);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Pick a sleep timer on the player — audio fades out gently, no need to stop it. The screen dims itself after a few seconds.</div>';
+  html += '<div style="margin-top:.85rem;background:rgba(8,14,26,.4);border:1px solid rgba(245,200,66,.08);border-radius:10px;padding:.6rem .85rem;font-size:.7rem;color:var(--tx3);line-height:1.5;">💡 Pick a sleep timer on the player — audio fades out gently, no need to stop it. The screen dims itself after a few seconds.</div>';
   html += '</div>';
   root.innerHTML = html;
 }
