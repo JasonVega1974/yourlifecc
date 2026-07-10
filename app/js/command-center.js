@@ -370,8 +370,8 @@
     // WC-2b-i — daily-goal XP ring. xpToday / dailyGoal, brass fill turning
     // green at 100%. Readers come from xp.js (guarded). Geometry: r=26 →
     // circumference ~163.4; the fill arc starts at 12 o'clock via the -90deg
-    // rotation + stroke-dashoffset. Theme-independent (dark scene, matches the
-    // cc- chrome — no light pass) and reduced-motion safe (CSS gates the fill
+    // rotation + stroke-dashoffset. Has a :root.light pass since Phase 1d
+    // (2026-07-09) and reduced-motion safe (CSS gates the fill
     // transition). The flame repoint (streak) is WC-2b-ii.
     var _xpGoal  = (typeof getDailyGoal === 'function') ? getDailyGoal() : 25;
     var _xpToday = (typeof getXpToday === 'function') ? getXpToday() : 0;

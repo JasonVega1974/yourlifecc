@@ -2602,7 +2602,7 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
 /* ─── UNIFIED CARD / BANNER SYSTEM ─────────────────────────────
    Brand alternative — Settings → Card Style flips this on. */
 :root[data-card-theme="brand"]{
-  --cd-banner: linear-gradient(135deg, #38bdf8 0%, #a78bfa 100%);
+  --cd-banner: linear-gradient(135deg, #38bdf8 0%, #22d3ee 100%);
   --cd-banner-text: #0b1220;
   --cd-banner-text-muted: rgba(11,18,32,.7);
   --cd-banner-shadow: 0 10px 40px rgba(56,189,248,.22);
@@ -11498,13 +11498,13 @@ html.flatnav #appDailyBriefingWrap{ padding:0 1.2rem; margin:.9rem 0 1rem; }
    (no markup change — the per-tile accent rides the existing [data-dest], same
    hue as each tile's constellation star / pillar family). */
 html.flatnav .cc-tile{ overflow:visible; }
-html.flatnav .cc-tile[data-dest="habits"]{ --tile-accent:#F5A623; }
+html.flatnav .cc-tile[data-dest="habits"]{ --tile-accent:#f59e0b; }
 html.flatnav .cc-tile[data-dest="chores"]{ --tile-accent:#6AA7FF; }
 html.flatnav .cc-tile[data-dest="goals"]{  --tile-accent:#7EC19A; }
 html.flatnav .cc-tile[data-dest="money"]{  --tile-accent:#F47B5A; }
 html.flatnav .cc-tile[data-dest="skills"]{ --tile-accent:#D4A04C; }
 html.flatnav .cc-tile[data-dest="health"]{ --tile-accent:#4A9082; }
-html.flatnav .cc-tile[data-dest="life"]{   --tile-accent:#F5A623; }
+html.flatnav .cc-tile[data-dest="life"]{   --tile-accent:#f59e0b; }
 html.flatnav .cc-tile[data-dest="learn"]{  --tile-accent:#38BDF8; }
 html.flatnav .cc-tile[data-dest="growth"]{ --tile-accent:#34D399; }
 html.flatnav .cc-tile[data-dest="me"]{     --tile-accent:#F472B6; }
@@ -11512,19 +11512,19 @@ html.flatnav .cc-tile[data-dest="me"]{     --tile-accent:#F472B6; }
    (z:0, behind the z:1 content). Static, so it is fine under reduced-motion. */
 html.flatnav .cc-tile::after{
   content:''; position:absolute; left:0; top:0; width:130px; height:130px; pointer-events:none; z-index:0;
-  background:radial-gradient(circle at 34px 36px, color-mix(in srgb, var(--tile-accent,#FBBF24) 26%, transparent) 0%, transparent 62%);
+  background:radial-gradient(circle at 34px 36px, color-mix(in srgb, var(--tile-accent,#f59e0b) 26%, transparent) 0%, transparent 62%);
 }
 /* Gradient-border sweep — hidden at rest, sweeps in on hover/focus only. */
 html.flatnav .cc-tile::before{
   content:''; position:absolute; inset:0; border-radius:inherit; padding:1px; pointer-events:none; z-index:2;
-  background:linear-gradient(120deg, transparent 18%, var(--tile-accent,#FBBF24) 50%, transparent 82%);
+  background:linear-gradient(120deg, transparent 18%, var(--tile-accent,#f59e0b) 50%, transparent 82%);
   background-size:200% 100%;
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
           mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);         mask-composite:exclude;
   opacity:0; transition:opacity .2s ease;
 }
 html.flatnav .cc-tile:hover::before, html.flatnav .cc-tile:focus-visible::before{ opacity:1; animation:yl-card-sweep 1.4s linear infinite; }
-html.flatnav .cc-tile:focus-visible{ outline-color:var(--tile-accent,#FBBF24); }
+html.flatnav .cc-tile:focus-visible{ outline-color:var(--tile-accent,#f59e0b); }
 /* Faith tile stays de-emphasized — no glow, no sweep. */
 html.flatnav .cc-tile--faith::after, html.flatnav .cc-tile--faith::before{ display:none; }
 /* Reduced motion — keep the static glow, drop the sweep (the CC reduced-motion
@@ -11545,7 +11545,7 @@ html.flatnav .yl-card__pin{
 }
 html.flatnav .yl-card__pin:hover{ color:var(--tx); background:rgba(255,255,255,.08); }
 html.flatnav .yl-card__pin:active{ transform:scale(.9); }
-html.flatnav .yl-card__pin[aria-pressed="true"]{ color:#F5A623; }
+html.flatnav .yl-card__pin[aria-pressed="true"]{ color:#f59e0b; }
 html.flatnav .yl-card__pin:focus-visible{ outline:2px solid var(--c); outline-offset:2px; }
 html.flatnav .yl-card__pin--disabled{ opacity:.32; cursor:not-allowed; }
 html.flatnav.light .yl-card__pin:hover{ background:rgba(15,23,42,.06); }
@@ -11557,7 +11557,7 @@ html.flatnav .cc-shortcuts-empty{ font-size:.85rem; color:#9AA0B4; line-height:1
 html.flatnav .cc-shortcut-tile{ min-height:92px; }
 html.flatnav .cc-shortcut-remove{ position:absolute; top:6px; right:6px; z-index:3; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:1rem; line-height:1; color:#9AA0B4; cursor:pointer; border-radius:50%; background:transparent; -webkit-tap-highlight-color:transparent; transition:color .15s ease, background .15s ease; }
 html.flatnav .cc-shortcut-remove:hover{ color:#F1E9D5; background:rgba(255,255,255,.12); }
-html.flatnav .cc-shortcut-remove:focus-visible{ outline:2px solid var(--tile-accent,#FBBF24); outline-offset:2px; }
+html.flatnav .cc-shortcut-remove:focus-visible{ outline:2px solid var(--tile-accent,#f59e0b); outline-offset:2px; }
 :root.light #appCommandCenter .cc-shortcuts-empty{ color:#4a4b52; border-color:rgba(15,23,42,.18); }
 :root.light #appCommandCenter .cc-shortcut-remove{ color:#4a4b52; }
 :root.light #appCommandCenter .cc-shortcut-remove:hover{ color:#0f172a; background:rgba(15,23,42,.08); }
@@ -11603,18 +11603,18 @@ html.flatnav #s-me .tab-landing{ display:block; }
 html.flatnav .hb-tile{ position:relative; }
 html.flatnav .hb-tile > div{ position:relative; z-index:1; }
 html.flatnav .hb-tile[data-hb-hue="cool"]{    --hb-accent:#38BDF8; }
-html.flatnav .hb-tile[data-hb-hue="amber"]{   --hb-accent:#F5A623; }
+html.flatnav .hb-tile[data-hb-hue="amber"]{   --hb-accent:#f59e0b; }
 html.flatnav .hb-tile[data-hb-hue="emerald"]{ --hb-accent:#34D399; }
 html.flatnav .hb-tile[data-hb-hue="violet"]{  --hb-accent:#F472B6; }
 /* icon glow — soft accent radial behind the left icon (not on done tiles). */
 html.flatnav .hb-tile:not(.hb-tile-done)::after{
   content:''; position:absolute; left:0; top:0; width:90px; height:100%; pointer-events:none; z-index:0;
-  background:radial-gradient(circle at 24px 50%, color-mix(in srgb, var(--hb-accent,#FBBF24) 24%, transparent) 0%, transparent 60%);
+  background:radial-gradient(circle at 24px 50%, color-mix(in srgb, var(--hb-accent,#f59e0b) 24%, transparent) 0%, transparent 60%);
 }
 /* gradient-border sweep — hidden at rest, sweeps on hover/focus only (not done). */
 html.flatnav .hb-tile:not(.hb-tile-done)::before{
   content:''; position:absolute; inset:0; border-radius:inherit; padding:1px; pointer-events:none; z-index:2;
-  background:linear-gradient(120deg, transparent 18%, var(--hb-accent,#FBBF24) 50%, transparent 82%);
+  background:linear-gradient(120deg, transparent 18%, var(--hb-accent,#f59e0b) 50%, transparent 82%);
   background-size:200% 100%;
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
           mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);         mask-composite:exclude;
@@ -11622,7 +11622,7 @@ html.flatnav .hb-tile:not(.hb-tile-done)::before{
 }
 html.flatnav .hb-tile:not(.hb-tile-done):hover::before,
 html.flatnav .hb-tile:not(.hb-tile-done):focus-visible::before{ opacity:1; animation:yl-card-sweep 1.4s linear infinite; }
-html.flatnav .hb-tile:not(.hb-tile-done):focus-visible{ outline:2px solid var(--hb-accent,#FBBF24); outline-offset:2px; }
+html.flatnav .hb-tile:not(.hb-tile-done):focus-visible{ outline:2px solid var(--hb-accent,#f59e0b); outline-offset:2px; }
 
 /* Skills topic cards — animate the existing cat-color gradient border (::after)
    into a sweep on hover/focus (the card already carries a static border + an

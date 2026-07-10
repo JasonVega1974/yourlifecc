@@ -6024,7 +6024,7 @@ function applyTheme(){
 
 // F3-X — Card Style: 'kingdom' (purple gradient banners + glow) is the
 // default that matches Christian Life Guide and Worship Playlist. 'brand'
-// switches every banner/modal/card-shadow to brand cyan/violet.
+// switches every banner/modal/card-shadow to brand cyan (violet retired 2026-07-09).
 function applyCardTheme(){
   const theme = (D && D.cardTheme === 'brand') ? 'brand' : 'kingdom';
   const html = document.documentElement;

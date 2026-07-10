@@ -240,14 +240,14 @@
 
     <!-- Lifetime -->
     <a href="https://buy.stripe.com/00w14g2UbaPv1EOepD7wA02" style="display:block;text-decoration:none;margin-bottom:1.25rem;">
-      <div style="background:rgba(168,85,247,.06);border:1.5px solid rgba(168,85,247,.3);border-radius:14px;padding:1rem 1.1rem;transition:all .2s;" onmouseover="this.style.borderColor='#a855f7'" onmouseout="this.style.borderColor='rgba(168,85,247,.3)'">
+      <div style="background:rgba(255,255,255,.06);border:1.5px solid rgba(168,85,247,.3);border-radius:14px;padding:1rem 1.1rem;transition:all .2s;" onmouseover="this.style.borderColor='rgba(255,255,255,.6)'" onmouseout="this.style.borderColor='rgba(255,255,255,.32)'">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
             <div style="font-size:.9rem;font-weight:800;color:#fff;">Lifetime</div>
             <div style="font-size:.72rem;color:rgba(255,255,255,.5);margin-top:2px;">One-time · Never pay again</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:.78rem;font-weight:800;color:#a855f7;">Continue →</div>
+            <div style="font-size:.78rem;font-weight:800;color:#e9eef7;">Continue →</div>
           </div>
         </div>
       </div>
@@ -18326,7 +18326,7 @@
               /* Photo-card home grid — paper cards, ink titles, the
                  photo hero keeps its own night gradient (scene-ish
                  thumbnail, reads fine on paper). */
-              :root.light #appCommandCenter .cc-eyebrow{color:#92400e;}
+              :root.light #appCommandCenter .cc-eyebrow{color:#0e7490;}
               :root.light #appCommandCenter .cc-pcard{
                 background:#ffffff;
                 border-color:rgba(8,145,178,.22);
@@ -19055,9 +19055,9 @@
             --pc-gold:        var(--g);
             --pc-gold-soft:   color-mix(in srgb, var(--g) 12%, transparent);
             --pc-gold-bd:     color-mix(in srgb, var(--g) 32%, transparent);
-            --pc-violet:      var(--p);
-            --pc-violet-soft: color-mix(in srgb, var(--p) 14%, transparent);
-            --pc-violet-bd:   color-mix(in srgb, var(--p) 30%, transparent);
+            --pc-violet:      #f472b6;
+            --pc-violet-soft: color-mix(in srgb, #f472b6 14%, transparent);
+            --pc-violet-bd:   color-mix(in srgb, #f472b6 30%, transparent);
             --pc-green:       var(--gr);
             --pc-green-soft:  color-mix(in srgb, var(--gr) 12%, transparent);
             --pc-green-bd:    color-mix(in srgb, var(--gr) 32%, transparent);
@@ -19563,7 +19563,7 @@
         <!-- ════════════════════════════════════════════════════════
              Reports & Progress design pass (2026-06-05).
              Same pattern as Activity & Schedule one increment ago,
-             but VIOLET-accented to signal "AI / summary" vs the
+             but GOLD-accented to signal "AI / summary" vs the
              cyan "calendar / time" Activity surface. Token vocab
              stays scoped to #s-parent (--pc-violet family already
              declared at line ~15323 / 15331 / 15399). No new tokens.
@@ -19615,7 +19615,7 @@
             background:linear-gradient(135deg,#451a03 0%,#78350f 55%,#2d1102 100%);
             -webkit-background-clip:text;background-clip:text;
             -webkit-text-fill-color:transparent;
-            color:#4c1d95;
+            color:#92400e;
           }
           #s-parent .ph-rep-chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;position:relative;}
           #s-parent .ph-rep-chip{
@@ -20228,9 +20228,9 @@
               --pc-gold:        var(--g);
               --pc-gold-soft:   color-mix(in srgb, var(--g) 12%, transparent);
               --pc-gold-bd:     color-mix(in srgb, var(--g) 32%, transparent);
-              --pc-violet:      var(--p);
-              --pc-violet-soft: color-mix(in srgb, var(--p) 14%, transparent);
-              --pc-violet-bd:   color-mix(in srgb, var(--p) 30%, transparent);
+              --pc-violet:      #f472b6;
+              --pc-violet-soft: color-mix(in srgb, #f472b6 14%, transparent);
+              --pc-violet-bd:   color-mix(in srgb, #f472b6 30%, transparent);
               --pc-green:       var(--gr);
               --pc-green-soft:  color-mix(in srgb, var(--gr) 12%, transparent);
               --pc-green-bd:    color-mix(in srgb, var(--gr) 32%, transparent);
@@ -20266,7 +20266,7 @@
             /* ─── Approval row (avatar / meta / proof / actions) */
             #ph-chores .ph-ch-approw{display:flex;align-items:center;gap:.85rem;flex-wrap:wrap;}
             #ph-chores .ph-ch-ava{width:42px;height:42px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--fn);font-weight:700;font-size:1rem;color:#1b1606;background:linear-gradient(135deg,var(--pc-gold),color-mix(in srgb, var(--g) 70%, #c97c0c));}
-            #ph-chores .ph-ch-ava-violet{background:linear-gradient(135deg,var(--pc-violet),color-mix(in srgb, var(--p) 70%, #6c4dd0));color:#170f2e;}
+            #ph-chores .ph-ch-ava-violet{background:linear-gradient(135deg,#f472b6,#ec4899);color:#170f2e;}
             #ph-chores .ph-ch-ava-green{background:linear-gradient(135deg,var(--pc-green),color-mix(in srgb, var(--gr) 70%, #15803d));color:#04210f;}
             #ph-chores .ph-ch-apmeta{flex:1;min-width:0;}
             #ph-chores .ph-ch-who{font-family:var(--fn);font-weight:700;font-size:.95rem;color:var(--tx);}
@@ -22557,7 +22557,7 @@
 
     <div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:.6rem;">Tap or drag to scratch each panel</div>
     <div id="scratchResult" style="min-height:3rem;font-size:1rem;font-weight:700;color:#fff;margin-bottom:.6rem;text-align:center;"></div>
-    <button id="scratchRevealBtn" onclick="revealAllPanels()" style="display:none;background:linear-gradient(135deg,#f472b6,#a855f7);border:none;color:#fff;font-weight:800;font-size:.82rem;padding:.55rem 1.4rem;border-radius:10px;cursor:pointer;margin-bottom:.5rem;letter-spacing:.5px;">✨ Reveal All!</button>
+    <button id="scratchRevealBtn" onclick="revealAllPanels()" style="display:none;background:linear-gradient(135deg,#f472b6,#ec4899);border:none;color:#fff;font-weight:800;font-size:.82rem;padding:.55rem 1.4rem;border-radius:10px;cursor:pointer;margin-bottom:.5rem;letter-spacing:.5px;">✨ Reveal All!</button>
     <button onclick="closeScratch()" style="font-size:.75rem;color:rgba(255,255,255,.4);background:none;border:1px solid rgba(255,255,255,.1);padding:.4rem 1rem;border-radius:8px;cursor:pointer;">Close</button>
   </div>
 </div>
