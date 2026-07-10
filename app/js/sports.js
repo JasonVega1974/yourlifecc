@@ -3057,13 +3057,13 @@ function _renderAthlete(s, athleteName){
   // 2) Milestones & memories — experiences, not metrics
   const chips = milestones.map(m =>
     '<span class="msp-mschip">'+esc(m.text) + (m.date ? '<span class="msp-mschip__d">'+esc(m.date)+'</span>' : '')
-    + '<button class="msp-mschip__x" type="button" onclick="deleteMilestone('+s.id+',\''+esc(m.id)+'\')" aria-label="Remove moment: '+esc(m.text)+'">✕</button></span>').join('');
+    + '<button class="msp-mschip__x" type="button" onclick="deleteSportMilestone('+s.id+',\''+esc(m.id)+'\')" aria-label="Remove moment: '+esc(m.text)+'">✕</button></span>').join('');
   html += '<div class="msp-asec fx-reveal-target"><div class="msp-asec__l">✨ Milestones &amp; memories</div>'
     + (chips ? '<div class="msp-mschips">'+chips+'</div>' : '<p class="msp-asec__empty">Capture the moments that mattered — a first varsity start, a comeback, the day it finally clicked.</p>')
     + '<div class="msp-addmoment">'
     +   '<input class="msp-input msp-addmoment__t" id="msMs_'+s.id+'" aria-label="Add a moment" placeholder="Add a moment — e.g. named team captain" maxlength="90">'
     +   '<input class="msp-input msp-addmoment__d" id="msMsD_'+s.id+'" aria-label="When (optional)" placeholder="When (optional)" maxlength="24">'
-    +   '<button class="msp-btn msp-btn--add" type="button" onclick="addMilestone('+s.id+')">+ Add a moment</button>'
+    +   '<button class="msp-btn msp-btn--add" type="button" onclick="addSportMilestone('+s.id+')">+ Add a moment</button>'
     + '</div></div>';
 
   // 3) Season reflection — gentle, growth/character framed
@@ -3129,7 +3129,7 @@ function _renderSeasonStats(s){
 
 /* Milestones & reflection — the documentation engine. Experiences/growth, free
    text; never weight/body-comp, never tracked-over-time metrics. */
-function addMilestone(sportId){
+function addSportMilestone(sportId){
   const t = document.getElementById('msMs_'+sportId);
   const dEl = document.getElementById('msMsD_'+sportId);
   const text = t ? t.value.trim() : '';
@@ -3142,7 +3142,7 @@ function addMilestone(sportId){
   saveMySports(sports);
   renderMySports();
 }
-function deleteMilestone(sportId, mid){
+function deleteSportMilestone(sportId, mid){
   const sports = getMySports();
   const sp = sports.find(x=>x.id===sportId);
   if(!sp || !Array.isArray(sp.milestones)) return;

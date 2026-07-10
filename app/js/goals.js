@@ -883,10 +883,10 @@ function renderGoalCard(g){
 
   // "Break it down" CTA (no milestones yet) or "+ Add milestone" (existing + room for more).
   const breakBtn = !hasBreakdown && !g.done
-    ? `<button type="button" onclick="addMilestone(${g.id})" style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.28);color:var(--section-goals);padding:.45rem .9rem;border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:600;font-family:var(--fm);margin-top:.6rem;">+ Break it down</button>`
+    ? `<button type="button" onclick="addGoalMilestone(${g.id})" style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.28);color:var(--section-goals);padding:.45rem .9rem;border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:600;font-family:var(--fm);margin-top:.6rem;">+ Break it down</button>`
     : '';
   const addMsBtn = hasBreakdown && !g.done && ms.length < 5
-    ? `<button type="button" onclick="addMilestone(${g.id})" style="background:rgba(249,115,22,.04);border:1px dashed rgba(249,115,22,.35);color:var(--section-goals);padding:.4rem .8rem;border-radius:8px;cursor:pointer;font-size:.72rem;font-weight:600;font-family:var(--fm);margin-top:.45rem;width:100%;">+ Add milestone (${ms.length}/5)</button>`
+    ? `<button type="button" onclick="addGoalMilestone(${g.id})" style="background:rgba(249,115,22,.04);border:1px dashed rgba(249,115,22,.35);color:var(--section-goals);padding:.4rem .8rem;border-radius:8px;cursor:pointer;font-size:.72rem;font-weight:600;font-family:var(--fm);margin-top:.45rem;width:100%;">+ Add milestone (${ms.length}/5)</button>`
     : '';
 
   // 2026-06-07 — Goals Inc 1: holographic completion stamp (replaces
@@ -946,14 +946,14 @@ function renderMilestone(gid, m){
       <div style="display:flex;align-items:center;gap:.55rem;">
         <span onclick="toggleMilestone(${gid},${m.id})" style="width:18px;height:18px;border-radius:4px;${checkBoxStyle}display:flex;align-items:center;justify-content:center;font-size:.78rem;cursor:pointer;flex-shrink:0;">${m.done?'✓':''}</span>
         <span style="flex:1;font-size:.86rem;font-weight:600;color:${m.done?'var(--tx2)':'var(--tx)'};${m.done?'text-decoration:line-through;':''}">${escapeHtml(m.text)}</span>
-        <button onclick="deleteMilestone(${gid},${m.id})" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.78rem;padding:0 .25rem;">✕</button>
+        <button onclick="deleteGoalMilestone(${gid},${m.id})" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.78rem;padding:0 .25rem;">✕</button>
       </div>
       ${actsHtml}
       ${addActBtn}
     </div>`;
 }
 
-function addMilestone(gid){
+function addGoalMilestone(gid){
   const g = (D.goals||[]).find(g => g.id === gid);
   if(!g) return;
   if(!g.milestones) g.milestones = [];
@@ -967,7 +967,7 @@ function addMilestone(gid){
   if(typeof _checkGoalMilestones === 'function') _checkGoalMilestones();
 }
 
-function deleteMilestone(gid, mid){
+function deleteGoalMilestone(gid, mid){
   const g = (D.goals||[]).find(g => g.id === gid);
   if(!g || !g.milestones) return;
   if(!confirm('Delete this milestone and its actions?')) return;
