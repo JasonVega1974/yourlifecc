@@ -322,8 +322,8 @@ function renderSports(){ _injectFinderLaunch(); renderSportsGrid(); }
    .sds-* (light/dark/reduced-motion handled). */
 const THEME_HEX = {
   forge:['#fb923c','#ef4444'], ember:['#f59e0b','#f43f5e'], hunter:['#34d399','#14b8a6'],
-  ocean:['#06b6d4','#3b82f6'], mind:['#ec4899','#f472b6'], lightning:['#38bdf8','#818cf8'],
-  treasury:['#fbbf24','#16a34a'], time:['#818cf8','#a78bfa']
+  ocean:['#06b6d4','#3b82f6'], mind:['#ec4899','#f472b6'], lightning:['#38bdf8','#38bdf8'],
+  treasury:['#fbbf24','#16a34a'], time:['#38bdf8','#22d3ee']
 };
 function _sdEsc(s){ return (typeof escapeHtml==='function') ? escapeHtml(String(s==null?'':s)) : String(s==null?'':s); }
 function _sportSheetEl(){
@@ -2762,7 +2762,7 @@ function _finderRender(){
       + '<div class="sfind-results">'+list+'</div>'
       + '<button type="button" class="sfind-restart" onclick="finderRestart()">↺ Start over</button>';
   }
-  m.innerHTML = '<div class="sds-sheet sfind-sheet" role="dialog" aria-modal="true" aria-label="Find your sport" style="--sd-a:#38bdf8;--sd-b:#a78bfa;">'
+  m.innerHTML = '<div class="sds-sheet sfind-sheet" role="dialog" aria-modal="true" aria-label="Find your sport" style="--sd-a:#38bdf8;--sd-b:#22d3ee;">'
     + '<button class="sds-close" type="button" aria-label="Close" onclick="closeSportFinder()">✕</button>'
     + '<div class="sfind-body" aria-live="polite">'+inner+'</div></div>';
 }
@@ -2907,7 +2907,7 @@ function renderSportPicker(){
 
   try {
     var tiles = catalog.map(function(s){
-      var pal = themeMap[s.id], hex = (pal && hexMap[pal]) ? hexMap[pal] : ['#38bdf8','#818cf8'];
+      var pal = themeMap[s.id], hex = (pal && hexMap[pal]) ? hexMap[pal] : ['#38bdf8','#38bdf8'];
       return '<button type="button" class="msp-tile" data-sport="'+s.id+'" style="--sd-a:'+hex[0]+';--sd-b:'+hex[1]+';" onclick="selectSportTile(\''+s.id+'\')" aria-label="'+esc(s.name)+'">'
         + '<span class="msp-tile__e" aria-hidden="true">'+s.emoji+'</span><span class="msp-tile__n">'+esc(s.name)+'</span></button>';
     }).join('');
@@ -2929,7 +2929,7 @@ function _setActiveTile(key){
 }
 function _themeIntake(dataId){
   const intake = document.getElementById('sportIntake'); if(!intake) return;
-  const hex = (dataId && typeof SPORT_THEME !== 'undefined' && SPORT_THEME[dataId]) ? THEME_HEX[SPORT_THEME[dataId]] : ['#38bdf8','#818cf8'];
+  const hex = (dataId && typeof SPORT_THEME !== 'undefined' && SPORT_THEME[dataId]) ? THEME_HEX[SPORT_THEME[dataId]] : ['#38bdf8','#38bdf8'];
   intake.style.setProperty('--sd-a', hex[0]);
   intake.style.setProperty('--sd-b', hex[1]);
 }
@@ -2972,7 +2972,7 @@ function renderSportPreview(){
   const data = SPORT_DATA.find(s=>s.name.toLowerCase()===name.toLowerCase());
   const emoji = data ? data.emoji : '🏅';
   const themeId = data ? data.id : null;
-  const hex = (themeId && SPORT_THEME[themeId]) ? THEME_HEX[SPORT_THEME[themeId]] : ['#38bdf8','#818cf8'];
+  const hex = (themeId && SPORT_THEME[themeId]) ? THEME_HEX[SPORT_THEME[themeId]] : ['#38bdf8','#38bdf8'];
   const motif = (themeId && typeof window.sportsFxMotif === 'function') ? window.sportsFxMotif(themeId) : '';
   const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
   const sub = [_heroSafePos(val('mySportPosition')), val('mySportTeam'), val('mySportLevel')].filter(Boolean).join(' · ');
@@ -3035,7 +3035,7 @@ function _renderAthlete(s, athleteName){
   const jersey = s.jersey||'', motto = s.motto||'', milestones = s.milestones||[], reflection = s.reflection||'';
   const themeId = (s.dataId && typeof SPORT_THEME !== 'undefined' && SPORT_THEME[s.dataId]) ? s.dataId : null;
   const theme = themeId ? SPORT_THEME[themeId] : 'lightning';
-  const hex = (typeof THEME_HEX !== 'undefined' && THEME_HEX[theme]) ? THEME_HEX[theme] : ['#38bdf8','#818cf8'];
+  const hex = (typeof THEME_HEX !== 'undefined' && THEME_HEX[theme]) ? THEME_HEX[theme] : ['#38bdf8','#38bdf8'];
   const motif = (themeId && typeof window.sportsFxMotif === 'function') ? window.sportsFxMotif(themeId) : '';
   const subline = [s.name, _heroSafePos(s.position), s.team].filter(Boolean).join(' · ');
 

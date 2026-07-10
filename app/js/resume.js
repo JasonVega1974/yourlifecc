@@ -569,10 +569,10 @@ const JA_STATUSES = [
 
 const JA_STATUS_COLORS = {
   'Applied':              '#38bdf8',
-  'Phone Screen':         '#a78bfa',
+  'Phone Screen':         '#22d3ee',
   'Interview Scheduled':  '#fb923c',
   '1st Interview':        '#f472b6',
-  '2nd Interview':        '#e879f9',
+  '2nd Interview':        '#f9a8d4',
   'Final Round':          '#facc15',
   'Offer Received':       '#4ade80',
   'Offer Accepted':       '#22c55e',

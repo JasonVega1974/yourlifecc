@@ -56,12 +56,12 @@ function _hDomainHabits(){
 }
 
 const HEALTH_DOMAINS = [
-  {key:'sleep',    icon:'💤', name:'Sleep',    accent:'#818cf8',                       sub:'sleep',    stat:_hDomainSleep},
+  {key:'sleep',    icon:'💤', name:'Sleep',    accent:'#38bdf8',                       sub:'sleep',    stat:_hDomainSleep},
   {key:'mind',     icon:'💚', name:'Mind',     accent:'var(--section-health, #34d399)', sub:'mind',     stat:_hDomainMind},
   {key:'meals',    icon:'🍽️', name:'Meals',    accent:'#fbbf24',                       sub:'meals',    stat:_hDomainMeals},
   {key:'movement', icon:'🏃', name:'Movement', accent:'#f97316',                       sub:'habits',   stat:_hDomainMovement},
   {key:'body',     icon:'⚖️', name:'Body',     accent:'#22d3ee',                       sub:'weight',   stat:_hDomainBody},
-  {key:'habits',   icon:'⚡', name:'Habits',   accent:'#a78bfa',                       sub:'habits',   stat:_hDomainHabits}
+  {key:'habits',   icon:'⚡', name:'Habits',   accent:'#22d3ee',                       sub:'habits',   stat:_hDomainHabits}
 ];
 
 function renderHealthDomainStrip(){
@@ -158,7 +158,7 @@ const HEALTH_MILESTONES = [
   { id:'water7',       name:'Hydrated',          icon:'🌊', color:'#22d3ee',
     desc:'Hit your water goal 7 days in a row.',
     check: function(){ return (typeof calcWaterStreak === 'function') && calcWaterStreak() >= 7; } },
-  { id:'sleep30',      name:'Sleep Scholar',     icon:'💤', color:'#818cf8',
+  { id:'sleep30',      name:'Sleep Scholar',     icon:'💤', color:'#38bdf8',
     desc:'Log 30 nights of sleep.',
     check: function(){ return ((D && Array.isArray(D.sleepLog)) ? D.sleepLog.length : 0) >= 30; } },
   { id:'water100',     name:'Centurion',         icon:'💧', color:'#38bdf8',
@@ -173,7 +173,7 @@ const HEALTH_MILESTONES = [
   { id:'meals7',       name:'Consistent',        icon:'🍽️', color:'#fbbf24',
     desc:'Log a meal 7 days in a row.',
     check: function(){ return (typeof calcMealStreak === 'function') && calcMealStreak() >= 7; } },
-  { id:'phq6',         name:'Check-in Champion', icon:'🧠', color:'#a78bfa',
+  { id:'phq6',         name:'Check-in Champion', icon:'🧠', color:'#22d3ee',
     desc:'Complete 6 weekly mind check-ins.',
     check: function(){ return ((D && Array.isArray(D.phq2Log)) ? D.phq2Log.length : 0) >= 6; } },
   { id:'weeklyMin',    name:'Goal Crusher',      icon:'🎯', color:'#34d399',
@@ -483,7 +483,7 @@ const WORKOUT_TYPES = [
   { key:'cardio',   icon:'🏃', label:'Cardio',   color:'#ef4444' },
   { key:'strength', icon:'💪', label:'Strength', color:'#f97316' },
   { key:'sport',    icon:'⚽', label:'Sport',    color:'#22d3ee' },
-  { key:'mobility', icon:'🧘', label:'Mobility', color:'#a78bfa' }
+  { key:'mobility', icon:'🧘', label:'Mobility', color:'#22d3ee' }
 ];
 const INTENSITY_LEVELS = [
   { v:1, label:'Easy',     color:'#22c55e' },

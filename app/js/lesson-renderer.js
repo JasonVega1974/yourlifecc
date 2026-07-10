@@ -77,7 +77,7 @@
     single:  { std:15750, brackets:[[0,11925,.10],[11925,48475,.12],[48475,103350,.22],[103350,197300,.24],[197300,250525,.32],[250525,626350,.35],[626350,Infinity,.37]] },
     married: { std:31500, brackets:[[0,23850,.10],[23850,96950,.12],[96950,206700,.22],[206700,394600,.24],[394600,501050,.32],[501050,751600,.35],[751600,Infinity,.37]] }
   };
-  var BRACKET_COLORS = ['#34d399','#22d3ee','#38bdf8','#818cf8','#a78bfa','#f472b6','#fb7185'];
+  var BRACKET_COLORS = ['#34d399','#22d3ee','#38bdf8','#38bdf8','#22d3ee','#f472b6','#fb7185'];
 
   var VIZ = {
     // A horizontal stacked ladder of the progressive brackets — shows that
@@ -140,7 +140,7 @@
       var f = [
         { name:'Payment history', pct:35, color:'#34d399' },
         { name:'Utilization', pct:30, color:'#60a5fa' },
-        { name:'Length of history', pct:15, color:'#a78bfa' },
+        { name:'Length of history', pct:15, color:'#22d3ee' },
         { name:'Credit mix', pct:10, color:'#fbbf24' },
         { name:'New credit', pct:10, color:'#fb7185' }
       ];
@@ -161,7 +161,7 @@
     valueBars: function(data){
       data = data || {};
       var items = data.items || [];
-      var PAL = ['#60a5fa', '#fbbf24', '#34d399', '#a78bfa', '#fb7185', '#22d3ee'];
+      var PAL = ['#60a5fa', '#fbbf24', '#34d399', '#22d3ee', '#fb7185', '#22d3ee'];
       var cap = data.caption ? '<figcaption class="lr-brk__cap">' + esc(data.caption) + '</figcaption>' : '';
       function fv(v){ return data.money ? money(v) : esc(v + (data.unit ? data.unit : '')); }
       if(data.mode === 'stack'){
@@ -1196,7 +1196,7 @@
         var med = MED_RATE * g + (g > 200000 ? 0.009 * (g - 200000) : 0);
         var inc = (tr / 100) * g;
         var net = Math.max(0, g - ss - med - inc);
-        var NET = '#34d399', INC = '#f59e0b', SS = '#60a5fa', MED = '#a78bfa';
+        var NET = '#34d399', INC = '#f59e0b', SS = '#60a5fa', MED = '#22d3ee';
         $o.innerHTML = '<div class="lr-calc__stats">'
           + '<div class="lr-calc__stat"><div class="lr-calc__sv" style="color:' + NET + ';">' + money(net) + '</div><div class="lr-calc__sl">take-home / year</div></div>'
           + '<div class="lr-calc__stat"><div class="lr-calc__sv">' + money(net / 12) + '</div><div class="lr-calc__sl">take-home / month</div></div>'

@@ -223,7 +223,7 @@
       }
     }
   }
-  var _AH_HUE_HEX = { cool:'#38BDF8', amber:'#F5A623', emerald:'#34D399', violet:'#A78BFA' };
+  var _AH_HUE_HEX = { cool:'#38BDF8', amber:'#F5A623', emerald:'#34D399', violet:'#F472B6' };
   function renderHomeShortcuts(){
     if (typeof document === 'undefined') return;
     var host = document.getElementById('ccShortcuts');

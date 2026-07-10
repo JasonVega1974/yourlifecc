@@ -91,7 +91,7 @@ function renderVerseSettingsList(){
   const el=document.getElementById('customVerseList'); if(!el) return;
   if(!(D.verses||[]).length){ el.innerHTML='<div style="font-size:.73rem;color:var(--tx2);padding:.3rem 0;">No custom scriptures yet.</div>'; return; }
   el.innerHTML=D.verses.map((v,i)=>`
-    <div style="display:flex;align-items:center;gap:.4rem;padding:.38rem .5rem;background:rgba(167,139,250,.07);border-radius:7px;margin-bottom:.28rem;">
+    <div style="display:flex;align-items:center;gap:.4rem;padding:.38rem .5rem;background:rgba(251,191,36,.08);border-radius:7px;margin-bottom:.28rem;">
       <div style="flex:1;min-width:0;"><div style="font-size:.74rem;font-weight:700;color:var(--p);">${escapeHtml(v.r)}</div>
       <div style="font-size:.68rem;color:var(--tx2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">"${escapeHtml(v.t.substring(0,60))}${v.t.length>60?'…':''}"</div></div>
       <button class="db" onclick="deleteCustomVerse(${i})">✕</button>
@@ -343,16 +343,16 @@ function renderPathway(){
   const pct = items.length ? Math.round((done/items.length)*100) : 0;
 
   el.innerHTML = `
-    <div style="background:rgba(139,92,246,.04);border:1px solid rgba(139,92,246,.12);border-radius:14px;padding:.9rem 1.2rem;margin-bottom:.8rem;">
+    <div style="background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:14px;padding:.9rem 1.2rem;margin-bottom:.8rem;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
         <div>
           <span style="font-size:.9rem;">${pathway.icon}</span>
-          <span style="font-family:var(--fh);font-size:.72rem;letter-spacing:1px;color:#a78bfa;font-weight:700;margin-left:.3rem;">${pathway.name.toUpperCase()}</span>
+          <span style="font-family:var(--fh);font-size:.72rem;letter-spacing:1px;color:#fbbf24;font-weight:700;margin-left:.3rem;">${pathway.name.toUpperCase()}</span>
         </div>
-        <span style="font-size:.7rem;font-weight:800;color:${pct>=100?'#22c55e':pct>=50?'#fbbf24':'#a78bfa'};">${done}/${items.length} · ${pct}%</span>
+        <span style="font-size:.7rem;font-weight:800;color:${pct>=100?'#22c55e':pct>=50?'#fbbf24':'#f59e0b'};">${done}/${items.length} · ${pct}%</span>
       </div>
-      <div style="background:rgba(139,92,246,.1);border-radius:5px;height:7px;overflow:hidden;margin-bottom:.6rem;">
-        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#8b5cf6,${pct>=100?'#22c55e':'#a78bfa'});border-radius:5px;transition:width .5s;"></div>
+      <div style="background:rgba(251,191,36,.12);border-radius:5px;height:7px;overflow:hidden;margin-bottom:.6rem;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#fbbf24,${pct>=100?'#22c55e':'#f59e0b'});border-radius:5px;transition:width .5s;"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.2rem .5rem;">
         ${items.map((item,i)=>`<div style="display:flex;align-items:center;gap:.3rem;padding:.2rem 0;">
@@ -1201,7 +1201,7 @@ const TAB_IA = [
     // back figure purple — instead of the old currentColor monochrome.
     icon:'<svg class="tab-icon-svg" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true">'
        + '<path fill="#38bdf8" d="M9 12c2.21 0 4-1.79 4-4S11.21 4 9 4 5 5.79 5 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>'
-       + '<path fill="#a78bfa" d="M16.5 12c1.93 0 3.5-1.57 3.5-3.5S18.43 5 16.5 5c-.55 0-1.07.13-1.54.35.66.95 1.04 2.11 1.04 3.15s-.38 2.2-1.04 3.15c.47.22.99.35 1.54.35zm.5 2c-.66 0-1.42.05-2.21.16C16.5 15.27 17 16.55 17 18v2h6v-2c0-2.66-5.33-4-6-4z"/>'
+       + '<path fill="#22d3ee" d="M16.5 12c1.93 0 3.5-1.57 3.5-3.5S18.43 5 16.5 5c-.55 0-1.07.13-1.54.35.66.95 1.04 2.11 1.04 3.15s-.38 2.2-1.04 3.15c.47.22.99.35 1.54.35zm.5 2c-.66 0-1.42.05-2.21.16C16.5 15.27 17 16.55 17 18v2h6v-2c0-2.66-5.33-4-6-4z"/>'
        + '</svg>',
     accent:'var(--c)',
     primary:[

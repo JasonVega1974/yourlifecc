@@ -71,7 +71,7 @@ const HABIT_BADGE_TIERS = [
   {days:21,  name:'Three Weeks',  icon:'🔥', color:'#fb923c'},
   {days:30,  name:'One Month',    icon:'🏆', color:'#fbbf24'},
   {days:66,  name:'Formed',       icon:'💎', color:'#22d3ee'},
-  {days:100, name:'Centurion',    icon:'👑', color:'#a78bfa'},
+  {days:100, name:'Centurion',    icon:'👑', color:'#22d3ee'},
 ];
 
 // ── INIT + SEED ──────────────────────────────────────────────
@@ -477,7 +477,7 @@ function renderHabitsStreaks(){
     const bestCurrent = habits.reduce((m,h)=>Math.max(m, getHabitCurrentStreak(h)), 0);
     const pct = Math.min(100, Math.round((bestCurrent/66)*100));
     tracker66.innerHTML = `
-      <div style="background:linear-gradient(135deg,rgba(34,211,238,.10),rgba(167,139,250,.06));
+      <div style="background:linear-gradient(135deg,rgba(34,211,238,.10),rgba(34,211,238,.06));
                   border:1px solid rgba(34,211,238,.22);border-radius:14px;
                   padding:1rem 1.1rem;margin:1rem 0;">
         <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;">
@@ -494,7 +494,7 @@ function renderHabitsStreaks(){
         </div>
         <div style="background:rgba(255,255,255,.06);height:8px;border-radius:6px;overflow:hidden;">
           <div style="height:100%;width:${pct}%;
-                      background:linear-gradient(90deg,#22d3ee,#a78bfa);
+                      background:linear-gradient(90deg,#22d3ee,#22d3ee);
                       border-radius:6px;transition:width .6s ease;"></div>
         </div>
         ${bestCurrent >= 66
@@ -745,7 +745,7 @@ function renderHabitsAnalytics(){
       type:'doughnut',
       data:{labels, datasets:[{
         data,
-        backgroundColor:['#fbbf24','#f59e0b','#a78bfa','#34d399'],
+        backgroundColor:['#fbbf24','#f59e0b','#22d3ee','#34d399'],
         borderColor:'rgba(0,0,0,.2)',
         borderWidth:2,
       }]},
@@ -1243,7 +1243,7 @@ function renderHabitsScience(){
   `).join('');
 
   wrap.innerHTML = `
-    <div style="background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(167,139,250,.04));
+    <div style="background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(34,211,238,.04));
                 border:1px solid rgba(34,211,238,.22);border-radius:16px;
                 padding:1.3rem 1.4rem;margin-bottom:.8rem;min-height:380px;
                 display:flex;flex-direction:column;">

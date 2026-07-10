@@ -44,7 +44,7 @@
     chore:   { icon:'✅', label:'Chores',  color:'#22c55e', soft:'rgba(34,197,94,.12)',  bd:'rgba(34,197,94,.28)' },
     money:   { icon:'💰', label:'Money',   color:'#10b981', soft:'rgba(16,185,129,.12)', bd:'rgba(16,185,129,.28)' },
     health:  { icon:'💪', label:'Health',  color:'#22d3ee', soft:'rgba(34,211,238,.12)', bd:'rgba(34,211,238,.28)' },
-    goal:    { icon:'🎯', label:'Goals',   color:'#a78bfa', soft:'rgba(167,139,250,.12)',bd:'rgba(167,139,250,.28)' },
+    goal:    { icon:'🎯', label:'Goals',   color:'#22d3ee', soft:'rgba(34,211,238,.12)',bd:'rgba(34,211,238,.28)' },
     skill:   { icon:'🧠', label:'Skills',  color:'#60a5fa', soft:'rgba(96,165,250,.12)', bd:'rgba(96,165,250,.28)' },
     habit:   { icon:'⚡', label:'Habits',  color:'#fbbf24', soft:'rgba(251,191,36,.12)', bd:'rgba(251,191,36,.28)' },
     mood:    { icon:'😊', label:'Mood',    color:'#f472b6', soft:'rgba(244,114,182,.12)',bd:'rgba(244,114,182,.28)' },
@@ -139,7 +139,7 @@
   // KID_COLORS palette so the same kid gets the same dot every
   // render without needing to backfill profile data.
   const KID_COLORS = [
-    '#38bdf8', '#f472b6', '#fbbf24', '#a78bfa',
+    '#38bdf8', '#f472b6', '#fbbf24', '#22d3ee',
     '#22c55e', '#fb7185', '#fb923c', '#22d3ee'
   ];
   function _kidColor(profileId){

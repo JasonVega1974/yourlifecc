@@ -221,7 +221,7 @@
   // ── Renderers ────────────────────────────────────────────────
   function _renderIntro(){
     return ''
-      + '<div style="background:linear-gradient(135deg,rgba(244,114,182,.06),rgba(167,139,250,.04));'
+      + '<div style="background:linear-gradient(135deg,rgba(244,114,182,.06),rgba(34,211,238,.04));'
       +              'border:1px solid rgba(244,114,182,.22);border-left:4px solid var(--section-health,#22d3ee);'
       +              'border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1rem;">'
       +   '<div style="font-size:1.05rem;font-weight:700;color:var(--tx);margin-bottom:.4rem;">Your body is doing remarkable things.</div>'

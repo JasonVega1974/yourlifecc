@@ -560,14 +560,14 @@ function renderParentOverview(){
   const cards = [
     {icon:'📚',label:'GPA',value:gpa||'—',color:gpaColor,sub:classes.length+' classes'},
     {icon:'✅',label:'Chores (Week)',value:verified,color:'#22c55e',sub:totalWeek+' submitted'},
-    {label:'Life Skills',value:certs+'/16',color:'#a78bfa',sub:'certificates'},
+    {label:'Life Skills',value:certs+'/16',color:'#22d3ee',sub:'certificates'},
     {label:'Goals',value:goalsDone+'/'+goals.length,color:'#60a5fa',sub:'completed'},
     {icon:'🔥',label:'Check-in Streak',value:streak,color:'#fbbf24',sub:'days'},
     {icon:'😊',label:'Mood (7d avg)',value:moodEmoji+' '+moodAvg,color:'#22d3ee',sub:recentMoods.length+' entries'},
     {icon:'📖',label:'Books Read',value:booksRead,color:'#fb923c',sub:(Array.isArray(D.books)?D.books:[]).length+' total'},
     {label:'Journal',value:journalThisMonth,color:'#f472b6',sub:'this month'},
     {icon:'⭐',label:'Chore Points',value:choreTotal,color:'#22c55e',sub:'lifetime'},
-    {icon:'👍',label:'Behavior',value:'👍'+posCount+' 👎'+negCount,color:'#818cf8',sub:'logged'},
+    {icon:'👍',label:'Behavior',value:'👍'+posCount+' 👎'+negCount,color:'#38bdf8',sub:'logged'},
   ];
 
   el.innerHTML = cards.map(c=>`
@@ -1117,7 +1117,7 @@ function renderHeroAlerts(){
   if(activeInc.length){
     const closest = activeInc[0];
     const prog = typeof checkIncentiveProgress==='function' ? checkIncentiveProgress(closest) : {pct:0};
-    alerts.push({icon:'🎯',color:'#a78bfa',border:'rgba(167,139,250,.2)',bg:'rgba(167,139,250,.05)',
+    alerts.push({icon:'🎯',color:'#fbbf24',border:'rgba(251,191,36,.25)',bg:'rgba(251,191,36,.06)',
       title:closest.name, sub:Math.round(prog.pct)+'% progress · '+activeInc.length+' active',
       click:"showSection('s-parent')"});
   }
@@ -1275,7 +1275,7 @@ function renderGettingStarted(){
 
   el.style.display='block';
   el.innerHTML = `
-    <div style="background:linear-gradient(135deg,rgba(56,189,248,.05),rgba(139,92,246,.05));border:1px solid rgba(56,189,248,.15);border-radius:16px;padding:1rem 1.2rem;">
+    <div style="background:linear-gradient(135deg,rgba(56,189,248,.05),rgba(34,211,238,.05));border:1px solid rgba(56,189,248,.15);border-radius:16px;padding:1rem 1.2rem;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;">
         <div>
           <span style="font-family:var(--fh);font-size:.78rem;letter-spacing:1.5px;color:#38bdf8;font-weight:700;">🚀 LET'S GET STARTED</span>
@@ -1379,16 +1379,16 @@ function renderParentGettingStarted(){
   _gspOpenTip = null;
 
   el.innerHTML = `
-    <div style="background:linear-gradient(135deg,rgba(139,92,246,.06),rgba(251,146,60,.04));border:1px solid rgba(139,92,246,.18);border-radius:14px;padding:.9rem 1.1rem;margin-bottom:1rem;">
+    <div style="background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(251,146,60,.04));border:1px solid rgba(251,191,36,.18);border-radius:14px;padding:.9rem 1.1rem;margin-bottom:1rem;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
         <div>
-          <span style="font-family:var(--fh);font-size:.72rem;letter-spacing:1.5px;color:#a78bfa;font-weight:700;">👨‍👩‍👧 PARENT SETUP GUIDE</span>
+          <span style="font-family:var(--fh);font-size:.72rem;letter-spacing:1.5px;color:#fbbf24;font-weight:700;">👨‍👩‍👧 PARENT SETUP GUIDE</span>
           <span style="font-size:.58rem;color:var(--tx2);margin-left:.4rem;">${done}/${total}</span>
         </div>
         <button onclick="D.gspDismissed=true;save();renderParentGettingStarted();" style="background:none;border:none;color:var(--tx2);font-size:.55rem;cursor:pointer;">✕</button>
       </div>
-      <div style="background:rgba(139,92,246,.1);border-radius:4px;height:5px;overflow:hidden;margin-bottom:.6rem;">
-        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#a78bfa,#22c55e);border-radius:4px;transition:width .5s;"></div>
+      <div style="background:rgba(251,191,36,.12);border-radius:4px;height:5px;overflow:hidden;margin-bottom:.6rem;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#fbbf24,#22c55e);border-radius:4px;transition:width .5s;"></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:.25rem;">
         ${results.map(s=>`
@@ -2067,7 +2067,7 @@ function openChildLogin(){
   if(typeof IS_DEMO !== 'undefined' && IS_DEMO){ showSection('s-hero'); return; }
   const children = _profiles.filter(p => !p.isParent);
   if(children.length === 0){ showToast('No child profiles yet — add in Parent Hub'); return; }
-  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
+  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#22d3ee','#22d3ee','#ef4444'];
   const list = document.getElementById('clChildList');
   if(list){
     list.innerHTML = children.map((p,i)=>{
@@ -2094,7 +2094,7 @@ function clSelectChild(id){
   _clSelectedId=id; _childPinBuffer='';
   updateChildPinDots();
   const msgEl=document.getElementById('childLoginMsg'); if(msgEl) msgEl.textContent='';
-  const colors=['#38bdf8','#22c55e','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
+  const colors=['#38bdf8','#22c55e','#f5a623','#f472b6','#22d3ee','#22d3ee','#ef4444'];
   const idx=_profiles.filter(x=>!x.isParent).findIndex(x=>x.id===id);
   const c=colors[idx%colors.length];
   const nm=document.getElementById('clChildName');
@@ -2559,7 +2559,7 @@ function renderProfileSwitcher(){
   if(!el || !tabs) return;
 
   el.style.display = 'none'; // Hidden from hero — use Child Login button instead
-  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
+  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#22d3ee','#22d3ee','#ef4444'];
 
   tabs.innerHTML = _profiles.map((p,i)=>{
     const active = p.id === _activeProfileId;
@@ -2593,8 +2593,8 @@ function renderSwitchToParentBtn(){
   host.style.display='flex';
   host.innerHTML = '<button onclick="switchToParentRequest()" '
     + 'style="display:flex;align-items:center;gap:.45rem;padding:.5rem .9rem;border-radius:10px;'
-    + 'border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.12);'
-    + 'color:#c4b5fd;font-family:var(--fn);font-weight:700;font-size:.75rem;cursor:pointer;">'
+    + 'border:1px solid rgba(251,191,36,.35);background:rgba(251,191,36,.12);'
+    + 'color:#fde68a;font-family:var(--fn);font-weight:700;font-size:.75rem;cursor:pointer;">'
     + '<span style="font-size:.95rem;">👨‍👩‍👧</span> Switch to ' + (parent.name||'Parent')
     + '</button>';
 }
@@ -2752,7 +2752,7 @@ function renderParentMultiChild(){
   const el = document.getElementById('parentMultiChildView'); if(!el) return;
   if(_profiles.length <= 1){ el.innerHTML = ''; return; }
 
-  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#a78bfa','#22d3ee'];
+  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#22d3ee','#22d3ee'];
 
   el.innerHTML = `
     <div style="font-family:var(--fh);font-size:.7rem;letter-spacing:1.5px;color:#fb923c;margin-bottom:.6rem;">👨‍👩‍👧‍👦 ALL CHILDREN OVERVIEW</div>
@@ -3460,7 +3460,7 @@ const PARENT_FUNDAMENTALS = [
     body:`<h4>Why Patience Matters</h4><p>Your child watches how you handle frustration. Every time you stay calm, they learn emotions can be managed.</p><p><b>The 10-second rule:</b> Count to 10 before responding. <b>Reframe:</b> "They're struggling and need help" not "they're trying to annoy me." <b>Whisper:</b> When you want to yell, whisper instead.</p><h4>Practice This Week</h4><p>Track your patience 1-5 each evening. Note what triggered low-patience moments.</p>`},
   {icon:'🤝',title:'Building Trust With Your Child',color:'#22c55e',
     body:`<h4>Trust Is Built in Small Moments</h4><p>Do you listen without your phone? Follow through on promises? Keep their secrets?</p><h4>What Breaks Trust</h4><p>Dismissing feelings. Sharing their info with others. Breaking promises. Using confided info against them.</p><h4>What Builds It</h4><p>Active listening. Validating feelings before correcting. Following through. Apologizing when wrong.</p><h4>Practice This Week</h4><p>Make one promise and follow through perfectly.</p>`},
-  {icon:'⚖️',title:'Positive Discipline vs Punishment',color:'#a78bfa',
+  {icon:'⚖️',title:'Positive Discipline vs Punishment',color:'#22d3ee',
     body:`<h4>The Difference</h4><p><b>Punishment</b> is backward-looking (suffering for wrong). <b>Discipline</b> is forward-looking (teaching better).</p><p><b>Natural consequences:</b> Don't study → face the grade. <b>Logical consequences:</b> Misuse screen time → screen time reduced.</p><h4>The Script</h4><p>"When you [behavior], the consequence is [logical result]. I know you can do better. How can we make this go differently next time?"</p>`},
   {icon:'🗣️',title:'Healthy Communication',color:'#f472b6',
     body:`<h4>Talking WITH Not AT</h4><p><b>Open questions:</b> "What was the best part of your day?" not "How was school?" <b>Share first:</b> Tell them about YOUR day. <b>Don't fix everything:</b> "Do you want advice or just need me to listen?" <b>Car conversations:</b> Side-by-side makes hard topics easier. <b>Bedtime:</b> Dark + quiet = sharing.</p><h4>Practice This Week</h4><p>Try "best/worst" at dinner. Everyone shares. You go first. No phones.</p>`},
@@ -3481,7 +3481,7 @@ const PARENT_STAGES = [
     body:`<h4>What They Need</h4><p><b>Structure and consistency.</b> Same bedtime, same routines, same rules every day.</p><p><b>Simple rules:</b> "We use kind words." "We put toys away." <b>Emotional vocabulary:</b> Teach them to name feelings. <b>Play together:</b> 15 minutes of undivided attention. <b>Read every night.</b></p><h4>Common Mistakes</h4><p>Overexplaining. Negotiating rules. Inconsistency. Doing everything for them.</p>`},
   {icon:'📚',title:'Elementary Age (8-11)',color:'#22c55e',
     body:`<h4>What They Need</h4><p><b>Responsibility and curiosity.</b> Chores they own. Choices with consequences. Praise effort over results.</p><h4>Social Development</h4><p>Friendships become critical. Help them navigate conflict. Teach empathy.</p><h4>Common Mistakes</h4><p>Helicopter parenting. Over-scheduling. Focusing only on academics. Not letting them be bored.</p>`},
-  {icon:'🔄',title:'Preteen Years (12-14)',color:'#a78bfa',
+  {icon:'🔄',title:'Preteen Years (12-14)',color:'#22d3ee',
     body:`<h4>What They Need</h4><p><b>Identity support and emotional safety.</b> They need privacy. They value peers more than you (normal). They push boundaries — your job is to hold firm while keeping the relationship warm.</p><h4>Conversations to Have Now</h4><p>Online safety. Peer pressure scripts. Substance awareness. Healthy relationships. Mental health.</p><h4>Common Mistakes</h4><p>Taking independence as rejection. Spying instead of talking. Punishing emotional expression.</p>`},
   {icon:'🎓',title:'Teenage Years (15-18)',color:'#fbbf24',
     body:`<h4>What They Need</h4><p><b>Your job shifts from manager to consultant.</b> Gradually increase freedom with responsibility.</p><h4>Preparing to Launch</h4><p>By 17-18 they should: manage their schedule, do laundry, cook basic meals, handle a bank account, have a resume, resolve conflict.</p><h4>The Hardest Part</h4><p>Letting go. The parent who becomes their biggest advocate during the hardest years will be the parent they call first as adults.</p>`},
@@ -4834,8 +4834,8 @@ function renderLifeMapBoard(){
   const prog = document.getElementById('lifeMapProgress');
   if(prog) prog.textContent = completed + '/' + total;
 
-  const colors = ['#22c55e','#38bdf8','#60a5fa','#a78bfa','#f472b6','#fbbf24','#fb923c','#ef4444',
-                  '#06b6d4','#8b5cf6','#f59e0b','#22d3ee','#e879f9','#84cc16','#14b8a6','#eab308'];
+  const colors = ['#22c55e','#38bdf8','#60a5fa','#22d3ee','#f472b6','#fbbf24','#fb923c','#ef4444',
+                  '#06b6d4','#0891b2','#f59e0b','#22d3ee','#f9a8d4','#84cc16','#14b8a6','#eab308'];
 
   // Build a winding path game board
   const cols = 4;
@@ -4931,7 +4931,7 @@ function toggleCustomMessage(){
 
 // ── CONTESTS & CHALLENGES ─────────────────────────────────────
 const CHALLENGES = [
-  {id:'quiz-champ',icon:'🧠',title:'Quiz Champion',desc:'Pass 3 parent quizzes this month',color:'#8b5cf6',
+  {id:'quiz-champ',icon:'🧠',title:'Quiz Champion',desc:'Pass 3 parent quizzes this month',color:'#0891b2',
     target:3, check:()=>(Array.isArray(D.quizzes)?D.quizzes:[]).filter(q=>q.status==='passed'&&q.sentDate>=new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().slice(0,10)).length,
     reward:50, rewardType:'pb'},
   {id:'kindness-week',icon:'💛',title:'Kindness Challenge',desc:'Log 5 helpful deeds this week',color:'#fbbf24',
@@ -4940,7 +4940,7 @@ const CHALLENGES = [
   {id:'chore-hero',icon:'✅',title:'Chore Champion',desc:'Complete 10 verified chores this month',color:'#22c55e',
     target:10, check:()=>{const ms=new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().slice(0,10);return(D.choreLog||[]).filter(l=>l.status==='verified'&&l.date>=ms).length;},
     reward:40, rewardType:'pb'},
-  {id:'scripture-streak',icon:'✝️',title:'Scripture Warrior',desc:'Read scripture 7 days in a row',color:'#a78bfa',
+  {id:'scripture-streak',icon:'✝️',title:'Scripture Warrior',desc:'Read scripture 7 days in a row',color:'#22d3ee',
     target:7, check:()=>typeof getScriptureStreak==='function'?getScriptureStreak():0,
     reward:35, rewardType:'pb'},
   {id:'journal-master',icon:'✍️',title:'Journal Master',desc:'Write 10 journal entries this month',color:'#f472b6',
@@ -4960,7 +4960,7 @@ const CHALLENGES = [
 const FAMILY_REWARDS = [
   {icon:'🍕',title:'Pizza Night',desc:'Family earns 500 combined PB',target:500,color:'#ef4444'},
   {icon:'🎬',title:'Movie Night',desc:'Family earns 750 combined PB',target:750,color:'#60a5fa'},
-  {icon:'🎮',title:'Game Night',desc:'All kids log 3+ day streaks',target:3,color:'#8b5cf6'},
+  {icon:'🎮',title:'Game Night',desc:'All kids log 3+ day streaks',target:3,color:'#0891b2'},
   {icon:'🍽️',title:'Kids Pick Dinner',desc:'Family completes 20 chores in a week',target:20,color:'#22c55e'},
   {icon:'🎉',title:'Family Outing',desc:'Family earns 1000 combined PB',target:1000,color:'#fbbf24'},
 ];
@@ -5257,7 +5257,7 @@ const CHARACTER_LESSONS = [
     body:`<h4>What Patience Actually Is</h4><p>Patience is the ability to endure delay, difficulty, or discomfort without losing your composure. It is not passive waiting — it is active endurance. It is choosing to stay calm and focused when everything in you wants to react, rush, or quit.</p><h4>Why It Matters</h4><p>Impatient people make bad decisions. They send the angry text they regret. They quit the project one week before it succeeds. They damage relationships with words they cannot take back. Patient people let situations develop, gather information before reacting, and choose responses instead of reactions.</p><h4>How to Build It</h4><p>Patience is a muscle. Practice in small moments: the slow line at the store, the sibling who annoys you, the assignment that takes longer than expected. When you feel impatience rising, pause. Breathe. Ask: "Will this matter in a week?" Usually it will not. The pause between stimulus and response is where your character lives.</p>`,
     quiz:[{q:'Patience is best described as:',a:'Active endurance during difficulty',opts:['Passive waiting','Active endurance during difficulty','Ignoring problems','Being slow']},
           {q:'The pause between stimulus and response is where:',a:'Your character lives',opts:['Nothing happens','Your character lives','You lose control','Time is wasted']}]},
-  {icon:'💜',title:'Forgiveness',sub:'Releasing others so you can be free',color:'#a78bfa',
+  {icon:'💜',title:'Forgiveness',sub:'Releasing others so you can be free',color:'#22d3ee',
     body:`<h4>What Forgiveness Actually Is</h4><p>Forgiveness is not saying what happened was okay. It is not pretending it did not hurt. It is choosing to stop carrying the weight of someone else's wrong. It is a decision to release the debt — not for their sake, but for yours.</p><h4>Why It Matters</h4><p>Unforgiveness is a poison you drink hoping the other person gets sick. It creates bitterness that leaks into every relationship. It replays the hurt on a loop in your mind. It keeps you chained to the person who wronged you. Forgiveness breaks the chain. It does not erase the past. It refuses to let the past control the future.</p><h4>The Hard Truth</h4><p>Some things are genuinely hard to forgive. Betrayal, abandonment, cruelty. You may need to forgive the same person for the same thing multiple times before it sticks. That is normal. Forgiveness is not a one-time event — it is a practice. And it gets easier each time you choose it.</p>`,
     quiz:[{q:'Forgiveness primarily benefits:',a:'The person who forgives',opts:['The person who did wrong','The person who forgives','Nobody','Society']},
           {q:'Forgiveness means:',a:'Releasing the debt, not condoning the action',opts:['Saying it was okay','Forgetting what happened','Releasing the debt, not condoning the action','Letting them do it again']}]},
@@ -5506,7 +5506,7 @@ function renderGrowthTracker(){
     ms.innerHTML = `<div style="display:flex;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap;">
       <div style="background:rgba(56,189,248,.06);border-radius:8px;padding:.35rem .6rem;font-size:.65rem;"><b style="color:#38bdf8;">${log.length}</b> measurements</div>
       ${totalH?`<div style="background:rgba(34,197,94,.06);border-radius:8px;padding:.35rem .6rem;font-size:.65rem;"><b style="color:#22c55e;">+${totalH} inches</b> grown</div>`:''}
-      ${daySpan>0?`<div style="background:rgba(167,139,250,.06);border-radius:8px;padding:.35rem .6rem;font-size:.65rem;">over <b style="color:#a78bfa;">${daySpan}</b> days</div>`:''}
+      ${daySpan>0?`<div style="background:rgba(251,191,36,.07);border-radius:8px;padding:.35rem .6rem;font-size:.65rem;">over <b style="color:#22d3ee;">${daySpan}</b> days</div>`:''}
     </div>`;
   } else if(ms){
     ms.innerHTML = '';
@@ -5532,17 +5532,17 @@ const DEV_MAP_STAGES = [
   {id:'start',icon:'🌱',label:'Getting Started',desc:'Set up your profile',check:()=>!!D.name,color:'#22c55e'},
   {id:'firstHabit',icon:'⚡',label:'First Habit',desc:'Check off a daily habit',check:()=>(D.streak||0)>=1,color:'#38bdf8'},
   {id:'firstLesson',icon:'📖',label:'First Lesson',desc:'Read a life skill lesson',check:()=>Object.values(D.skillCerts||{}).filter(Boolean).length>=1||((Array.isArray(D.activityLog)?D.activityLog:[]).find(a=>a.type==='lesson')),color:'#60a5fa'},
-  {id:'scripture5',icon:'✝️',label:'5 Days Reading',desc:'Read scripture 5 days',check:()=>Object.keys(D.scrReadDays||{}).length>=5,color:'#a78bfa'},
+  {id:'scripture5',icon:'✝️',label:'5 Days Reading',desc:'Read scripture 5 days',check:()=>Object.keys(D.scrReadDays||{}).length>=5,color:'#22d3ee'},
   {id:'streak7',icon:'🔥',label:'7-Day Streak',desc:'Build a 7-day streak',check:()=>(D.streak||0)>=7,color:'#f472b6'},
   {id:'firstGoal',icon:'🎯',label:'Goal Achieved',desc:'Complete your first goal',check:()=>(Array.isArray(D.goals)?D.goals:[]).filter(g=>g.done).length>=1,color:'#fbbf24'},
   {id:'chore10',icon:'✅',label:'10 Chores Done',desc:'Complete 10 verified chores',check:()=>(D.choreLog||[]).filter(l=>l.status==='verified').length>=10,color:'#22c55e'},
   {id:'cert3',icon:'🧠',label:'3 Certificates',desc:'Earn 3 skill certificates',check:()=>Object.values(D.skillCerts||{}).filter(Boolean).length>=3,color:'#06b6d4'},
   {id:'journal10',icon:'✍️',label:'10 Journal Entries',desc:'Write 10 reflections',check:()=>(Array.isArray(D.journal)?D.journal:[]).length>=10,color:'#fb923c'},
-  {id:'book1',icon:'📚',label:'First Book',desc:'Finish reading a book',check:()=>(Array.isArray(D.books)?D.books:[]).filter(b=>b.status==='done').length>=1,color:'#8b5cf6'},
+  {id:'book1',icon:'📚',label:'First Book',desc:'Finish reading a book',check:()=>(Array.isArray(D.books)?D.books:[]).filter(b=>b.status==='done').length>=1,color:'#0891b2'},
   {id:'pb100',icon:'🪙',label:'100 Parent Bucks',desc:'Earn 100 PB',check:()=>(D.pb||{}).balance>=100||(D.pb||{}).balance>=100,color:'#fbbf24'},
   {id:'streak30',icon:'💎',label:'30-Day Streak',desc:'Unstoppable consistency',check:()=>(D.streak||0)>=30,color:'#ef4444'},
   {id:'cert10',icon:'🎓',label:'10 Certificates',desc:'Master 10 skill areas',check:()=>Object.values(D.skillCerts||{}).filter(Boolean).length>=10,color:'#22d3ee'},
-  {id:'scripture100',icon:'📜',label:'100 Days Reading',desc:'Read 100 daily scriptures',check:()=>Object.keys(D.scrReadDays||{}).length>=100,color:'#a78bfa'},
+  {id:'scripture100',icon:'📜',label:'100 Days Reading',desc:'Read 100 daily scriptures',check:()=>Object.keys(D.scrReadDays||{}).length>=100,color:'#22d3ee'},
   {id:'goals10',icon:'🏆',label:'10 Goals Done',desc:'Achieve 10 goals',check:()=>(Array.isArray(D.goals)?D.goals:[]).filter(g=>g.done).length>=10,color:'#fbbf24'},
   {id:'master',icon:'👑',label:'Life Master',desc:'Complete all milestones above',check:()=>DEV_MAP_STAGES.slice(0,-1).every(s=>s.check()),color:'linear-gradient(135deg,#fbbf24,#22c55e)'},
 ];
@@ -5599,7 +5599,7 @@ const SOCIAL_LESSONS = [
     body:`<h4>What Real Friendship Looks Like</h4><p>A real friend tells you what you need to hear, not just what you want to hear. They keep your secrets, show up when things are hard, celebrate your wins without jealousy, and give you space when you need it. Real friendship is built on trust, shared experience, and mutual investment over time — it cannot be speed-run.</p><h4>How to Be That Friend</h4><p>Initiate — don't wait for others to text first. Remember details — ask how their test went, how their family stuff is going. Be reliable — if you say you'll be there, be there. Forgive imperfection — friends will let you down sometimes, and so will you. Grace keeps friendships alive.</p><h4>The Difference</h4><p>Social media followers are not friends. Streaks are not friendships. Having 500 connections means nothing if none of them would help you move. Invest in 3-5 people who actually know you.</p>`},
   {icon:'🗣️',title:'Resolving Disagreements',sub:'Fighting fair so the relationship survives',color:'#60a5fa',
     body:`<h4>Conflict is Inevitable</h4><p>Every relationship will have disagreements. The question is not whether you will fight — it is whether you will fight well. Fighting fair means attacking the problem, not the person.</p><h4>The Rules</h4><p>No name-calling — ever. No bringing up old issues that were already resolved. No "you always" or "you never" — these are exaggerations that escalate everything. Take a break if emotions are too high — say "I need 10 minutes" and come back calmer. Listen to understand, not to win.</p><h4>The Goal</h4><p>The goal of a disagreement is not to be right. It is to be understood — and to understand. Sometimes the resolution is compromise. Sometimes it is agreeing to disagree. Sometimes it is one person realizing they were wrong and owning it. All of these are healthy outcomes.</p>`},
-  {icon:'🫂',title:'Empathy — Feeling What Others Feel',sub:'The superpower of every great leader and friend',color:'#a78bfa',
+  {icon:'🫂',title:'Empathy — Feeling What Others Feel',sub:'The superpower of every great leader and friend',color:'#22d3ee',
     body:`<h4>What Empathy Is</h4><p>Empathy is the ability to understand and share someone else's feelings — to see the world through their eyes, even when their experience is different from yours. It is not "I know how you feel" (you often don't). It is "I'm trying to understand how you feel."</p><h4>Why It Matters</h4><p>Empathetic people have stronger friendships, better romantic relationships, more successful careers, and more influence. People trust those who understand them. Empathy is the foundation of every act of kindness, every good leadership decision, and every strong team.</p><h4>How to Build It</h4><p>Listen without planning your response. Ask "how did that make you feel?" and actually wait for the answer. Read books and watch stories about people whose lives are different from yours. Before judging someone, ask "what might be happening in their life that I can't see?"</p>`},
   {icon:'🌍',title:'Respecting Differences',sub:'People are different. That is the point.',color:'#22d3ee',
     body:`<h4>The Reality</h4><p>You will work with, live near, and depend on people who look different, think different, believe different, and live different from you. This is not a problem to solve — it is a feature of being human. The ability to respect differences without abandoning your own values is one of the most important skills you will ever develop.</p><h4>What Respect Looks Like</h4><p>Respect does not mean agreement. You can deeply respect someone you disagree with. It means listening before judging, assuming good intent until proven otherwise, and treating every person's dignity as non-negotiable — regardless of their background, beliefs, or choices.</p><h4>The Test</h4><p>Can you articulate the strongest version of an argument you disagree with? Can you be friends with someone who votes differently? Can you learn from someone whose lifestyle is different from yours? If yes, you have the kind of maturity that most adults never achieve.</p>`},
@@ -5861,7 +5861,7 @@ function showCelebration(message, emoji){
   msgEl.style.animation = 'celebBounce .6s ease-out';
 
   // Confetti
-  const colors = ['#fbbf24','#22c55e','#60a5fa','#f472b6','#a78bfa','#ef4444','#fb923c','#38bdf8'];
+  const colors = ['#fbbf24','#22c55e','#60a5fa','#f472b6','#22d3ee','#ef4444','#fb923c','#38bdf8'];
   for(let i=0;i<40;i++){
     const piece = document.createElement('div');
     piece.className = 'confetti-piece';
@@ -6317,7 +6317,7 @@ function renderProgressReportsTab(){
     container.innerHTML = '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:1.5rem;text-align:center;color:var(--tx2);font-size:.8rem;">No children added yet. Go to <b>Manage Users</b> to add a child profile.</div>';
     return;
   }
-  const colors = ['#38bdf8','#34d399','#fbbf24','#f472b6','#a78bfa','#fb923c'];
+  const colors = ['#38bdf8','#34d399','#fbbf24','#f472b6','#22d3ee','#fb923c'];
   container.innerHTML = children.map((child,i)=>{
     const c = colors[i%colors.length];
     const d = child.data||{};
@@ -6481,7 +6481,7 @@ LAST WEEK STATS (for comparison):
     {icon:'👎', label:'Needs-Work Notes',      curr:curr.negativeBeh,    prev:prev.negativeBeh,    unit:'', lower:true},
   ];
 
-  const colors = ['#38bdf8','#34d399','#fbbf24','#f472b6','#a78bfa','#fb923c'];
+  const colors = ['#38bdf8','#34d399','#fbbf24','#f472b6','#22d3ee','#fb923c'];
   const ci = (_profiles||[]).filter(p=>!p.isParent).findIndex(p=>p.id===childId);
   const cc = colors[ci%colors.length];
 
@@ -6584,7 +6584,7 @@ async function _emailWeeklySummary_RETIRED(childId){
 
   const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="background:#0d1117;font-family:Inter,Arial,sans-serif;margin:0;padding:20px;">
 <div style="max-width:540px;margin:0 auto;background:#161b27;border-radius:14px;overflow:hidden;border:1px solid rgba(56,189,248,.15);">
-  <div style="background:linear-gradient(135deg,#38bdf8,#818cf8);padding:20px 24px;">
+  <div style="background:linear-gradient(135deg,#38bdf8,#38bdf8);padding:20px 24px;">
     <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:28px;letter-spacing:4px;color:#06101e;">YourLife CC</div>
     <div style="font-size:13px;color:#06101e;opacity:.75;margin-top:2px;">Weekly Progress Report</div>
   </div>

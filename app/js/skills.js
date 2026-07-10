@@ -9,13 +9,13 @@ const SK_CATS=[
   {icon:'💸',name:'Taxes & Filing',key:'taxes',color:'#fbbf24'},
   {icon:'🚗',name:'Car & Driving',key:'car',color:'#60a5fa'},
   {icon:'🏥',name:'Health & Body',key:'health',color:'#34d399'},
-  {icon:'🦷',name:'Dental & Hygiene',key:'dental',color:'#a78bfa'},
+  {icon:'🦷',name:'Dental & Hygiene',key:'dental',color:'#22d3ee'},
   {icon:'🍳',name:'Cooking & Food',key:'cooking',color:'#fb923c'},
   {icon:'🏠',name:'Home & Renting',key:'home',color:'#38bdf8'},
-  {icon:'💼',name:'Career & Work',key:'career',color:'#818cf8'},
+  {icon:'💼',name:'Career & Work',key:'career',color:'#38bdf8'},
   {icon:'💳',name:'Credit & Banking',key:'credit',color:'#4ade80'},
   {icon:'🤝',name:'Relationships',key:'relationships',color:'#f472b6'},
-  {icon:'⛪',name:'Faith & Purpose',key:'faith',color:'#c084fc'},
+  {icon:'⛪',name:'Faith & Purpose',key:'faith',color:'#f472b6'},
   {icon:'🧠',name:'Mental Health',key:'mental',color:'#22d3ee'},
   {icon:'🏛️',name:'Civic Life',key:'civic',color:'#94a3b8'},
   {icon:'🆘',name:'Emergency Skills',key:'emergency',color:'#f87171'},
@@ -27,7 +27,7 @@ const SK_CATS=[
   {icon:'🗣️',name:'Communication',key:'communication',color:'#06b6d4'},
   {icon:'🧰',name:'Home Repairs & DIY',key:'diy',color:'#78716c'},
   {icon:'📦',name:'Shopping Smart',key:'shopping',color:'#f97316'},
-  {icon:'📝',name:'Professional Writing',key:'writing',color:'#6366f1'},
+  {icon:'📝',name:'Professional Writing',key:'writing',color:'#0891b2'},
   {icon:'👕',name:'Laundry & Clothes',key:'laundry',color:'#38bdf8'},
   {icon:'🧹',name:'Cleaning & Home Care',key:'cleaning',color:'#22d3ee'},
   {icon:'⏰',name:'Time Management',key:'timemanage',color:'#f59e0b'},
@@ -38,12 +38,12 @@ const SK_CATS=[
   {icon:'✈️', name:'Travel & World Readiness', key:'travel', color:'#f59e0b'},
   {icon:'🍽️',name:'Nutrition & Meal Planning',key:'nutrition',color:'#22c55e'},
   {icon:'💪',name:'Fitness & Exercise',key:'fitness',color:'#f97316'},
-  {icon:'😴',name:'Sleep Science',key:'sleep',color:'#818cf8'},
+  {icon:'😴',name:'Sleep Science',key:'sleep',color:'#38bdf8'},
   {icon:'💡',name:'Critical Thinking',key:'critical',color:'#facc15'},
   {icon:'💰',name:'Budgeting & Saving',key:'budgeting',color:'#34d399'},
   {icon:'🌍',name:'Environmental Awareness',key:'environment',color:'#4ade80'},
   {icon:'🧬',name:'Basic First Aid',key:'firstaid',color:'#f87171'},
-  {icon:'🎙️',name:'Public Speaking',key:'speaking',color:'#c084fc'},
+  {icon:'🎙️',name:'Public Speaking',key:'speaking',color:'#f472b6'},
   {icon:'🧘',name:'Stress & Resilience',key:'stress',color:'#38bdf8'},
   {icon:'📸',name:'Social Media & Reputation',key:'socialmedia',color:'#fb7185'},
   {icon:'🔐',name:'Online Safety & Privacy',key:'onlinesafety',color:'#60a5fa'},
@@ -71,7 +71,7 @@ const SK_DOMAINS = [
     keys:['taxes','credit','investing','insurance','budgeting','shopping']},
   {key:'body',       icon:'💪', name:'Body',       accent:'var(--section-health, #34d399)',
     keys:['health','dental','cooking','nutrition','fitness','sleep','firstaid']},
-  {key:'mind',       icon:'🧠', name:'Mind',       accent:'#c084fc',
+  {key:'mind',       icon:'🧠', name:'Mind',       accent:'#f472b6',
     keys:['mental','critical','stress','faith','speaking']},
   {key:'home',       icon:'🏠', name:'Home',       accent:'var(--section-daily-life, #f59e0b)',
     keys:['home','diy','cleaning','laundry','organize','safety','adulting']},
@@ -4169,10 +4169,10 @@ function finishSkillQuiz(){
           ? `<button class="btn" style="background:${col};color:#000;font-weight:800;" onclick="switchSkTab('cert')">View Certificate 🏆</button>`
           : `<button class="btn" style="background:${col};color:#000;font-weight:800;" onclick="renderQuiz('${_quizKey}')">Try Again →</button>`}
         <button class="btn bgh bs" onclick="switchSkTab('lessons')">Review Lessons</button>
-        <button class="btn bs" id="skAnalysisBtn" style="background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.35);color:#a78bfa;font-weight:700;" onclick="getQuizAnalysis()">🤖 Get Analysis</button>
+        <button class="btn bs" id="skAnalysisBtn" style="background:rgba(34,211,238,.15);border:1px solid rgba(34,211,238,.35);color:#22d3ee;font-weight:700;" onclick="getQuizAnalysis()">🤖 Get Analysis</button>
       </div>
-      <div id="skAnalysisPanel" style="display:none;margin-top:1rem;text-align:left;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.2);border-radius:12px;padding:1rem;">
-        <div style="font-size:.65rem;font-weight:700;font-family:var(--fn);letter-spacing:2px;color:#a78bfa;margin-bottom:.5rem;">🤖 AI ANALYSIS</div>
+      <div id="skAnalysisPanel" style="display:none;margin-top:1rem;text-align:left;background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.2);border-radius:12px;padding:1rem;">
+        <div style="font-size:.65rem;font-weight:700;font-family:var(--fn);letter-spacing:2px;color:#22d3ee;margin-bottom:.5rem;">🤖 AI ANALYSIS</div>
         <div id="skAnalysisText" style="font-size:.82rem;color:var(--tx);line-height:1.7;"></div>
       </div>
     </div>`;
@@ -5786,10 +5786,10 @@ function removeHeroBg(){
 // ── COLOR PALETTE SYSTEM ─────────────────────────────────────────────
 const PALETTES = {
   cyan:    null, // default — uses :root values
-  violet:  {c:'#8b5cf6', p:'#06b6d4', gr:'#34d399', g:'#fbbf24'},
-  rose:    {c:'#f43f5e', p:'#a78bfa', gr:'#34d399', g:'#fbbf24'},
-  emerald: {c:'#10b981', p:'#6366f1', gr:'#34d399', g:'#fbbf24'},
-  amber:   {c:'#f59e0b', p:'#8b5cf6', gr:'#34d399', g:'#fb923c'},
+  violet:  {c:'#0891b2', p:'#06b6d4', gr:'#34d399', g:'#fbbf24'},
+  rose:    {c:'#f43f5e', p:'#22d3ee', gr:'#34d399', g:'#fbbf24'},
+  emerald: {c:'#10b981', p:'#0891b2', gr:'#34d399', g:'#fbbf24'},
+  amber:   {c:'#f59e0b', p:'#0891b2', gr:'#34d399', g:'#fb923c'},
   coral:   {c:'#ff6b6b', p:'#4ecdc4', gr:'#45b7d1', g:'#ffd93d'},
   neon:    {c:'#39ff14', p:'#ff00ff', gr:'#00ffff', g:'#ffff00', bg:'#050505', s1:'#0a0a0a', s2:'#111', s3:'#161616', s4:'#1a1a1a'},
   // Mom-persona Phase 7 — three full themes that ride on light mode and
@@ -5884,7 +5884,7 @@ function applyPalette(){
   } else {
     // Reset to cyan defaults
     root.style.setProperty('--c',  '#38bdf8');
-    root.style.setProperty('--p',  '#a78bfa');
+    root.style.setProperty('--p',  '#22d3ee');
     root.style.setProperty('--gr', '#34d399');
     root.style.setProperty('--g',  '#fbbf24');
     root.style.removeProperty('--bg');

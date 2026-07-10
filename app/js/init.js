@@ -144,7 +144,7 @@ function loadDemoData(){
   // School
   D.classes = [
     {id:1,name:'AP English',teacher:'Mrs. Garcia',grade:94,target:95,color:'#38bdf8'},
-    {id:2,name:'Algebra II',teacher:'Mr. Thompson',grade:88,target:90,color:'#a78bfa'},
+    {id:2,name:'Algebra II',teacher:'Mr. Thompson',grade:88,target:90,color:'#22d3ee'},
     {id:3,name:'US History',teacher:'Ms. Chen',grade:92,target:90,color:'#22c55e'},
     {id:4,name:'Biology',teacher:'Mr. Davis',grade:85,target:88,color:'#fbbf24'},
   ];

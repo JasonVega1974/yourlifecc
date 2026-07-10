@@ -265,7 +265,7 @@ function _dbConfettiBurst() {
   var host = document.createElement('div');
   host.className = 'db-confetti-host';
   card.appendChild(host);
-  var colors = ['#fbbf24','#34d399','#38bdf8','#f87171','#a78bfa','#fef3c7'];
+  var colors = ['#fbbf24','#34d399','#38bdf8','#f87171','#22d3ee','#fef3c7'];
   for (var i = 0; i < 18; i++) {
     var p = document.createElement('span');
     p.className = 'db-confetti';

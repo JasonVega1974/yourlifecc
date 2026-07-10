@@ -261,11 +261,11 @@ async function changeParentPin(){
 function renderManageUsers(){
   updateParentPinToggleUI();
   const el=document.getElementById('manageUsersList'); if(!el) return;
-  const colors=['#a78bfa','#38bdf8','#22c55e','#f5a623','#f472b6','#22d3ee','#ef4444'];
+  const colors=['#22d3ee','#38bdf8','#22c55e','#f5a623','#f472b6','#22d3ee','#ef4444'];
   const bannerPresets=[
     {g:'none',label:'✕'},
-    {g:'linear-gradient(135deg,#38bdf8,#22c55e,#a78bfa)',label:'Aurora'},
-    {g:'linear-gradient(135deg,#667eea,#764ba2)',label:'Violet'},
+    {g:'linear-gradient(135deg,#38bdf8,#22c55e,#22d3ee)',label:'Aurora'},
+    {g:'linear-gradient(135deg,#0e7490,#164e63)',label:'Deep Sea'},
     {g:'linear-gradient(135deg,#f093fb,#f5576c)',label:'Pink'},
     {g:'linear-gradient(135deg,#4facfe,#00f2fe)',label:'Sky'},
     {g:'linear-gradient(135deg,#43e97b,#38f9d7)',label:'Mint'},
@@ -290,7 +290,7 @@ function renderManageUsers(){
       <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:${isP?'0':'.5rem'};">
         <div style="width:32px;height:32px;border-radius:50%;background:${c}22;border:2px solid ${c};display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:${c};flex-shrink:0;">${escapeHtml(String(p.name||'').charAt(0).toUpperCase())}</div>
         <div style="flex:1;">
-          <div style="font-size:.8rem;font-weight:700;color:#e0e0e0;">${escapeHtml(p.name)}${isP?' <span style="font-size:.58rem;background:rgba(139,92,246,.2);color:#a78bfa;border-radius:4px;padding:1px 5px;margin-left:3px;">PARENT</span>':''}</div>
+          <div style="font-size:.8rem;font-weight:700;color:#e0e0e0;">${escapeHtml(p.name)}${isP?' <span style="font-size:.58rem;background:rgba(34,211,238,.2);color:#22d3ee;border-radius:4px;padding:1px 5px;margin-left:3px;">PARENT</span>':''}</div>
           <div style="font-size:.65rem;color:var(--tx3);">${isP?'6-digit PIN (managed above)':'4-digit PIN: <span style="font-family:monospace;letter-spacing:.15rem;color:var(--tx3);">••••</span>'}</div>
         </div>
         <div style="display:flex;gap:.3rem;">
@@ -1415,7 +1415,7 @@ function renderParentChildCards(){
 
 // Deterministic avatar color from the profile id (stable per child, order-agnostic).
 function _pccColor(id){
-  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#a78bfa','#22d3ee','#ef4444'];
+  const colors = ['#38bdf8','#22c55e','#f5a623','#f472b6','#22d3ee','#22d3ee','#ef4444'];
   const s = String(id || '');
   let h = 0;
   for(let i=0;i<s.length;i++){ h = (h * 31 + s.charCodeAt(i)) >>> 0; }

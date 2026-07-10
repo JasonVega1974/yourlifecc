@@ -20,13 +20,13 @@
 // logic is a future Inc 4 polish; Inc 1 stays visual-only).
 // ════════════════════════════════════════════════════════════
 const GOAL_DOMAINS = [
-  {key:'faith',         icon:'⛪',  name:'Faith',       accent:'#c084fc', match:'Faith / Spiritual'},
+  {key:'faith',         icon:'⛪',  name:'Faith',       accent:'#f472b6', match:'Faith / Spiritual'},
   {key:'fitness',       icon:'💪', name:'Fitness',     accent:'#34d399', match:'Fitness / Health'},
   {key:'money',         icon:'💰', name:'Money',       accent:'#16a34a', match:'Money / Financial'},
   {key:'school',        icon:'📚', name:'School',      accent:'#38bdf8', match:'School / Education'},
-  {key:'career',        icon:'💼', name:'Career',      accent:'#818cf8', match:'Career / Work'},
+  {key:'career',        icon:'💼', name:'Career',      accent:'#38bdf8', match:'Career / Work'},
   {key:'relationships', icon:'🤝', name:'People',      accent:'#f472b6', match:'Relationships'},
-  {key:'music',         icon:'🎵', name:'Music',       accent:'#a78bfa', match:'DJ / Music'},
+  {key:'music',         icon:'🎵', name:'Music',       accent:'#22d3ee', match:'DJ / Music'},
   {key:'sports',        icon:'🥋', name:'Sports',      accent:'#ef4444', match:'Sports / Martial Arts'},
   {key:'growth',        icon:'🌱', name:'Growth',      accent:'#fbbf24', match:'Personal Growth'},
   {key:'other',         icon:'🗂️', name:'Other',       accent:'#94a3b8', match:'Other'}
@@ -320,7 +320,7 @@ const GOAL_MILESTONES = [
   { id:'firstGoal',     name:'Goal Setter',      icon:'🎯', color:'#f97316',
     desc:'Set your first goal.',
     check: function(){ return ((D && Array.isArray(D.goals)) ? D.goals.length : 0) >= 1; } },
-  { id:'vision',        name:'Visionary',        icon:'✦', color:'#a78bfa',
+  { id:'vision',        name:'Visionary',        icon:'✦', color:'#22d3ee',
     desc:'Write your life vision statement.',
     check: function(){ return !!(D && D.vision && String(D.vision).trim().length > 0); } },
   { id:'firstAchieved', name:'First Win',        icon:'🏆', color:'#fbbf24',
@@ -335,7 +335,7 @@ const GOAL_MILESTONES = [
       const g = (D && Array.isArray(D.goals)) ? D.goals : [];
       return g.filter(function(x){ return x && x.done; }).length >= 5;
     } },
-  { id:'longGoal',      name:'Mountain Climber', icon:'🏔', color:'#818cf8',
+  { id:'longGoal',      name:'Mountain Climber', icon:'🏔', color:'#38bdf8',
     desc:'Complete your first long-term goal.',
     check: function(){
       const g = (D && Array.isArray(D.goals)) ? D.goals : [];
@@ -827,7 +827,7 @@ function renderGoals(){
     const shortG  = goals.filter(g=>g.type==='short'&&!g.done).length;
     statsEl.innerHTML = `
       <div class="gv-stat"><div class="gv-stat-num">${total}</div><div class="gv-stat-lbl">Total</div></div>
-      <div class="gv-stat"><div class="gv-stat-num" style="color:#a78bfa;">${longG}</div><div class="gv-stat-lbl">Long-Term</div></div>
+      <div class="gv-stat"><div class="gv-stat-num" style="color:#22d3ee;">${longG}</div><div class="gv-stat-lbl">Long-Term</div></div>
       <div class="gv-stat"><div class="gv-stat-num" style="color:#fbbf24;">${shortG}</div><div class="gv-stat-lbl">Short-Term</div></div>
       <div class="gv-stat"><div class="gv-stat-num" style="color:#34d399;">${done}</div><div class="gv-stat-lbl">Achieved</div></div>
     `;
@@ -1342,7 +1342,7 @@ const CAREERS = [
     name:'Teacher / Educator',
     salary:'$45k–$85k+',
     tag:'Education',
-    tagColor:'#a78bfa',
+    tagColor:'#22d3ee',
     desc:'Shape the people who will shape the world.',
     overview:'Teachers at every level — K-12, community college, trade instruction — shape human potential. The financial compensation is modest but improving in many states, and the influence compounds across thousands of students over a career.',
     dayInLife:'Plan and deliver lessons, grade assignments, meet with students and parents, collaborate with colleagues, attend professional development, supervise extracurriculars. Summers off but significant prep work continues.',
@@ -1410,7 +1410,7 @@ const CAREERS = [
     name:'Pastor / Ministry',
     salary:'$35k–$90k+',
     tag:'Ministry',
-    tagColor:'#c084fc',
+    tagColor:'#f472b6',
     desc:'Lead people toward God — the highest calling.',
     overview:'Pastors lead congregations spiritually, preach and teach Scripture, counsel members through life\'s hardest moments, develop leaders, and steward the mission of the local church. It\'s simultaneously the most rewarding and most demanding work a person can do.',
     dayInLife:'Sermon preparation (15–20 hrs/week for most pastors), counseling, hospital visits, staff meetings, leadership development, community presence, administrative responsibilities. There is no off switch when people are in crisis.',
@@ -1643,7 +1643,7 @@ const CAREERS = [
   },
   {
     id:'paralegal',icon:'⚖️',name:'Paralegal / Legal Assistant',
-    salary:'$42k-$75k',tag:'Legal',tagColor:'#818cf8',
+    salary:'$42k-$75k',tag:'Legal',tagColor:'#38bdf8',
     desc:'Support attorneys with research, documentation, and case management.',
     overview:'Paralegals are essential to every law firm, corporate legal department, and government agency. They research case law, draft legal documents, organize evidence, and manage client communications. The work is intellectually stimulating and provides exposure to the entire legal system.',
     path:'Associate degree or certificate in paralegal studies. Many employers prefer a bachelor degree. Certification through NALA or NFPA strengthens your resume. Entry-level positions are available at law firms, corporate legal departments, and government agencies.',
@@ -1763,7 +1763,7 @@ const CAREERS = [
   },
   {
     id:'marketing',icon:'📣',name:'Marketing / Digital Marketing',
-    salary:'$45k-$110k+',tag:'Business',tagColor:'#a78bfa',
+    salary:'$45k-$110k+',tag:'Business',tagColor:'#22d3ee',
     desc:'Drive brand awareness, customer engagement, and revenue through strategic campaigns.',
     overview:'Digital marketing encompasses SEO, social media, content marketing, email campaigns, paid advertising, analytics, and brand strategy. Every business needs marketing, creating enormous demand. The field rewards creativity, analytical thinking, and adaptability as platforms and algorithms constantly evolve.',
     path:'Bachelor degree in marketing, communications, or business. Build real experience through internships, freelancing, or managing social media for local businesses. Google Analytics and Google Ads certifications are free and highly valued. HubSpot Academy offers free marketing certifications.',
@@ -1823,7 +1823,7 @@ const CAREERS = [
   },
   {
     id:'counselor',icon:'🧠',name:'Therapist / Counselor',
-    salary:'$45k-$90k',tag:'Healthcare',tagColor:'#a78bfa',
+    salary:'$45k-$90k',tag:'Healthcare',tagColor:'#22d3ee',
     desc:'Help people overcome challenges and improve their mental health.',
     overview:'Licensed counselors and therapists work with individuals, couples, families, and groups dealing with mental health challenges, life transitions, trauma, and relationship issues. Demand has surged in recent years as mental health awareness grows. Many therapists eventually open private practices.',
     path:'Bachelor degree in psychology or related field, then a master degree in counseling or social work (2-3 years). Complete supervised clinical hours (2,000-4,000) and pass licensing exams. Specializations include marriage/family, substance abuse, child/adolescent, and trauma.',

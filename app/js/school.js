@@ -459,7 +459,7 @@ function buildSchedule(){
         const isTd=isToday(d); const wknd=isWeekend(d);
         const k=dk(d,slot.h); const val=sched[k]||'';
         const act=acts.find(a=>a.v===val)||{bg:'',tc:''};
-        const bg=act.bg||(isTd?'rgba(56,189,248,.04)':wknd?'rgba(167,139,250,.03)':'');
+        const bg=act.bg||(isTd?'rgba(56,189,248,.04)':wknd?'rgba(34,211,238,.03)':'');
         html+=`<td class="act-cell${isTd?' today-col':''}" style="${bg?'background:'+bg+';':''}${act.tc?'color:'+act.tc+';':''}">
           <select onchange="setCell('${k}',this.value,this.closest('td'))" style="${act.tc?'color:'+act.tc+';':''}">
             ${actOpts.replace(`value="${val}"`,`value="${val}" selected`)}
@@ -492,7 +492,7 @@ function buildSchedule(){
         const isTd=isToday(d); const wknd=isWeekend(d);
         const k=dk(d,slot.h); const val=sched[k]||'';
         const act=acts.find(a=>a.v===val)||{bg:'',tc:''};
-        const bg=act.bg||(isTd?'rgba(56,189,248,.04)':wknd?'rgba(167,139,250,.03)':'');
+        const bg=act.bg||(isTd?'rgba(56,189,248,.04)':wknd?'rgba(34,211,238,.03)':'');
         html+=`<td class="act-cell${isTd?' today-col':''}" style="${bg?'background:'+bg+';':''}${act.tc?'color:'+act.tc+';':''}">
           <select onchange="setCell('${k}',this.value,this.closest('td'))" style="${act.tc?'color:'+act.tc+';':''}">
             ${actOpts.replace(`value="${val}"`,`value="${val}" selected`)}

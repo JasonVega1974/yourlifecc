@@ -76,7 +76,7 @@ function renderBankHist(){
   el.innerHTML=(D.bankHistory||[]).map(h=>`
     <div style="display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.78rem;">
       <span style="color:#c8d4e8;">${h.date} · ${escapeHtml(h.label||'')}</span>
-      <span style="color:#c4b5fd;font-weight:700;">$${(h.bank||0).toLocaleString()}</span>
+      <span style="color:#67e8f9;font-weight:700;">$${(h.bank||0).toLocaleString()}</span>
       ${h.savAcct!==undefined?`<span style="color:var(--gr);font-weight:700;">+$${(h.savAcct||0).toLocaleString()}</span>`:''}
     </div>`).join('');
 }
@@ -364,7 +364,7 @@ function renderMonthSnap(inc,exp,bills){
   const paid=(D.bills||[]).filter(b=>b.paid).length;
   const total=(D.bills||[]).length;
   el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.55rem;font-size:.84rem;">
-    <div style="padding:.6rem;background:rgba(255,255,255,.1);border-radius:9px;"><div style="font-size:.62rem;color:#c8d4e8;">CHECKING</div><div style="font-weight:800;color:#c4b5fd;font-family:var(--fn);">$${(D.bank||0).toLocaleString()}</div></div>
+    <div style="padding:.6rem;background:rgba(255,255,255,.1);border-radius:9px;"><div style="font-size:.62rem;color:#c8d4e8;">CHECKING</div><div style="font-weight:800;color:#67e8f9;font-family:var(--fn);">$${(D.bank||0).toLocaleString()}</div></div>
     <div style="padding:.6rem;background:rgba(255,255,255,.1);border-radius:9px;"><div style="font-size:.62rem;color:#c8d4e8;">SAVINGS ACCT</div><div style="font-weight:800;color:var(--gr);font-family:var(--fn);">$${(D.bankSavAcct||0).toLocaleString()}</div></div>
     <div style="padding:.6rem;background:rgba(255,255,255,.1);border-radius:9px;"><div style="font-size:.62rem;color:#c8d4e8;">MONTH INCOME</div><div style="font-weight:800;color:var(--c);font-family:var(--fn);">$${inc.toFixed(2)}</div></div>
     <div style="padding:.6rem;background:rgba(255,255,255,.1);border-radius:9px;"><div style="font-size:.62rem;color:#c8d4e8;">MONTH EXPENSES</div><div style="font-weight:800;color:var(--pk);font-family:var(--fn);">$${exp.toFixed(2)}</div></div>
@@ -488,10 +488,10 @@ function renderSavGoalCards(){
       if(daysLeft < 0){
         countdownHtml = '<span class="mz-goal-chip mz-goal-chip--warn" style="font-size:.55rem;font-weight:800;background:rgba(251,113,133,.14);color:#fb7185;padding:.12rem .4rem;border-radius:5px;letter-spacing:.4px;">PAST DUE</span>';
       } else if(daysLeft < 60){
-        countdownHtml = '<span class="mz-goal-chip" style="font-size:.55rem;font-weight:800;background:rgba(99,102,241,.14);color:#6366f1;padding:.12rem .4rem;border-radius:5px;letter-spacing:.4px;">' + daysLeft + ' DAYS LEFT</span>';
+        countdownHtml = '<span class="mz-goal-chip" style="font-size:.55rem;font-weight:800;background:rgba(8,145,178,.14);color:#0891b2;padding:.12rem .4rem;border-radius:5px;letter-spacing:.4px;">' + daysLeft + ' DAYS LEFT</span>';
       } else {
         const monthsLeft = Math.round(daysLeft / 30);
-        countdownHtml = '<span class="mz-goal-chip" style="font-size:.55rem;font-weight:800;background:rgba(99,102,241,.14);color:#6366f1;padding:.12rem .4rem;border-radius:5px;letter-spacing:.4px;">' + monthsLeft + ' MO LEFT</span>';
+        countdownHtml = '<span class="mz-goal-chip" style="font-size:.55rem;font-weight:800;background:rgba(8,145,178,.14);color:#0891b2;padding:.12rem .4rem;border-radius:5px;letter-spacing:.4px;">' + monthsLeft + ' MO LEFT</span>';
       }
     } else if(g.completedAt){
       countdownHtml = '<span class="mz-goal-chip" style="font-size:.55rem;font-weight:800;background:rgba(16,185,129,.16);color:#10b981;padding:.12rem .4rem;border-radius:5px;letter-spacing:.4px;">✓ ' + escapeHtml(g.completedAt.slice(0,7)) + '</span>';
@@ -609,7 +609,7 @@ const FIN_DONUT_BUCKETS = {
 };
 const FIN_DONUT_COLORS = {
   Food:          '#f59e0b',
-  Entertainment: '#c084fc',
+  Entertainment: '#f472b6',
   Clothing:      '#f472b6',
   Transport:     '#38bdf8',
   Other:         '#94a3b8'

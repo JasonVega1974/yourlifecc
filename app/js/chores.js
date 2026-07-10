@@ -552,7 +552,7 @@ function renderChores(){
         // scoped to this chore; on selection we route through
         // markChoreDone(id, file) which uploads + attaches photoPath.
         const photoBtn = (st === 'todo' || st === 'rejected')
-          ? `<button onclick="chorePhotoPick(${c.id})" title="Submit with photo proof" style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.22);color:#a78bfa;font-size:.62rem;padding:.3rem .45rem;border-radius:6px;cursor:pointer;margin-right:.25rem;">📸</button>`
+          ? `<button onclick="chorePhotoPick(${c.id})" title="Submit with photo proof" style="background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.22);color:#22d3ee;font-size:.62rem;padding:.3rem .45rem;border-radius:6px;cursor:pointer;margin-right:.25rem;">📸</button>`
           : '';
         const action = (st === 'todo' || st === 'rejected')
           ? `<button class="btn bp bs" onclick="markChoreDone(${c.id})" style="font-size:.6rem;white-space:nowrap;padding:.3rem .55rem;">${st==='rejected'?'↻ Redo':'✓ Done'}</button>`
@@ -581,7 +581,7 @@ function renderChores(){
         </div>`;
       todayEl.innerHTML = `<div class="ch-kanban">
         ${renderCol('todo',     'Todo',     '#fbbf24', 'Nothing to do')}
-        ${renderCol('pending',  'Pending',  '#a78bfa', 'None pending')}
+        ${renderCol('pending',  'Pending',  '#22d3ee', 'None pending')}
         ${renderCol('verified', 'Verified', '#22c55e', 'None yet')}
       </div>`;
       // Tab 1 Inc 5 Step D — instantiate SortableJS on the Todo column
@@ -680,7 +680,7 @@ function renderChores(){
           <div style="flex:1;min-width:80px;padding:.5rem;background:rgba(34,197,94,.08);border-radius:8px;text-align:center;"><div style="font-size:1.2rem;font-weight:800;color:#22c55e;">${verified.length}</div><div style="font-size:.55rem;color:var(--tx2);">Verified</div></div>
           <div style="flex:1;min-width:80px;padding:.5rem;background:rgba(251,191,36,.08);border-radius:8px;text-align:center;"><div style="font-size:1.2rem;font-weight:800;color:#fbbf24;">${pending.length}</div><div style="font-size:.55rem;color:var(--tx2);">Pending</div></div>
           <div style="flex:1;min-width:80px;padding:.5rem;background:rgba(239,68,68,.08);border-radius:8px;text-align:center;"><div style="font-size:1.2rem;font-weight:800;color:#ef4444;">${rejected.length}</div><div style="font-size:.55rem;color:var(--tx2);">Rejected</div></div>
-          <div style="flex:1;min-width:80px;padding:.5rem;background:rgba(167,139,250,.08);border-radius:8px;text-align:center;"><div style="font-size:1.2rem;font-weight:800;color:#a78bfa;">${ptsThisWeek}</div><div style="font-size:.55rem;color:var(--tx2);">Pts Earned</div></div>
+          <div style="flex:1;min-width:80px;padding:.5rem;background:rgba(34,211,238,.08);border-radius:8px;text-align:center;"><div style="font-size:1.2rem;font-weight:800;color:#22d3ee;">${ptsThisWeek}</div><div style="font-size:.55rem;color:var(--tx2);">Pts Earned</div></div>
         </div>`;
     }
   }
@@ -712,13 +712,13 @@ function renderChores(){
     if(!recent.length){
       histEl.innerHTML = '<div style="color:var(--tx2);font-size:.72rem;padding:.5rem;text-align:center;">No activity yet.</div>';
     } else {
-      const statusColors = {pending:'#fbbf24',verified:'#22c55e',rejected:'#ef4444',redeemed:'#a78bfa'};
+      const statusColors = {pending:'#fbbf24',verified:'#22c55e',rejected:'#ef4444',redeemed:'#22d3ee'};
       const statusLabels = {pending:'Pending',verified:'Verified',rejected:'Rejected',redeemed:'Redeemed'};
       histEl.innerHTML = recent.map(l=>`
         <div style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.04);font-size:.65rem;">
           <span>${l.emoji}</span>
           <span style="flex:1;color:var(--tx);">${escapeHtml(l.choreName)}</span>
-          <span style="color:${l.pts>0?'#22c55e':'#a78bfa'};font-weight:700;">${l.pts>0?'+':'-'}${Math.abs(l.pts)}</span>
+          <span style="color:${l.pts>0?'#22c55e':'#22d3ee'};font-weight:700;">${l.pts>0?'+':'-'}${Math.abs(l.pts)}</span>
           <span style="color:${statusColors[l.status]||'var(--tx2)'};font-size:.55rem;">${statusLabels[l.status]||l.status}</span>
           <span style="color:var(--tx2);font-size:.5rem;">${l.date.slice(5)}</span>
         </div>
@@ -731,7 +731,7 @@ function renderChores(){
 
 // ── SCREEN TIME MANAGER ──────────────────────────────────────
 const SCREEN_CATS = [
-  {key:'games',icon:'🎮',label:'Video Games',color:'#8b5cf6'},
+  {key:'games',icon:'🎮',label:'Video Games',color:'#0891b2'},
   {key:'tv',icon:'📺',label:'TV / Streaming',color:'#38bdf8'},
   {key:'phone',icon:'📱',label:'Phone / Social',color:'#f472b6'},
   {key:'tablet',icon:'📲',label:'Tablet / iPad',color:'#22c55e'},
@@ -1675,7 +1675,7 @@ const CHORE_BADGES = [
     test:function(D){ return D.chorePoints && D.chorePoints.total >= 100; }
   },
   { id:'high_roller',    label:'High Roller',     sub:'500 points earned',
-    icon:'🚀', accent:'#a78bfa',
+    icon:'🚀', accent:'#22d3ee',
     test:function(D){ return D.chorePoints && D.chorePoints.total >= 500; }
   },
   { id:'big_spender',    label:'Big Spender',     sub:'1000 points earned',
