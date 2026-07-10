@@ -629,7 +629,11 @@ async function finishInit(cloudReady){
     // _ylccGetFlag's per-user LS read could fall to _local and re-show.
     _ylccOnAuthResolved(function(){
       const today = new Date().toISOString().slice(0,10);
-      const faithOn = !(D.settings && D.settings.faithMode===false);
+      // faithMode opt-out lives in D.settings.faithMode with a DEF-resident
+      // mirror D.faithMode (init.js keeps them in sync at onboarding). Check
+      // BOTH so a legacy blob whose settings object was stripped by the old
+      // pre-DEF loadData still honors the opt-out.
+      const faithOn = !((D.settings && D.settings.faithMode===false) || D.faithMode===false);
       const wizardOpen = (document.getElementById('parentOnboard')||{}).classList&&document.getElementById('parentOnboard').classList.contains('open');
       const kidWizOpen = (document.getElementById('kidOnboard')||{}).classList&&document.getElementById('kidOnboard').classList.contains('open');
       const alreadyRead = D.scrReadDays && D.scrReadDays[today];

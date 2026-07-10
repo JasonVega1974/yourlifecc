@@ -624,6 +624,29 @@ const DEF = {
   //   'idle' → 'in_progress' → 'complete'   (or 'failed' on retry).
   // Kept distinct from D.pinMigration which tracks the PIN-hash rollout.
   profileIdMigration:{ status:'idle', mappings:{}, startedAt:null, completedAt:null },
+  // ── Daily Spark (Phase 4, 2026-07-09, daily-spark.js) ────────
+  // Once-per-day engagement card. sparkLastShown = 'YYYY-MM-DD' local
+  // date the card last auto-showed (gate: never twice in one day).
+  // sparkDismissedToday = user closed it (the ✨ chip reopens it that
+  // day); reset when the date rolls. sparkTodayKind = 'faith'|'main',
+  // frozen at first show so a chip reopen renders the SAME spark even
+  // if the user has since navigated to the other home.
+  sparkLastShown:'', sparkDismissedToday:false, sparkTodayKind:'',
+  // ── DEF-membership backfill #2 (2026-07-09 Phase 0 audit) — fields
+  //    written by modules but MISSING from DEF, so loadData (which
+  //    restores only DEF keys) dropped them on any offline reload and
+  //    the next cloudSync propagated the loss. Defaults match each
+  //    writer's first-use shape / lazy-init expectations.
+  flashcardProgress:{},        // index.html flashcards — { [cardIdx]: 'correct'|'incorrect' }
+  flashcardHistory:[],         // index.html flashcards — session log, capped 50
+  settings:{},                 // init.js onboarding — { faithMode:boolean } (see D.faithMode mirror)
+  pinMigration:null,           // auth.js — lazily seeded { status, startedAt, completedAt, childrenMigrated[] }
+  donationPromptDismissed:false, // faith.js — faith_free donation ask dismissed
+  rewardsLegacyMigrated:false, // chores.js — one-time rewards migration flag
+  _weeklyReports:{},           // parent.js — { [childId]: weekly report snapshot }
+  wellLastTab:'home',          // faith.js — Well tab resume pointer
+  age:'',                      // init.js onboarding — raw age answer
+  onboardingCompletedAt:'',    // init.js — ISO timestamp of wizard completion
 };
 
 let D = JSON.parse(JSON.stringify(DEF));

@@ -22820,6 +22820,11 @@
      after streaks.js (uses getScriptureStreak) and before init.js (which
      calls renderDailyBriefing during finishInit). -->
 <script defer src="/app/js/daily-briefing.js"></script>
+<!-- Daily Spark (Phase 4, 2026-07-09) — once-per-day engagement card,
+     both apps. Self-booting (owns its own DOMContentLoaded timer); reads
+     the pool datasets loaded above and D state. Must load before init.js
+     like every feature module. -->
+<script defer src="/app/js/daily-spark.js"></script>
 
 <!-- 2026-06-04 — Command Center home (Constellation concept).
      Renders into #appCommandCenter for non-faith-free, non-parent-view
@@ -23356,6 +23361,88 @@ document.addEventListener('DOMContentLoaded', function() {
         style="display:none;">
   <span id="primaryFabLabel">+ Add</span>
 </button>
+
+<!-- ════ DAILY SPARK (Phase 4, 2026-07-09) ════
+     Once-per-day engagement card, both apps. Bottom sheet on mobile,
+     centered modal on desktop. Content + behavior owned by
+     /app/js/daily-spark.js (self-booting; deterministic date-hash pick;
+     faith spark = gold register, main spark = cyan register). The ✨ chip
+     reopens the same spark any time that day. -->
+<style>
+#dailySparkOverlay{position:fixed;inset:0;z-index:9600;}
+#dailySparkOverlay[hidden]{display:none;}
+#dailySparkOverlay .dsp-backdrop{position:absolute;inset:0;background:rgba(4,8,18,.62);opacity:0;transition:opacity .3s ease-out;}
+#dailySparkOverlay.dsp-in .dsp-backdrop{opacity:1;}
+#dailySparkOverlay .dsp-card{position:absolute;left:50%;bottom:0;transform:translate(-50%,105%);
+  width:min(560px,100%);box-sizing:border-box;border-radius:22px 22px 0 0;
+  padding:1.5rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom,0px));
+  transition:transform .3s cubic-bezier(.22,.9,.3,1);}
+#dailySparkOverlay.dsp-in .dsp-card{transform:translate(-50%,0);}
+@media(min-width:641px){
+  #dailySparkOverlay .dsp-card{bottom:auto;top:50%;border-radius:22px;opacity:0;
+    transform:translate(-50%,-46%);transition:transform .3s cubic-bezier(.22,.9,.3,1),opacity .3s ease-out;}
+  #dailySparkOverlay.dsp-in .dsp-card{transform:translate(-50%,-50%);opacity:1;}
+}
+#dailySparkOverlay .dsp-card.dsp-faith{background:linear-gradient(175deg,#0e1a33,#0a1628 60%,#0a0d1a);border:1px solid rgba(245,200,66,.25);}
+#dailySparkOverlay .dsp-card.dsp-main{background:linear-gradient(175deg,#0a1626,#050d1a);border:1px solid rgba(34,211,238,.25);}
+#dailySparkOverlay .dsp-x{position:absolute;top:.4rem;right:.4rem;width:44px;height:44px;border:none;background:none;
+  color:rgba(255,255,255,.55);font-size:1rem;cursor:pointer;border-radius:99px;}
+#dailySparkOverlay .dsp-x:focus-visible{outline:2px solid #22d3ee;outline-offset:-4px;}
+#dailySparkOverlay .dsp-faith .dsp-x:focus-visible{outline-color:#f5c842;}
+#dailySparkOverlay .dsp-eyebrow{font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;margin-bottom:.35rem;}
+#dailySparkOverlay .dsp-faith .dsp-eyebrow{color:#f5c842;}
+#dailySparkOverlay .dsp-main .dsp-eyebrow{color:#22d3ee;}
+#dailySparkOverlay .dsp-kicker{font-size:12px;font-weight:500;color:rgba(255,255,255,.55);margin-bottom:.8rem;}
+#dailySparkOverlay .dsp-title{margin:0 0 .55rem;font-size:1.2rem;line-height:1.4;font-weight:500;color:#eef4fb;}
+#dailySparkOverlay .dsp-faith .dsp-title{font-family:Georgia,'Times New Roman',serif;color:#f6edd9;}
+#dailySparkOverlay .dsp-body{margin:0 0 .6rem;font-size:.95rem;line-height:1.65;color:#dce7f3;}
+#dailySparkOverlay .dsp-body.dsp-serif{font-family:Georgia,'Times New Roman',serif;font-size:1.05rem;color:#f2e9d8;}
+#dailySparkOverlay .dsp-ref{font-family:'Oswald',sans-serif;font-weight:500;font-size:12px;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;}
+#dailySparkOverlay .dsp-faith .dsp-ref{color:#f5c842;}
+#dailySparkOverlay .dsp-main .dsp-ref{color:#22d3ee;}
+#dailySparkOverlay .dsp-cta{display:block;width:100%;margin-top:1rem;padding:.85rem 1rem;border:none;
+  border-radius:12px;font-size:.95rem;font-weight:500;cursor:pointer;}
+#dailySparkOverlay .dsp-faith .dsp-cta{background:#f5c842;color:#221503;}
+#dailySparkOverlay .dsp-main .dsp-cta{background:#22d3ee;color:#04222b;}
+#dailySparkOverlay .dsp-cta:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+#dailySparkChip{position:fixed;top:calc(env(safe-area-inset-top,0px) + 68px);right:14px;z-index:1450;
+  width:44px;height:44px;border-radius:99px;border:1px solid rgba(34,211,238,.35);
+  background:rgba(8,20,34,.85);font-size:1.1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;}
+#dailySparkChip.dsp-chip-faith{border-color:rgba(245,200,66,.4);background:rgba(14,20,38,.85);}
+#dailySparkChip[hidden]{display:none;}
+/* Light mode — interface-layer card, so it papers over per the standing rule. */
+:root.light #dailySparkOverlay .dsp-backdrop{background:rgba(44,36,22,.42);}
+:root.light #dailySparkOverlay .dsp-card.dsp-faith{background:#fbf7ef;border-color:rgba(146,64,14,.3);}
+:root.light #dailySparkOverlay .dsp-card.dsp-main{background:#f7fafc;border-color:rgba(14,116,144,.32);}
+:root.light #dailySparkOverlay .dsp-x{color:rgba(40,44,52,.55);}
+:root.light #dailySparkOverlay .dsp-faith .dsp-eyebrow,
+:root.light #dailySparkOverlay .dsp-faith .dsp-ref{color:#92400e;}
+:root.light #dailySparkOverlay .dsp-main .dsp-eyebrow,
+:root.light #dailySparkOverlay .dsp-main .dsp-ref{color:#0e7490;}
+:root.light #dailySparkOverlay .dsp-kicker{color:rgba(40,44,52,.6);}
+:root.light #dailySparkOverlay .dsp-title{color:#26303c;}
+:root.light #dailySparkOverlay .dsp-faith .dsp-title{color:#3b2f1a;}
+:root.light #dailySparkOverlay .dsp-body{color:#3a4452;}
+:root.light #dailySparkOverlay .dsp-body.dsp-serif{color:#43371f;}
+:root.light #dailySparkOverlay .dsp-faith .dsp-cta{background:#92400e;color:#fff;}
+:root.light #dailySparkOverlay .dsp-main .dsp-cta{background:#0e7490;color:#fff;}
+:root.light #dailySparkChip{background:rgba(255,252,245,.92);border-color:rgba(14,116,144,.35);}
+:root.light #dailySparkChip.dsp-chip-faith{border-color:rgba(146,64,14,.4);}
+@media(prefers-reduced-motion:reduce){
+  #dailySparkOverlay .dsp-backdrop,#dailySparkOverlay .dsp-card{transition:none;}
+}
+</style>
+<div id="dailySparkOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="dspTitle">
+  <div class="dsp-backdrop"></div>
+  <div class="dsp-card dsp-main">
+    <button type="button" class="dsp-x" aria-label="Close today's spark">✕</button>
+    <div id="dspBody"></div>
+  </div>
+</div>
+<button id="dailySparkChip" hidden type="button" aria-label="Open today's spark">✨</button>
 
 <!-- ════════════════════════════════════════════════════════════
      Phase E — ONBOARDING OVERLAY (2026-05-15)
