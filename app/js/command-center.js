@@ -322,7 +322,13 @@
     // by this gold MY FAITH doorway: dest 'faithhome' lands on the faith
     // journey home grid (all 21 photo cards). The classic Well stays
     // reachable inside the faith section itself.
-    var faithHtml = ''
+    // Phase 2 (2026-07-10): honor the parent's section toggle — The Well
+    // off (D.sections.scripture===0) hides the doorway too. Known limit:
+    // the FORCE list in sync.js/init.js still resurrects 'scripture' on
+    // plain-localStorage boots; removing it there is a separate owner call.
+    var _faithOff = false;
+    try { _faithOff = !!(typeof D !== 'undefined' && D && D.sections && D.sections.scripture === 0); } catch(_){}
+    var faithHtml = _faithOff ? '' : ''
       + '<button class="cc-tile cc-tile--faith cc-tile--myfaith" type="button" data-dest="faithhome" '
       +   'aria-label="My Faith — your faith journey">'
       +   '<span class="cc-tile__icon" aria-hidden="true">✨</span>'
@@ -614,7 +620,16 @@
       + '</div>'
       + '<div id="lifePathWrap"></div>';
     document.body.appendChild(ov);
-    ov.querySelector('#ccClimbHomeBtn').addEventListener('click', ccCloseClimb);
+    // Phase 2: the two explicit user-close paths also consume the climb's
+    // history sentinel (the resulting async pop no-ops — overlay closed,
+    // on hub). ccCloseClimb itself stays history-free: the lifeOpenTool
+    // wrapper calls it right before a showSection, and an async back()
+    // there would race the new section's sentinel.
+    function _ccClimbUserClose(){
+      ccCloseClimb();
+      try { if (history.state && history.state.ylccSec === 'cc-climb') history.back(); } catch(_){}
+    }
+    ov.querySelector('#ccClimbHomeBtn').addEventListener('click', _ccClimbUserClose);
     // Esc: close the station sheet first if it's up, else leave the climb.
     document.addEventListener('keydown', function(e){
       if (e.key !== 'Escape') return;
@@ -624,7 +639,7 @@
         if (typeof window.lifeCloseStation === 'function') window.lifeCloseStation();
         return;
       }
-      ccCloseClimb();
+      _ccClimbUserClose();
     });
     return ov;
   }
@@ -651,6 +666,9 @@
     var ov = _ccClimbOverlay();
     ov.style.display = 'block';
     document.body.style.overflow = 'hidden';
+    // Phase 2: hub→overlay hop gets the one history sentinel so Android
+    // hardware back closes the climb instead of exiting the app.
+    try { if (!(history.state && history.state.ylccSec)) history.pushState({ ylccSec: 'cc-climb' }, ''); } catch(_){}
     try {
       window.renderLifePath('lifePathWrap');
     } catch(e){
@@ -735,7 +753,13 @@
       + '</div>'
       + '<div style="max-width:560px;margin:0 auto;padding:1rem .9rem 2.5rem;"><div id="mwHost"></div></div>';
     document.body.appendChild(ov);
-    ov.querySelector('#ccWalkHomeBtn').addEventListener('click', ccCloseWalk);
+    // Phase 2: same sentinel-consumption etiquette as the climb — only
+    // on the explicit user-close paths, never inside ccCloseWalk.
+    function _ccWalkUserClose(){
+      ccCloseWalk();
+      try { if (history.state && history.state.ylccSec === 'cc-walk') history.back(); } catch(_){}
+    }
+    ov.querySelector('#ccWalkHomeBtn').addEventListener('click', _ccWalkUserClose);
     // Esc: close the station sheet first if it's up, else leave the walk.
     document.addEventListener('keydown', function(e){
       if (e.key !== 'Escape') return;
@@ -745,7 +769,7 @@
         if (typeof window.walkCloseStation === 'function') window.walkCloseStation();
         return;
       }
-      ccCloseWalk();
+      _ccWalkUserClose();
     });
     return ov;
   }
@@ -776,6 +800,8 @@
     var ov = _ccWalkOverlay();
     ov.style.display = 'block';
     document.body.style.overflow = 'hidden';
+    // Phase 2: hub→overlay hop gets the one history sentinel.
+    try { if (!(history.state && history.state.ylccSec)) history.pushState({ ylccSec: 'cc-walk' }, ''); } catch(_){}
     try {
       if (typeof window.renderMyWalkTabs === 'function'){
         window.renderMyWalkTabs('mwHost', { startTab:'pathway' });

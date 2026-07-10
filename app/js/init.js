@@ -535,12 +535,20 @@ async function finishInit(cloudReady){
   if(_appInitialized) return;
   _appInitialized = true;
   if(D.sections){
-    const FORCE = ['cbt','resume','motivation','mentors','christianLiving','worship','scripture'];
+    // Phase 2 (2026-07-10): the old camelCase FORCE key never matched — the real
+    // section key is 'christian-living' (id s-christian-living minus the
+    // s- prefix). The camelCase entry was a silent no-op since it shipped.
+    const FORCE = ['cbt','resume','motivation','mentors','christian-living','worship','scripture'];
     const allowed = (typeof _bracketAllowedKeys === 'function') ? _bracketAllowedKeys(D.ageBracket) : null;
     FORCE.forEach(function(k){
       if(k === 'cbt'){ delete D.sections[k]; return; }
       if(allowed === null || allowed.has(k)) delete D.sections[k];
     });
+    // Phase 2: habits joined ALL_SECTIONS, so the bracket allowlist can
+    // finally hide it — backfill existing 12_14/15_17 accounts once
+    // (undefined guard: a future explicit parent toggle is never stomped).
+    const _alw = (typeof _bracketAllowedKeys === 'function') ? _bracketAllowedKeys(D.ageBracket) : null;
+    if(_alw && !_alw.has('habits') && D.sections.habits === undefined) D.sections.habits = 0;
   }
   // Belt+suspenders: force CBT on
   if(D.sections && D.sections.cbt===0) delete D.sections.cbt;

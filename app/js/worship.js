@@ -338,7 +338,10 @@ function worshipClose() {
   if (window.history.state && window.history.state.ylccWorship) {
     try { window.history.back(); return; } catch(e){}
   }
-  if (typeof wellGoto === 'function') wellGoto('home');
+  // Phase 2: honor the recorded origin (journey home vs Well vs child
+  // home) — the Well stays the empty-stack fallback.
+  if (typeof ylBackHasOrigin === 'function' && ylBackHasOrigin() && typeof ylBack === 'function') ylBack();
+  else if (typeof wellGoto === 'function') wellGoto('home');
   else if (typeof showSection === 'function') showSection('s-scripture');
 }
 
@@ -363,7 +366,9 @@ function worshipWireNav() {
       if (iframe) iframe.src = '';
       const mini = document.getElementById('wpMini');
       if (mini) mini.classList.add('hidden');
-      if (typeof wellGoto === 'function') wellGoto('home');
+      // Phase 2: honor the recorded origin; Well stays the fallback.
+      if (typeof ylBackHasOrigin === 'function' && ylBackHasOrigin() && typeof ylBack === 'function') ylBack();
+      else if (typeof wellGoto === 'function') wellGoto('home');
     }
   });
 }

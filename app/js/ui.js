@@ -234,7 +234,7 @@ function applyName(){
   const name=(D.name||'').trim();
   const el=document.getElementById('heroName');
   if(el) el.textContent=name?(name.toUpperCase()):'CHAMPION';
-  const ml=document.getElementById('modeLbl'); if(ml) ml.textContent=MODE_LABELS[D.mode||'high']||'High School';
+  const ml=document.getElementById('modeLbl'); if(ml) ml.textContent=MODE_LABELS[D.mode||'mid_hs']||'High School';
 }
 
 function editNameInline(el){
@@ -634,7 +634,7 @@ function updateHeroDashboard(){
 const ALL_SECTIONS=[
   {id:'s-finance',label:'💰 Money Manager'},
   {id:'s-school',label:'📚 School'},{id:'s-resources',label:'📐 School Resources'},{id:'s-schedule',label:'📅 Schedule'},
-  {id:'s-calendar',label:'🗓️ Calendar'},{id:'s-health',label:'💪 Health'},
+  {id:'s-calendar',label:'🗓️ Calendar'},{id:'s-health',label:'💪 Health'},{id:'s-habits',label:'⚡ Habits'},
   {id:'s-goals',label:'🎯 Goals'},{id:'s-skills',label:'🧠 Life Skills'},{id:'s-growing',label:'🌱 Growing Up'},
   {id:'s-craft',label:'🎵 Music & Practice'},{id:'s-contests',label:'🏆 Challenges'},{id:'s-rewards',label:'🎁 Rewards'},{id:'s-scripture',label:'✝️ The Well'},{id:'s-worship',label:'🎵 Worship Playlist'},{id:'s-flashcards',label:'📇 Bible Flashcards'},{id:'s-badges',label:'🏅 Badges'},{id:'s-driving',label:'🚗 Driving'},{id:'s-sports',label:'🏆 Sports'},
   {id:'s-journal',label:'✍️ Journal'},{id:'s-motivation',label:'🔥 Fuel Wall'},{id:'s-resume',label:'📄 Jobs/Resume'},{id:'s-bio',label:'🪪 Bio Page'},{id:'s-reading',label:'📖 Reading List'},{id:'s-mentors',label:'🤝 My People'},{id:'s-milestones',label:'🏆 Milestones'},{id:'s-mood',label:'😊 Mood Tracker'},{id:'s-chores',label:'✅ Chores'},
@@ -848,7 +848,7 @@ function openSettings(anchorId){
   } catch(e){}
 
   const _snEl=document.getElementById('settingsName'); if(_snEl) _snEl.value=D.name||'';
-  const _msEl=document.getElementById('modeSelect'); if(_msEl) _msEl.value=D.mode||'high';
+  const _msEl=document.getElementById('modeSelect'); if(_msEl) _msEl.value=D.mode||'mid_hs';
   // 2026-06-07 — Faith tab swap dropdown.
   const _tsEl=document.getElementById('settingsTabSwap');
   if(_tsEl) _tsEl.value = (D.tabSwap && TAB_SWAP_OPTIONS[D.tabSwap]) ? D.tabSwap : '';
@@ -1655,7 +1655,10 @@ function _updateMobileHomeBack(){
   // global floating "Back" here. Otherwise it shows a second, conflicting control
   // whose hard-coded showSection('s-hero') leaves the journey for the app/faith
   // landing. Flag-off: _fjHomeOn() is false -> term drops out -> byte-identical.
-  var _fjFaith = (_activeSection === 's-scripture') && (typeof _fjHomeOn === 'function') && _fjHomeOn();
+  // Phase 2: worship also has its own visible close pill (audio-safe
+  // worshipClose) — same double-back rationale as the journey home.
+  var _fjFaith = ((_activeSection === 's-scripture') && (typeof _fjHomeOn === 'function') && _fjHomeOn())
+              || (_activeSection === 's-worship');
   btn.style.display = ((standalone || narrow) && !isHome && !isParent && !_fjFaith) ? 'inline-flex' : 'none';
 }
 
@@ -2106,6 +2109,11 @@ function tgOpenTopic(sectionId, tabName){
   if(fnName && typeof window[fnName] === 'function'){
     try { window[fnName](tabName); } catch(e) {}
   }
+  // Phase 2 (2026-07-10): open at the top — a topic panel opened from a
+  // scrolled grid used to appear mid-scroll (the one sub-nav path that
+  // skipped showSection scroll reset). Last so it wins over any
+  // incidental scrolling in the tab handler.
+  try { window.scrollTo(0,0); } catch(_e){}
 }
 
 function tgInitAll(){
@@ -2281,20 +2289,79 @@ function _ensureFlatBack(sectionEl){
   try {
     if(!sectionEl || !document.documentElement.classList.contains('flatnav')) return;
     var id = sectionEl.id;
-    if(id === 's-hero' || id === 's-parent' || id === 's-scripture') return;
+    // Phase 2: s-worship excluded — it keeps only its own audio-safe close
+    // pill (worshipClose). s-flashcards deliberately NOT excluded: it has
+    // no internal back affordance at all, and #mobileHomeBack is CSS-killed
+    // under flatnav, so this pill is its only exit (now origin-honoring).
+    if(id === 's-hero' || id === 's-parent' || id === 's-scripture' || id === 's-worship') return;
     var first = sectionEl.firstElementChild;
     if(first && first.classList && first.classList.contains('flatnav-back')) return;
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'flatnav-back';
-    b.setAttribute('aria-label', 'Back to Home');
-    b.textContent = '← Home';
-    b.onclick = function(){ if(typeof showSection === 'function') showSection('s-hero'); };
+    b.setAttribute('aria-label', 'Back');
+    b.textContent = '← Back';
+    b.onclick = function(){
+      if(typeof ylBack === 'function') ylBack();
+      else if(typeof showSection === 'function') showSection('s-hero');
+    };
     sectionEl.insertBefore(b, sectionEl.firstChild);
   } catch(e){}
 }
 
+// ── Phase 2 (2026-07-10): unified back model ────────────────────────────
+// One origin stack + ONE synthetic history entry while off-hub, so every
+// back affordance (pills, Esc-adjacent, Android hardware back) returns
+// exactly one recorded level instead of hardcoding s-hero. Media surfaces
+// (worship/video/meditation/sleep) stack their own history entries ON TOP
+// of the ylccSec sentinel and keep their own popstate handlers — the
+// section-level handler defers to them (see the guards in the listener).
+var _navStack = [];        // origin section ids, oldest→newest
+var _navIsBack = false;    // true while ylBack() drives showSection
+function _ylIsHub(id){ return !id || id === 's-hero' || id === 's-parent'; }
+function ylBackHasOrigin(){ return _navStack.length > 0; }
+function ylBack(){
+  var dest = _navStack.length ? _navStack.pop() : 's-hero';
+  _navIsBack = true;
+  try { showSection(dest); } finally { _navIsBack = false; }
+}
+if(typeof window !== 'undefined'){
+  window.ylBack = ylBack;
+  window.ylBackHasOrigin = ylBackHasOrigin;
+  window._ylNavRepush = function(val){
+    try{ if(!(history.state && history.state.ylccSec)) history.pushState({ ylccSec: val }, ''); }catch(_e){}
+  };
+  window.addEventListener('popstate', function(){
+    // 1. Media surfaces own their popstate — do nothing while any is up.
+    if(document.getElementById('meditationOverlay') || document.getElementById('sleepStoryOverlay')) return;
+    if(document.getElementById('videoPlayerOverlay')) return;
+    var _w = document.getElementById('s-worship');
+    if(_w && _w.classList.contains('active')) return;
+    // 2. CC takeover overlays count as one level (mirror their Esc semantics).
+    var climb = document.getElementById('lifeClimbOverlay');
+    if(climb && climb.style.display === 'block'){
+      var st = document.getElementById('lifeStationOverlay');
+      if(st && st.style.display === 'flex'){ if(typeof lifeCloseStation === 'function') lifeCloseStation(); window._ylNavRepush('cc-climb'); return; }
+      if(typeof ccCloseClimb === 'function') ccCloseClimb();
+      return;
+    }
+    var walk = document.getElementById('ccWalkOverlay');
+    if(walk && walk.style.display === 'block'){
+      var wst = document.getElementById('walkStationOverlay');
+      if(wst && wst.style.display !== 'none'){ if(typeof walkCloseStation === 'function') walkCloseStation(); window._ylNavRepush('cc-walk'); return; }
+      if(typeof ccCloseWalk === 'function') ccCloseWalk();
+      return;
+    }
+    // 3. Section-level back: pop one recorded level. showSection's history
+    //    block re-pushes the sentinel automatically if still off-hub.
+    if(!_ylIsHub(_activeSection)) ylBack();
+    // 4. On a hub the entry is already consumed — the next hardware back
+    //    exits the app, which is correct.
+  });
+}
+
 function showSection(id, fromMobile){
+  var _prevSection = _activeSection;
   // Stop all audio (TTS, MP3, ambient) when navigating between sections
   if(typeof stopAllAudio === 'function') stopAllAudio();
   else if('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -2343,6 +2410,32 @@ function showSection(id, fromMobile){
   if(target){ target.style.display = ''; target.classList.add('active'); }
   _ensureFlatBack(target);
   _activeSection = id;
+  // ── Phase 2: origin recording (skips self-nav and back-driven hops) ──
+  if(!_navIsBack && id !== _prevSection){
+    if(_ylIsHub(id)){ _navStack.length = 0; }
+    else {
+      var _ri = _navStack.indexOf(id);
+      if(_ri !== -1){ _navStack.length = _ri; }      // revisit = return: truncate, never push
+      else {
+        _navStack.push(_prevSection);
+        if(_navStack.length > 10) _navStack.shift(); // hard cap
+      }
+    }
+  }
+  // ── Phase 2: maintain the ONE ylccSec history sentinel (also on
+  //    back-driven hops, hence outside the recording gate) ──
+  if(id !== _prevSection){
+    try {
+      var _hs = window.history.state;
+      if(_ylIsHub(id)){
+        if(_hs && _hs.ylccSec) window.history.back();     // consume; async pop no-ops (handler sees hub)
+      } else if(_hs && _hs.ylccSec){
+        window.history.replaceState({ ylccSec: id }, ''); // lateral hop keeps ONE entry
+      } else {
+        window.history.pushState({ ylccSec: id }, '');    // hub→destination: the one push
+      }
+    } catch(_e){}
+  }
   // L2 photo-card home — remember the last real destination + when, so
   // the Command Center can offer "Continue where you left off" and hide
   // it once stale (>1h). Mirrors faithLastDest. Home/parent are not

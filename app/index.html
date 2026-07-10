@@ -17950,7 +17950,7 @@
 
       <!-- Phase 2.4 — Hub Home back-link above the 4-tab bar -->
       <div class="ph-home-crumb">
-        <a href="javascript:void(0)" onclick="(typeof _pchReturnToSplash==='function')?_pchReturnToSplash():phNav('home')" id="phn-home-link">🏡 ← Hub Home</a>
+        <a href="javascript:void(0)" onclick="(typeof phNav==='function')&&phNav('home')" id="phn-home-link">🏡 ← Hub Home</a>
       </div>
 
       <!-- Phase 2 IA — Legacy 4-tab bar hidden by default. Kept in
@@ -23298,7 +23298,7 @@ document.addEventListener('DOMContentLoaded', function() {
      Visibility wired by _updateMobileHomeBack() in ui.js. Hidden on
      desktop. Hidden on s-hero / Command Center. Routes back to home. -->
 <button id="mobileHomeBack" type="button" aria-label="Back"
-        onclick="(typeof showSection==='function')&&showSection('s-hero')"
+        onclick="(typeof ylBack==='function')?ylBack():((typeof showSection==='function')&&showSection('s-hero'))"
         style="display:none;">
   <span aria-hidden="true">←</span><span>Back</span>
 </button>

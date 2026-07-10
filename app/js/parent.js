@@ -1201,7 +1201,7 @@ const GS_STEPS = [
    action:"openModal('settingsModal');"},
   {id:'gs-stage', icon:'🎯', title:'Choose Your Life Stage',
    tip:'<b>YourLife CC adapts to where you are.</b> Go to <b>Settings ⚙️</b> and pick your level — Middle School through Young Adult. This controls which sections and learning pathways you see.',
-   check:()=>!!(D.mode && D.mode!=='mid_hs'),
+   check:()=>!!D.mode, // Phase 2: DEF default is now the valid 'mid_hs' key; keep this item always-satisfied (no #modeSelect exists to complete it)
    action:"openModal('settingsModal');"},
   {id:'gs-daily', icon:'✅', title:'Complete a Daily Activity',
    tip:'<b>Build daily habits!</b> Check off activities in the <b>Daily Activity Check</b> on your dashboard — scripture, exercise, journaling, reading, kindness, and more. Complete all for bonus PB!',
@@ -2824,6 +2824,22 @@ function parentDrillChild(id){
   renderGradeMonitor();
   renderParentActivityFeed();
   showToast('Viewing '+profile.name+'\'s data — navigate away to return');
+  // Phase 2 (2026-07-10): drill-down was a dead end — toast-only exit, no
+  // visible affordance. Fixed pill at the bottom exits explicitly and
+  // re-fires the full reports render set against the restored parent D.
+  var pill = document.getElementById('phDrillExitPill');
+  if(!pill){
+    pill = document.createElement('button');
+    pill.id = 'phDrillExitPill'; pill.type = 'button';
+    pill.setAttribute('aria-label','Exit child view');
+    pill.style.cssText = 'position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:9500;'
+      + 'background:#1a1a2e;color:#fff;border:1px solid rgba(251,191,36,.5);border-radius:999px;'
+      + 'padding:.55rem 1.1rem;font-weight:700;font-size:.8rem;cursor:pointer;'
+      + 'box-shadow:0 4px 18px rgba(0,0,0,.45);font-family:var(--fm);';
+    pill.onclick = function(){ parentDrillExit(); if(typeof phNav === 'function') phNav('reports'); };
+    document.body.appendChild(pill);
+  }
+  pill.textContent = '← Done viewing ' + profile.name;
 }
 
 // Restore D to the parent's pre-drill snapshot. Idempotent — safe to call
@@ -2837,6 +2853,10 @@ function parentDrillExit(){
   Object.assign(D, snap);
   if(typeof renderParentScore === 'function') renderParentScore();
   if(typeof renderParentOverview === 'function') renderParentOverview();
+  // Phase 2: remove the drill exit pill on EVERY exit path (nav-away hook
+  // in showSection, profile switch, beforeunload, explicit pill tap).
+  var _dp = document.getElementById('phDrillExitPill');
+  if(_dp && _dp.parentNode) _dp.parentNode.removeChild(_dp);
 }
 window.parentDrillExit = parentDrillExit;
 

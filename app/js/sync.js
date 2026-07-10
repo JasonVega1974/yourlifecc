@@ -244,7 +244,7 @@ function loadData(){
       }
       // Never hide sections added after initial registration
       if(D.sections){
-        const FORCE = ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'];
+        const FORCE = ['cbt','resume','motivation','mentors','hero','parent','christian-living','worship','scripture'];
         const allowed = (typeof _bracketAllowedKeys === 'function') ? _bracketAllowedKeys(D.ageBracket) : null;
         FORCE.forEach(function(s){
           // 'hero', 'parent', 'cbt' are always-visible specials regardless of bracket.
@@ -666,7 +666,7 @@ async function cloudLoad(){
     }
     // Strip any sections that should never be hidden
     if(D.sections){
-      const FORCE = ['cbt','resume','motivation','mentors','hero','parent','christianLiving','worship','scripture'];
+      const FORCE = ['cbt','resume','motivation','mentors','hero','parent','christian-living','worship','scripture'];
       const allowed = (typeof _bracketAllowedKeys === 'function') ? _bracketAllowedKeys(D.ageBracket) : null;
       FORCE.forEach(function(k){
         if(k === 'hero' || k === 'parent' || k === 'cbt'){ delete D.sections[k]; return; }
