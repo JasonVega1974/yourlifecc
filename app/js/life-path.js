@@ -238,7 +238,11 @@ function _injectCss(){
 '@keyframes lpFadeIn{from{opacity:0}to{opacity:1}}',
 '.lp-sheet{position:relative;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;background:linear-gradient(180deg,#132038,#0b1428);border:1px solid rgba(34,211,238,.22);border-bottom:0;padding:1.2rem 1.15rem 2.4rem;animation:lpSheetUp .3s cubic-bezier(.22,1,.36,1);}',
 '@keyframes lpSheetUp{from{transform:translateY(46px);opacity:0}to{transform:translateY(0);opacity:1}}',
-'@media (prefers-reduced-motion:reduce){.lp-sheet,#lifeStationOverlay{animation:none;}}',
+'@media (prefers-reduced-motion:reduce){.lp-sheet,#lifeStationOverlay{animation:none;}' +
+  /* Phase 1d (2026-07-09): the ambient scene loops kept running under
+     reduced-motion — only the sheet/overlay entrances were gated. Still
+     the scene renders; it just holds still. */
+  '.lp-star,.lp-star--glow,.lp-beacon,.lp-cta,.lp-firefly,[class*="lp-"]{animation:none !important;}}',
 '.lp-sheet-x{position:sticky;top:0;float:right;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#e9f4f6;font-size:1rem;cursor:pointer;z-index:3;}',
 '.lp-eyebrow{font-size:.58rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#67e8f9;}',
 '.lp-st-name{font-size:1.35rem;font-weight:900;color:#fff;margin:.15rem 0 .1rem;}',

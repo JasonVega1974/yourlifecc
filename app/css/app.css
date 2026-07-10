@@ -2291,6 +2291,30 @@ body{top:0!important;}
 /* Holy Bible title card */
 :root.light [style*="color:#fff"][style*="font-weight:900"] { color: #0f172a !important; }
 
+/* ── Phase 1d (2026-07-09) — patch-block extension from the Phase 0 audit.
+   The system above covered white-alpha text at .3/.45/.5/.7/.8 and #fff,
+   but five alpha steps and four light hexes fell through, leaving the
+   Typing Test passage, home hero status pills, the achievement
+   certificate (incl. its print/share output), the goal-milestone delete
+   ✕, and onboarding step 1 unreadable white-on-paper in light mode. */
+:root.light [style*="color:rgba(255,255,255,.25)"]{ color:#94a3b8 !important; }
+:root.light [style*="color:rgba(255,255,255,.35)"]{ color:#64748b !important; }
+:root.light [style*="color:rgba(255,255,255,.4)"]{ color:#64748b !important; }
+:root.light [style*="color:rgba(255,255,255,.55)"]{ color:#475569 !important; }
+:root.light [style*="color:rgba(255,255,255,.6)"]{ color:#475569 !important; }
+:root.light [style*="color:#e2e8f0"]{ color:#334155 !important; }
+:root.light [style*="color:#cbd5e1"]{ color:#475569 !important; }
+:root.light [style*="color:#f1f5f9"]{ color:#1f2937 !important; }
+:root.light [style*="color:#fde68a"]{ color:#92400e !important; }
+
+/* School — the one section with ZERO light coverage before Phase 1d.
+   Its inline dark panels (white-alpha washes) get the same treatment the
+   patch system gives everything else. The .0 prefix intentionally nets
+   .03/.04/.05/.08; text/borders are covered by the global patches. */
+:root.light #s-school [style*="background:rgba(255,255,255,.0"]{ background:rgba(15,23,42,.04) !important; }
+:root.light #s-school [style*="background:rgba(255,255,255,.1"]{ background:rgba(15,23,42,.06) !important; }
+:root.light #s-health [style*="background:rgba(255,255,255,.1)"]{ background:rgba(15,23,42,.06) !important; }
+
 /* Spin wheel / scratch card text */
 :root.light [style*="color:rgba(255,255,255,.5)"] { color: #64748b !important; }
 

@@ -915,7 +915,7 @@
     font-size:1.55rem; line-height:1.15; letter-spacing:.02em;
     color:var(--tx); margin-bottom:1rem; text-align:center;
   }
-  .db-greeting #dbGreetName{ color:#fbbf24; font-weight:700; }
+  .db-greeting #dbGreetName{ color:#f59e0b; font-weight:700; }
   .db-wave{ display:inline-block; transform-origin:70% 70%; animation:dbWave 2.4s ease-in-out 1; }
   @keyframes dbWave{
     0%,60%,100%{transform:rotate(0);}
@@ -925,7 +925,7 @@
   }
   .db-streak{ display:flex; align-items:center; justify-content:center; gap:.55rem; margin-bottom:1.1rem; }
   .db-streak-text{ font-family:var(--fm); font-size:.95rem; color:var(--tx2); letter-spacing:.02em; }
-  .db-streak-text b{ color:#fbbf24; font-size:1.15rem; font-family:var(--fn); padding:0 .15rem; }
+  .db-streak-text b{ color:#f59e0b; font-size:1.15rem; font-family:var(--fn); padding:0 .15rem; }
   .db-flame{ display:inline-block; line-height:1; }
   .db-flame-small{ font-size:1.1rem; }
   .db-flame-medium{ font-size:1.5rem; filter:drop-shadow(0 0 6px rgba(251,146,60,.5)); }
@@ -1014,7 +1014,7 @@
   }
   .db-trait-fill{
     display:block; height:100%;
-    background:linear-gradient(90deg,#fbbf24,#f97316);
+    background:linear-gradient(90deg,#f59e0b,#fb923c);
     border-radius:99px;
     transition:width .35s ease;
   }
@@ -1135,7 +1135,7 @@
   .cc-greeting{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.5rem;}
   .cc-greeting__hello{font-size:1.7rem;font-weight:600;letter-spacing:-.01em;color:#F1E9D5;margin:0;line-height:1.18;}
   .cc-greeting__sub{display:flex;align-items:center;gap:.6rem;color:#9AA0B4;font-size:.95rem;margin:0;}
-  .cc-greeting__sub::before{content:'';width:6px;height:6px;border-radius:50%;background:#F5A623;box-shadow:0 0 8px rgba(245,166,35,.6);flex-shrink:0;}
+  .cc-greeting__sub::before{content:'';width:6px;height:6px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.6);flex-shrink:0;}
   .cc-time{font-family:ui-monospace,'JetBrains Mono',Menlo,Consolas,monospace;font-feature-settings:"tnum";color:#9AA0B4;font-size:.85rem;margin-left:auto;letter-spacing:.02em;}
   /* daystamp — Oswald day-of-week + italic rotating sub. Replaces
      the prior "Day 1 starts now" engagement nudge on the streak tile.
@@ -1143,28 +1143,33 @@
   .cc-daystamp{display:flex;flex-direction:column;gap:.3rem;margin-top:.15rem;}
   .cc-daystamp__date{font-family:var(--fh,'Oswald',var(--fm));font-size:1.55rem;letter-spacing:.13em;font-weight:400;color:#F1E9D5;line-height:1;}
   .cc-daystamp__sub{display:flex;align-items:center;gap:.6rem;color:#9AA0B4;font-size:.9rem;}
-  .cc-daystamp__quote{font-family:Georgia,'Times New Roman',serif;font-style:italic;}
+  .cc-daystamp__quote{font-family:var(--fm,Inter,sans-serif);font-style:italic;}
   @media (min-width:720px){ .cc-greeting__hello{font-size:2.2rem;} .cc-greeting__sub{font-size:1rem;} .cc-daystamp__date{font-size:2rem;letter-spacing:.15em;} .cc-daystamp__sub{font-size:1rem;} }
 
   /* stats */
   .cc-stats{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;align-items:stretch;margin-bottom:1.4rem;}
-  .cc-streak{grid-column:1 / -1;display:flex;align-items:center;gap:1rem;padding:1.1rem 1.2rem;background:linear-gradient(135deg,rgba(245,166,35,.10),rgba(244,123,90,.06));border:1px solid rgba(245,166,35,.22);border-radius:18px;position:relative;overflow:hidden;}
-  .cc-streak::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 0% 50%,rgba(245,166,35,.18),transparent 55%);pointer-events:none;}
-  .cc-streak__icon{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#F5A623,#F47B5A);display:grid;place-items:center;font-size:1.7rem;flex-shrink:0;box-shadow:0 6px 20px rgba(244,123,90,.35);position:relative;z-index:1;}
+  /* Phase 1d (2026-07-09): streak = flame semantics -> --warning amber
+     family (#f59e0b/#fb923c), replacing the off-palette #F5A623/#F47B5A
+     pair; radius 18px -> 16px (on-scale). Gold #fbbf24 stays faith's. */
+  .cc-streak{grid-column:1 / -1;display:flex;align-items:center;gap:1rem;padding:1.1rem 1.2rem;background:linear-gradient(135deg,rgba(245,158,11,.10),rgba(251,146,60,.06));border:1px solid rgba(245,158,11,.22);border-radius:16px;position:relative;overflow:hidden;}
+  .cc-streak::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 0% 50%,rgba(245,158,11,.18),transparent 55%);pointer-events:none;}
+  .cc-streak__icon{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#fb923c);display:grid;place-items:center;font-size:1.7rem;flex-shrink:0;box-shadow:0 6px 20px rgba(251,146,60,.35);position:relative;z-index:1;}
   .cc-streak__body{display:flex;flex-direction:column;gap:.1rem;position:relative;z-index:1;}
-  .cc-streak__num{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:3rem;line-height:1;background:linear-gradient(135deg,#F5A623 0%,#F47B5A 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.02em;}
+  .cc-streak__num{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:3rem;line-height:1;background:linear-gradient(135deg,#f59e0b 0%,#fb923c 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.02em;}
   .cc-streak__label{font-size:.78rem;color:#9AA0B4;letter-spacing:.06em;text-transform:uppercase;}
   .cc-chip{display:flex;flex-direction:column;justify-content:center;gap:.2rem;padding:.9rem 1rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;}
   .cc-chip__num{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1.35rem;color:#F1E9D5;letter-spacing:-.01em;line-height:1.1;}
   .cc-chip__label{font-size:.74rem;color:#9AA0B4;letter-spacing:.04em;}
-  /* WC-2b-i — daily-goal XP ring. Full-width lead element in cc-stats; brass
-     fill turns green at 100%. Theme-independent (dark scene, matches the cc-
-     chrome — no :root.light pass), reduced-motion safe. */
-  .cc-ring{grid-column:1 / -1;display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;}
+  /* WC-2b-i — daily-goal XP ring. Full-width lead element in cc-stats;
+     amber fill turns green at 100%. Phase 1d (2026-07-09): fill re-cut
+     #FBBF24 faith gold -> #f59e0b warning amber (gold stays faith's),
+     radius 18 -> 16, and a :root.light pass added — the CC is interface
+     layer, not a scene-exemption surface. Reduced-motion safe. */
+  .cc-ring{grid-column:1 / -1;display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;}
   .cc-ring__circle{position:relative;width:64px;height:64px;flex-shrink:0;}
   .cc-ring__svg{width:64px;height:64px;display:block;}
   .cc-ring__track{fill:none;stroke:rgba(255,255,255,.10);stroke-width:6;}
-  .cc-ring__fill{fill:none;stroke:#FBBF24;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s ease,stroke .4s ease;}
+  .cc-ring__fill{fill:none;stroke:#f59e0b;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .6s ease,stroke .4s ease;}
   .cc-ring--met .cc-ring__fill{stroke:#34D399;}
   .cc-ring__num{position:absolute;inset:0;display:grid;place-items:center;font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1.15rem;color:#F1E9D5;letter-spacing:-.01em;}
   .cc-ring--met .cc-ring__num{color:#34D399;}
@@ -1173,6 +1178,13 @@
   .cc-ring__meta{font-size:.74rem;color:#9AA0B4;font-feature-settings:"tnum";letter-spacing:.02em;}
   .cc-ring--met .cc-ring__meta{color:#34D399;}
   @media (prefers-reduced-motion: reduce){ .cc-ring__fill{transition:none;} }
+  :root.light .cc-ring{background:rgba(15,23,42,.04);border-color:rgba(15,23,42,.1);}
+  :root.light .cc-ring__track{stroke:rgba(15,23,42,.12);}
+  :root.light .cc-ring__fill{stroke:#b45309;}
+  :root.light .cc-ring--met .cc-ring__fill{stroke:#047857;}
+  :root.light .cc-ring__num,:root.light .cc-ring__title{color:#1f2937;}
+  :root.light .cc-ring__meta{color:#64748b;}
+  :root.light .cc-ring--met .cc-ring__num,:root.light .cc-ring--met .cc-ring__meta{color:#047857;}
   @media (min-width:720px){ .cc-stats{grid-template-columns:1.4fr 1fr 1fr;} .cc-streak{grid-column:auto;} .cc-streak__num{font-size:4rem;} .cc-stats.cc-stats--no-streak{grid-template-columns:1fr 1fr;} }
   /* WC-2c — flame pulse when the streak ticks (added on home render by
      command-center.js; the chip's fire icon gives a single beat). */
@@ -1183,11 +1195,11 @@
      #toast): flat dark surface + brass accent; the "lift" is motion, not
      decoration. Slides in from the top, holds, clears. Reduced-motion strips
      all motion (fade only, no flourish) while keeping the text/state. */
-  .xpj-toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-160%);z-index:100000;display:flex;align-items:center;gap:.6rem;max-width:88vw;padding:.6rem .95rem;border-radius:14px;background:#13192b;border:1px solid rgba(251,191,36,.42);box-shadow:0 10px 34px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:transform .34s cubic-bezier(.2,.9,.3,1.2),opacity .3s ease;}
+  .xpj-toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-160%);z-index:100000;display:flex;align-items:center;gap:.6rem;max-width:88vw;padding:.6rem .95rem;border-radius:14px;background:#13192b;border:1px solid rgba(245,158,11,.45);box-shadow:0 10px 34px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:transform .34s cubic-bezier(.2,.9,.3,1.2),opacity .3s ease;}
   .xpj-toast.show{transform:translate(-50%,0);opacity:1;}
-  .xpj-toast__flame{width:22px;height:22px;flex-shrink:0;filter:drop-shadow(0 0 4px rgba(251,191,36,.5));}
+  .xpj-toast__flame{width:22px;height:22px;flex-shrink:0;filter:drop-shadow(0 0 4px rgba(245,158,11,.5));}
   .xpj-toast__body{display:flex;flex-direction:column;gap:.05rem;min-width:0;}
-  .xpj-toast__title{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1rem;color:#FBBF24;letter-spacing:-.01em;line-height:1.15;}
+  .xpj-toast__title{font-family:ui-monospace,'JetBrains Mono',monospace;font-feature-settings:"tnum";font-weight:700;font-size:1rem;color:#f59e0b;letter-spacing:-.01em;line-height:1.15;}
   .xpj-toast__sub{font-size:.72rem;color:#F1E9D5;letter-spacing:.02em;}
   .xpj-toast--goal{border-color:rgba(52,211,153,.5);}
   .xpj-toast--goal .xpj-toast__title{color:#34D399;}
@@ -1209,11 +1221,11 @@
      = night gradient + icon glyph until an admin photo is
      uploaded (never a broken image). */
   .cc-group{margin:1.5rem 0 0;}
-  /* Eyebrow = the faith home's gold Oswald caps (Oswald lazy-loaded by
-     _ccEnsureFonts; Inter carries it until the face arrives). Gold is
-     shared section-voice chrome, not the surface accent — cards and
-     CTAs stay cyan. */
-  .cc-eyebrow{font:600 11px/1 Oswald,Inter,sans-serif;letter-spacing:.26em;text-transform:uppercase;color:#f5b431;margin:0 0 .75rem .3rem;}
+  /* Eyebrow: same Oswald caps anatomy as the faith home, but in the LIFE
+     register — Phase 1d (2026-07-09) re-cut #f5b431 gold -> cyan per the
+     owner ruling (gold stays faith's; child surfaces are cyan). Oswald
+     loads eagerly from the head link since Phase 1c. */
+  .cc-eyebrow{font:600 11px/1 Oswald,Inter,sans-serif;letter-spacing:.26em;text-transform:uppercase;color:#22d3ee;margin:0 0 .75rem .3rem;}
   /* 1 card per row on mobile (faith-card rhythm), 3 across on desktop. */
   .cc-cards{display:grid;grid-template-columns:1fr;gap:.85rem;}
   @media (min-width:720px){ .cc-cards{grid-template-columns:repeat(3,1fr);gap:1rem;} }
@@ -2252,7 +2264,11 @@
       <div style="margin-left:auto;font-size:.7rem;font-weight:700;color:#22c55e;" id="quizNotifReward"></div>
     </div>
   </div>
-  <style>@keyframes quizPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}</style>
+  <style>@keyframes quizPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+  /* Phase 1d: quizPulse is applied via inline styles (notification 📝 +
+     the parent quiz-board current-step ring) — kill it under reduced
+     motion with an attribute-substring match. */
+  @media(prefers-reduced-motion:reduce){ [style*="quizPulse"]{animation:none !important;} }</style>
 
   <!-- ═══ ALL DASHBOARD CARDS — 5 per row, uniform ═══ -->
   <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.55rem;margin-bottom:.7rem;" class="dashGrid">
@@ -4160,12 +4176,12 @@
   <!-- PB Mini Bar -->
   <div style="display:flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,rgba(251,191,36,.07),rgba(56,189,248,.04));border:1px solid rgba(251,191,36,.18);border-radius:10px;padding:.45rem .8rem;margin-bottom:.7rem;flex-wrap:wrap;">
     <span style="font-size:1rem;">🪙</span>
-    <span style="font-size:.7rem;color:#fbbf24;font-weight:700;">Parent Bucks:</span>
+    <span style="font-size:.7rem;color:#f59e0b;font-weight:700;">Parent Bucks:</span>
     <span style="font-size:.9rem;font-weight:900;color:#fbbf24;" id="schoolPBBalance">0</span>
     <span style="font-size:.6rem;color:var(--tx2);">PB</span>
     <span style="font-size:.65rem;color:var(--tx3);margin-left:.2rem;">· Complete chores &amp; quizzes to earn PB</span>
     <div style="margin-left:auto;display:flex;gap:.4rem;">
-      <button onclick="openSpinner()" style="background:rgba(253,230,138,.1);border:1px solid rgba(253,230,138,.25);color:#fde68a;padding:.25rem .5rem;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer;">🎰 <span id="schoolSpinCount">0</span></button>
+      <button onclick="openSpinner()" style="background:rgba(252,211,77,.12);border:1px solid rgba(252,211,77,.3);color:#fcd34d;padding:.25rem .5rem;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer;">🎰 <span id="schoolSpinCount">0</span></button>
       <button onclick="openScratch()" style="background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2);color:#f472b6;padding:.25rem .5rem;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer;">🎫 <span id="schoolScratchCount">0</span></button>
     </div>
   </div>
@@ -5132,12 +5148,12 @@
   <!-- PB Mini Bar -->
   <div style="display:flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,rgba(251,191,36,.07),rgba(34,211,238,.05));border:1px solid rgba(251,191,36,.18);border-radius:10px;padding:.45rem .8rem;margin-bottom:.8rem;flex-wrap:wrap;">
     <span style="font-size:1rem;">🪙</span>
-    <span style="font-size:.7rem;color:#fbbf24;font-weight:700;">Parent Bucks:</span>
+    <span style="font-size:.7rem;color:#f59e0b;font-weight:700;">Parent Bucks:</span>
     <span style="font-size:.9rem;font-weight:900;color:#fbbf24;" id="goalsPBBalance">0</span>
     <span style="font-size:.6rem;color:var(--tx2);">PB</span>
     <span style="font-size:.65rem;color:var(--tx3);margin-left:.2rem;">· Short goal = +10 PB · Long-term goal = +25 PB · Every 5th goal = 🎫 Scratch Card</span>
     <div style="margin-left:auto;display:flex;gap:.4rem;">
-      <button onclick="openSpinner()" style="background:rgba(253,230,138,.1);border:1px solid rgba(253,230,138,.25);color:#fde68a;padding:.25rem .5rem;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer;">🎰 <span id="goalsSpinCount">0</span></button>
+      <button onclick="openSpinner()" style="background:rgba(252,211,77,.12);border:1px solid rgba(252,211,77,.3);color:#fcd34d;padding:.25rem .5rem;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer;">🎰 <span id="goalsSpinCount">0</span></button>
       <button onclick="openScratch()" style="background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2);color:#f472b6;padding:.25rem .5rem;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer;">🎫 <span id="goalsScratchCount">0</span></button>
     </div>
   </div>
@@ -5324,12 +5340,12 @@
   <!-- PB Mini Bar -->
   <div style="display:flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,rgba(251,191,36,.07),rgba(34,197,94,.04));border:1px solid rgba(251,191,36,.18);border-radius:10px;padding:.45rem .8rem;margin-bottom:.8rem;flex-wrap:wrap;">
     <span style="font-size:1rem;">🪙</span>
-    <span style="font-size:.7rem;color:#fbbf24;font-weight:700;">Parent Bucks:</span>
+    <span style="font-size:.7rem;color:#f59e0b;font-weight:700;">Parent Bucks:</span>
     <span style="font-size:.9rem;font-weight:900;color:#fbbf24;" id="skillsPBBalance">0</span>
     <span style="font-size:.6rem;color:var(--tx2);">PB</span>
     <span style="font-size:.65rem;color:var(--tx3);margin-left:.2rem;">· Pass any quiz = +10 PB + 🎫 Scratch Card</span>
     <div style="margin-left:auto;display:flex;gap:.4rem;">
-      <button onclick="openSpinner()" style="background:rgba(253,230,138,.1);border:1px solid rgba(253,230,138,.25);color:#fde68a;padding:.25rem .5rem;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer;">🎰 <span id="skillsSpinCount">0</span></button>
+      <button onclick="openSpinner()" style="background:rgba(252,211,77,.12);border:1px solid rgba(252,211,77,.3);color:#fcd34d;padding:.25rem .5rem;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer;">🎰 <span id="skillsSpinCount">0</span></button>
       <button onclick="openScratch()" style="background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.2);color:#f472b6;padding:.25rem .5rem;border-radius:6px;font-size:.65rem;font-weight:700;cursor:pointer;">🎫 <span id="skillsScratchCount">0</span></button>
     </div>
   </div>

@@ -5856,13 +5856,18 @@ function showCelebration(message, emoji){
     <div style="font-family:var(--fh);font-size:1.6rem;font-weight:900;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.5);margin-bottom:.2rem;">${message||'GREAT JOB!'}</div>
     <div style="font-size:.9rem;color:rgba(255,255,255,.8);">Keep it up! 🔥</div>
   `;
+  // Phase 1d (2026-07-09): honor prefers-reduced-motion — message still
+  // shows, but no bounce and no confetti storm.
+  const _prm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   msgEl.style.animation = 'none';
-  void msgEl.offsetWidth;
-  msgEl.style.animation = 'celebBounce .6s ease-out';
+  if(!_prm){
+    void msgEl.offsetWidth;
+    msgEl.style.animation = 'celebBounce .6s ease-out';
+  }
 
   // Confetti
   const colors = ['#fbbf24','#22c55e','#60a5fa','#f472b6','#22d3ee','#ef4444','#fb923c','#38bdf8'];
-  for(let i=0;i<40;i++){
+  for(let i=0;i<(_prm?0:40);i++){
     const piece = document.createElement('div');
     piece.className = 'confetti-piece';
     piece.style.left = Math.random()*100+'%';

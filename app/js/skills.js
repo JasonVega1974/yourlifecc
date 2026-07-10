@@ -5024,7 +5024,7 @@ function togglePlay(){ if(!_tracks.length){showToast('Upload a track first!');re
 function prevTrack(){ loadTrack((_trackIdx-1+_tracks.length)%_tracks.length); }
 function nextTrack(){ loadTrack((_trackIdx+1)%_tracks.length); }
 function setVol(v){ _audio.volume=parseFloat(v); }
-function spinVinyl(on){ const v=document.getElementById('vinyl'); if(!v) return; v.style.animation=on?'spin 2s linear infinite':'none'; }
+function spinVinyl(on){ const v=document.getElementById('vinyl'); if(!v) return; const prm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches; v.style.animation=(on&&!prm)?'spin 2s linear infinite':'none'; }
 function renderPlaylist(){ const el=document.getElementById('playlist'); if(!el) return; if(!_tracks.length){el.innerHTML='<div style="font-size:.77rem;color:#c8d4e8;text-align:center;padding:.5rem;">No tracks loaded</div>';return;} el.innerHTML=_tracks.map((t,i)=>`<div style="display:flex;align-items:center;gap:.5rem;padding:.38rem .6rem;background:${i===_trackIdx?'rgba(56,189,248,.1)':'var(--s3)'};border-radius:7px;margin-bottom:.25rem;cursor:pointer;border-left:3px solid ${i===_trackIdx?'var(--c)':'transparent'};" onclick="loadTrack(${i})"><span style="font-size:.66rem;color:#c8d4e8;">${i+1}</span><span style="flex:1;font-size:.82rem;font-weight:${i===_trackIdx?'700':'400'};">${t.name}</span>${i===_trackIdx&&_playing?'<span style="font-size:.63rem;color:var(--c);">▶</span>':''}</div>`).join(''); }
 _audio.onended=()=>{ nextTrack(); };
 
