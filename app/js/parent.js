@@ -3272,9 +3272,9 @@ function renderPhCardGrid(){
 
 // Oswald (titles/eyebrows/badges) + Newsreader italic (subtitles) for the
 // photo cards — same lazy-load pattern as faith-zones' _fjEnsureFonts and
-// command-center's _ccEnsureFonts (the head link only carries Bebas Neue +
-// Inter). Idempotent via the link id; CSS falls back to Inter until the
-// faces arrive.
+// command-center's _ccEnsureFonts. Since Phase 1c (2026-07-09) the head
+// link carries Oswald eagerly, so this is belt-and-suspenders for the
+// Newsreader face only; idempotent via the link id.
 function _phcEnsureFonts(){
   if (typeof document === 'undefined' || document.getElementById('phcFonts')) return;
   try {
