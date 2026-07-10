@@ -3865,6 +3865,27 @@ function openBFLesson(type, idx){
   logActivity('faith', 'Read: '+l.title);
 }
 
+// Phase 1 bug fix (2026-07-09): openBFLesson's CTA has always called
+// academyMarkLesson(type, idx) but only academyMarkLessonNew (the Academy
+// panel's course/lessonId variant) existed — every "Mark Lesson Complete"
+// tap in Foundations of Faith / Bible Survey threw a ReferenceError. This
+// records against the SAME store with this surface's 'type:idx' key shape
+// (what openBFLesson's done-check at 3856 reads), then re-renders in place.
+function academyMarkLesson(type, idx){
+  const store = _acStore();
+  const lessonId = type + ':' + idx;
+  if(store.lessons[lessonId]){ showToast('Already complete'); return; }
+  store.lessons[lessonId] = new Date().toISOString();
+  D.scrPoints = (D.scrPoints || 0) + 5;
+  if(!D.scrReadDays) D.scrReadDays = {};
+  D.scrReadDays[new Date().toISOString().slice(0,10)] = true;
+  save();
+  if(typeof logActivity === 'function') logActivity('faith', 'Lesson complete: ' + lessonId);
+  if(typeof logFaithActivity === 'function'){ try{ logFaithActivity('academy_lesson', { lessonId: lessonId }); }catch(_){} }
+  showToast('Lesson complete +5 XP ✓');
+  openBFLesson(type, idx);   // re-render the modal in its done state
+}
+
 function getDailyDevotionalIdx(){
   // Seeded shuffle: each day gets a unique devotional, no repeats within 60-day cycle
   const now = new Date();

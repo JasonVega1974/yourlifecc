@@ -6572,6 +6572,43 @@ function saveBio(){
   showToast('Bio saved ✓');
 }
 
+// Phase 1 bug fix (2026-07-09): the three export buttons under the bio
+// editor (index.html "Actions" row) have called these since the feature
+// shipped, but none were ever defined — every tap was a ReferenceError.
+// All three ride the existing renderBioHTML(b, true) print variant.
+function _bioStandaloneDoc(){
+  const b = getBioData();
+  const t = (typeof escapeHtml === 'function') ? escapeHtml((b.name||'My')+' — Bio') : 'My Bio';
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>' + t + '</title></head>' +
+    '<body style="margin:0;padding:1.5rem;background:#f1f5f9;">' +
+    '<div style="max-width:860px;margin:0 auto;">' + renderBioHTML(b, true) + '</div>' +
+    '</body></html>';
+}
+function previewBioFullscreen(){
+  const w = window.open('', '_blank');
+  if(!w){ showToast('Pop-up blocked — allow pop-ups to preview'); return; }
+  w.document.write(_bioStandaloneDoc()); w.document.close();
+}
+function exportBioPDF(){
+  // Browser print dialog → "Save as PDF" (same pattern as the cert print).
+  const w = window.open('', '_blank');
+  if(!w){ showToast('Pop-up blocked — allow pop-ups to export'); return; }
+  w.document.write(_bioStandaloneDoc()); w.document.close();
+  setTimeout(function(){ try{ w.focus(); w.print(); }catch(_){/**/} }, 400);
+}
+function downloadBioPage(){
+  const b = getBioData();
+  const blob = new Blob([_bioStandaloneDoc()], { type:'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = String(b.name||'my').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '-bio.html';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
+  showToast('Shareable bio page downloaded ✓');
+}
+
 function renderBioHTML(b, forPrint){
   const tpl = b.template || 'professional';
   const p = forPrint;

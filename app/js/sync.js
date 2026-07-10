@@ -269,10 +269,13 @@ function showSaved(){
 }
 
 // ── CLOUD ────────────────────────────────────────────────────
-function setSyncSt(s){ 
-  // If we have a logged-in user, never show "Local Only" — show syncing state instead
+function setSyncSt(s){
+  // If we have a logged-in user, never show "Local Only" — show syncing state
+  // instead. IMPORTANT (Phase 1 fix, 2026-07-09): actual sync FAILURES pass
+  // 'error' and are exempt from this coercion — a failing upsert used to be
+  // coerced into "☁ Cloud Saved", hiding silent data-loss exposure forever.
   if(s==='local' && _supaUser) s='cloud';
-  const labels={loading:['⟳ Syncing…','#888'],cloud:['☁ Cloud Saved','var(--gr)'],local:['💾 Local Only','var(--tx2)']};
+  const labels={loading:['⟳ Syncing…','#888'],cloud:['☁ Cloud Saved','var(--gr)'],local:['💾 Local Only','var(--tx2)'],error:['⚠ Not synced — retrying','var(--warning,#f59e0b)']};
   var t,col; var base=labels[s]||labels.local;
   t=base[0]; col=base[1];
   if(s==='cloud'){
@@ -394,7 +397,8 @@ async function cloudSync(){
       data: D,
       updated_at: writeStamp
     }, { onConflict: 'user_id' }).select('updated_at').single();
-    setSyncSt(error ? 'local' : 'cloud');
+    setSyncSt(error ? 'error' : 'cloud');
+    if(error){ try{ console.warn('[sync] cloud upsert failed:', error.message || error); }catch(_){} }
     if(!error){
       // Use the SERVER's echoed updated_at as the new baseline timestamp
       // (microsecond precision + tz format that future SELECTs return).
@@ -413,8 +417,9 @@ async function cloudSync(){
         _mirrorMoneyToCloud(supa, _supaUser.id);
       }
     }
-  } catch(_){
-    setSyncSt('local');
+  } catch(e){
+    setSyncSt('error');
+    try{ console.warn('[sync] cloudSync threw:', e && e.message); }catch(_){}
   }
 }
 

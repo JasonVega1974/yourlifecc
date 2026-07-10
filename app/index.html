@@ -6674,71 +6674,11 @@
   </div>
 
 
-  <!-- TYPING TEST TAB -->
-  <div id="rs-typing" style="display:none;padding:.5rem;">
-    <div class="card" style="max-width:800px;margin:0 auto;">
-
-      <!-- Controls -->
-      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:.8rem;">
-        <span style="font-family:var(--fh);font-size:.8rem;letter-spacing:1px;color:var(--c);">⌨️ TYPING TEST</span>
-        <select id="tt-diff" style="padding:.3rem .5rem;background:var(--bg2);border:1px solid rgba(255,255,255,.15);color:var(--tx);border-radius:6px;font-size:.78rem;">
-          <option value="easy">Easy</option>
-          <option value="medium" selected>Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-        <button class="btn bp bs" id="tt-start-btn" onclick="ttStart()" style="font-size:.78rem;">▶ New Test</button>
-        <button class="btn bgh bs" onclick="ttReset()" style="font-size:.78rem;">↺ Reset</button>
-        <span id="tt-status" style="font-size:.72rem;color:var(--c);margin-left:.4rem;">Press New Test to begin</span>
-      </div>
-
-      <!-- Stats -->
-      <div style="display:flex;gap:.5rem;margin-bottom:.8rem;">
-        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
-          <div style="font-size:1.4rem;font-weight:700;color:var(--c);font-family:var(--fh);" id="tt-wpm">—</div>
-          <div style="font-size:.55rem;color:var(--tx3);">WPM</div>
-        </div>
-        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
-          <div style="font-size:1.4rem;font-weight:700;color:#34d399;font-family:var(--fh);" id="tt-acc">—</div>
-          <div style="font-size:.55rem;color:var(--tx3);">Accuracy</div>
-        </div>
-        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
-          <div style="font-size:1.4rem;font-weight:700;color:var(--tx);font-family:var(--fh);" id="tt-time">0s</div>
-          <div style="font-size:.55rem;color:var(--tx3);">Time</div>
-        </div>
-        <div style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem;text-align:center;">
-          <div style="font-size:1.4rem;font-weight:700;color:#f87171;font-family:var(--fh);" id="tt-err">0</div>
-          <div style="font-size:.55rem;color:var(--tx3);">Errors</div>
-        </div>
-      </div>
-
-      <!-- Passage -->
-      <div id="tt-passage" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:1rem;margin-bottom:.7rem;font-size:.95rem;line-height:2;font-family:'Courier New',monospace;min-height:64px;word-break:break-word;">
-        <span style="color:rgba(255,255,255,.3);">Press New Test to load a passage...</span>
-      </div>
-
-      <!-- Input -->
-      <textarea id="tt-input" rows="3" disabled
-        placeholder="Press New Test above, then type here..."
-        oninput="ttType(this.value)"
-        onkeydown="if(event.key==='Tab')event.preventDefault();"
-        style="width:100%;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:10px;padding:.7rem 1rem;font-size:.9rem;font-family:'Courier New',monospace;color:var(--tx);resize:none;box-sizing:border-box;outline:none;transition:border-color .2s;"
-      ></textarea>
-
-      <!-- Result -->
-      <div id="tt-result" style="display:none;margin-top:.7rem;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.3);border-radius:10px;padding:1rem;text-align:center;">
-        <div style="font-family:var(--fh);font-size:2.2rem;color:var(--c);" id="tt-grade"></div>
-        <div style="font-size:.82rem;color:var(--tx2);margin:.4rem 0 .7rem;" id="tt-msg"></div>
-        <button class="btn bp" onclick="ttStart()">Next Test</button>
-      </div>
-    </div>
-
-    <!-- Bests -->
-    <div class="card" style="max-width:800px;margin:.7rem auto 0;">
-      <div class="ct">🏆 Personal Bests</div>
-      <div id="tt-bests"></div>
-    </div>
-  </div>
-
+  <!-- Typing Test: the duplicate tt-* pane that lived here (2026-07-09
+       Phase 1 fix) was unreachable dead markup — no tab ever showed it,
+       and its ttStart/ttReset/ttType handlers were never defined. The
+       working Typing Test lives in the CBT section (typing* ids,
+       misc.js). -->
 
 </section>
 
@@ -23446,6 +23386,58 @@ body.demo-banner-on #dailySparkChip{top:calc(env(safe-area-inset-top,0px) + 96px
   </div>
 </div>
 <button id="dailySparkChip" hidden type="button" aria-label="Open today's spark">✨</button>
+
+<!-- ════ PARENT QUIZ MODAL (Phase 1 bug fix, 2026-07-09) ════
+     openPendingQuiz() / showQuizQuestion() / finishQuiz() in parent.js
+     have dereferenced these ids since the quiz feature shipped, but the
+     modal markup never existed — the child's tap on #quizNotification
+     threw a TypeError and the quiz could never be taken. IDs are the
+     parent.js contract: quizModal, qmTitle, qmSubtitle, qmReward,
+     qmPenalty, qmProgress, qmQuestionArea, qmResultArea. -->
+<style>
+#quizModal{display:none;position:fixed;inset:0;z-index:9500;background:rgba(4,8,18,.62);overflow:auto;padding:6vh 1rem 2rem;}
+#quizModal .qm-card{position:relative;max-width:520px;margin:0 auto;box-sizing:border-box;
+  background:linear-gradient(175deg,#0a1626,#050d1a);border:1px solid rgba(34,211,238,.25);
+  border-radius:16px;padding:1.5rem;}
+#quizModal .qm-x{position:absolute;top:.4rem;right:.4rem;width:44px;height:44px;border:none;background:none;
+  color:rgba(255,255,255,.55);font-size:1rem;cursor:pointer;border-radius:99px;}
+#quizModal .qm-x:focus-visible{outline:2px solid #22d3ee;outline-offset:-4px;}
+#quizModal .qm-eyebrow{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#22d3ee;margin-bottom:.4rem;}
+#quizModal #qmTitle{margin:0 0 .25rem;font-size:1.15rem;font-weight:500;color:#eef4fb;line-height:1.4;}
+#quizModal #qmSubtitle{font-size:.8rem;color:rgba(255,255,255,.6);margin-bottom:.8rem;}
+#quizModal .qm-stakes{display:flex;gap:.5rem;margin-bottom:1rem;font-size:.78rem;}
+#quizModal .qm-stake{padding:.3rem .7rem;border-radius:99px;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75);}
+#quizModal .qm-stake b{color:#22c55e;font-weight:500;}
+#quizModal .qm-stake.qm-stake-penalty b{color:#ef4444;}
+#quizModal .qm-track{height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:1rem;}
+#quizModal #qmProgress{height:100%;width:0%;background:#22d3ee;border-radius:99px;transition:width .3s ease-out;}
+#quizModal #qmResultArea{display:none;text-align:center;padding:.5rem 0;}
+:root.light #quizModal{background:rgba(44,36,22,.42);}
+:root.light #quizModal .qm-card{background:#f7fafc;border-color:rgba(14,116,144,.32);}
+:root.light #quizModal .qm-x{color:rgba(40,44,52,.55);}
+:root.light #quizModal .qm-eyebrow{color:#0e7490;}
+:root.light #quizModal #qmTitle{color:#26303c;}
+:root.light #quizModal #qmSubtitle{color:#4a5462;}
+:root.light #quizModal .qm-stake{border-color:rgba(40,44,52,.2);color:#3a4452;}
+:root.light #quizModal .qm-track{background:rgba(40,44,52,.12);}
+:root.light #quizModal #qmProgress{background:#0e7490;}
+@media(prefers-reduced-motion:reduce){ #quizModal #qmProgress{transition:none;} }
+</style>
+<div id="quizModal" role="dialog" aria-modal="true" aria-labelledby="qmTitle">
+  <div class="qm-card">
+    <button type="button" class="qm-x" aria-label="Close quiz" onclick="(typeof closeQuizModal==='function')&&closeQuizModal()">✕</button>
+    <div class="qm-eyebrow">📝 Quiz from your parent</div>
+    <h3 id="qmTitle"></h3>
+    <div id="qmSubtitle"></div>
+    <div class="qm-stakes">
+      <span class="qm-stake">Pass: <b>+<span id="qmReward"></span> PB</b></span>
+      <span class="qm-stake qm-stake-penalty">Fail: <b>-<span id="qmPenalty"></span> PB</b></span>
+    </div>
+    <div class="qm-track"><div id="qmProgress"></div></div>
+    <div id="qmQuestionArea"></div>
+    <div id="qmResultArea"></div>
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════════════════════════
      Phase E — ONBOARDING OVERLAY (2026-05-15)

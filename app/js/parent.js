@@ -4712,6 +4712,9 @@ function answerQuiz(answer){
 }
 
 function finishQuiz(){
+  // `total` was never defined in this scope — the quiz threw right at the
+  // finish line even once the modal existed. (Phase 1 bug fix, 2026-07-09)
+  const total = _activeQuiz.questions.length;
   const pct = Math.round((_quizScore/total)*100);
   const passed = pct >= _activeQuiz.passScore;
   

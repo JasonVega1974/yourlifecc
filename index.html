@@ -2203,6 +2203,19 @@ function submitContact(e){
 </script>
 
 <script>
+// FAQ accordion toggle (Phase 1 bug fix, 2026-07-09). The 9 .fq-q rows
+// have called tFaq(this) since the section shipped, but the function only
+// existed on guarantee.html — every FAQ answer on this page was stuck at
+// max-height:0. The .on classes match this page's CSS at lines ~394-396
+// (guarantee.html uses a different .open/parent contract — not shared).
+function tFaq(el){
+  el.classList.toggle('on');
+  var a = el.nextElementSibling;
+  if(a && a.classList.contains('fq-a')) a.classList.toggle('on');
+}
+</script>
+
+<script>
 // If visitor arrived via a referral link (?ref=CODE), append ref to all pricing buttons
 (function(){
   var ref = new URLSearchParams(window.location.search).get('ref');
