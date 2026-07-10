@@ -131,7 +131,7 @@ const FAITH_POOL = [
   { id:'mystery',
     avail:function(){ return true; },
     build:function(){
-      return { kicker:'Today’s mystery', title:'Today’s Mystery is waiting.',
+      return { kicker:'Today’s mystery', title:'A question worth sitting with.',
                body:'One honest question about God, examined with evidence — a new one every day.', ref:null,
                cta:'Open it', go:function(){ _goFaith('mystery'); } };
     } },
@@ -173,8 +173,8 @@ const FAITH_POOL = [
       // First sentence of the summary is the hook; the eyebrow is a long
       // metadata line, wrong register for a card title.
       const hook = String(p.summary || '').split('. ')[0];
-      return { kicker:'Did you know', title:p.title,
-               body:(hook ? hook + '.' : 'The evidence is stronger than most people have ever been shown.'), ref:null,
+      return { kicker:'From the evidence', title:p.title,
+               body:(hook ? hook + '.' : 'Real places, real dates, real manuscripts — worth ten minutes of your day.'), ref:null,
                cta:'See the evidence', go:function(){ _goFaith('proof'); } };
     } }
 ];
@@ -194,7 +194,7 @@ const MAIN_POOL = [
       });
       const name = (best && (best.name || 'your habit'));
       const body = bestN > 0
-        ? 'Your ' + name + ' streak is at ' + bestN + ' day' + (bestN===1?'':'s') + '. Don’t let today be the one that breaks it.'
+        ? 'Your ' + name + ' streak is at ' + bestN + ' day' + (bestN===1?'':'s') + '. One small check keeps it going.'
         : 'Your habit “' + name + '” is waiting for day one. Today’s a good day for it.';
       return { kicker:'Habit nudge', title:null, body:body, ref:null,
                cta:'Keep it alive', go:function(){ _goSection('s-habits'); } };
@@ -225,7 +225,7 @@ const MAIN_POOL = [
       const cat = cats[h % cats.length];
       const lessons = Array.isArray(SK_DATA[cat]) ? SK_DATA[cat] : [];
       const lesson = lessons.length ? lessons[h % lessons.length] : null;
-      return { kicker:'60-second skill', title:(lesson && lesson.h) || 'A life skill worth knowing',
+      return { kicker:'60-second skill', title:(lesson && lesson.h) || 'One small skill, yours for life',
                body:'One short lesson. Future-you already thinks it was worth it.', ref:null,
                cta:'Learn it', go:function(){ _goSection('s-skills'); } };
     } },
@@ -254,7 +254,7 @@ const MAIN_POOL = [
     build:function(){
       const n = _yesterdayXpCount(_D());
       return { kicker:'Beat yesterday', title:null,
-               body:'Yesterday you logged ' + n + ' XP moment' + (n===1?'':'s') + '. Beat it before bedtime.', ref:null,
+               body:'Yesterday you logged ' + n + ' XP moment' + (n===1?'':'s') + '. See what today can do.', ref:null,
                cta:'Start with today’s Daily 3', go:function(){ _goSection('s-hero'); } };
     } }
 ];
@@ -293,8 +293,7 @@ function _renderCard(kind, h){
   card.classList.toggle('dsp-faith', kind === 'faith');
   card.classList.toggle('dsp-main',  kind !== 'faith');
   body.innerHTML =
-    '<div class="dsp-eyebrow">✨ Today’s Spark</div>' +
-    '<div class="dsp-kicker">' + _esc(c.kicker) + '</div>' +
+    '<div class="dsp-eyebrow">✨ Today’s Spark<span class="dsp-eyebrow-kicker"> · ' + _esc(c.kicker) + '</span></div>' +
     (c.title ? '<h3 class="dsp-title" id="dspTitle">' + _esc(c.title) + '</h3>' : '') +
     '<p class="dsp-body' + (kind==='faith' ? ' dsp-serif' : '') + '"' + (c.title ? '' : ' id="dspTitle"') + '>' + _esc(c.body) + '</p>' +
     (c.ref ? '<div class="dsp-ref">' + _esc(c.ref) + '</div>' : '') +
@@ -321,7 +320,9 @@ function _show(){
   ov.classList.remove('dsp-in');
   if(_prm()){ ov.classList.add('dsp-in'); }
   else { requestAnimationFrame(function(){ requestAnimationFrame(function(){ ov.classList.add('dsp-in'); }); }); }
-  _settleSfx();
+  // Settle is the app's contemplative cue — faith sparks only; a gamified
+  // main-register nudge opens silently (see acts-journey.js:5's ruling).
+  if(kind === 'faith') _settleSfx();
   _openedThisSession = true;
   _chipSync();
   const x = ov.querySelector('.dsp-x');
@@ -336,6 +337,9 @@ function _hide(){
   const d = _D();
   if(d && !d.sparkDismissedToday){ d.sparkDismissedToday = true; _save(); }
   _chipSync();
+  // Return focus somewhere sensible — the chip if it's on screen.
+  const chip = document.getElementById('dailySparkChip');
+  if(chip && !chip.hidden){ try{ chip.focus(); }catch(e){} }
 }
 
 /* ── ✨ chip (same-day reopen) ─────────────────────────────── */
@@ -413,9 +417,17 @@ function _wire(){
   const chip = document.getElementById('dailySparkChip');
   if(chip) chip.onclick = function(){ _show(); };
   document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape'){
-      const o = document.getElementById('dailySparkOverlay');
-      if(o && !o.hidden) _hide();
+    const o = document.getElementById('dailySparkOverlay');
+    if(!o || o.hidden) return;
+    if(e.key === 'Escape'){ _hide(); return; }
+    // aria-modal promise: keep Tab inside the dialog while it's open.
+    if(e.key === 'Tab'){
+      const f = o.querySelectorAll('button');
+      if(!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); try{ last.focus(); }catch(_){/**/} }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); try{ first.focus(); }catch(_){/**/} }
+      else if(!o.contains(document.activeElement)){ e.preventDefault(); try{ first.focus(); }catch(_){/**/} }
     }
   });
 }

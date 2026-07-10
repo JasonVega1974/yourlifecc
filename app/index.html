@@ -23389,11 +23389,12 @@ document.addEventListener('DOMContentLoaded', function() {
   color:rgba(255,255,255,.55);font-size:1rem;cursor:pointer;border-radius:99px;}
 #dailySparkOverlay .dsp-x:focus-visible{outline:2px solid #22d3ee;outline-offset:-4px;}
 #dailySparkOverlay .dsp-faith .dsp-x:focus-visible{outline-color:#f5c842;}
-#dailySparkOverlay .dsp-eyebrow{font-family:'Oswald',sans-serif;font-weight:600;font-size:11px;
-  letter-spacing:.14em;text-transform:uppercase;margin-bottom:.35rem;}
-#dailySparkOverlay .dsp-faith .dsp-eyebrow{color:#f5c842;}
+#dailySparkOverlay .dsp-eyebrow{font-weight:500;font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem;}
+/* Oswald is faith-eyebrow-only per the skill — the main card stays Inter. */
+#dailySparkOverlay .dsp-faith .dsp-eyebrow{font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:.14em;color:#f5c842;}
 #dailySparkOverlay .dsp-main .dsp-eyebrow{color:#22d3ee;}
-#dailySparkOverlay .dsp-kicker{font-size:12px;font-weight:500;color:rgba(255,255,255,.55);margin-bottom:.8rem;}
+#dailySparkOverlay .dsp-eyebrow-kicker{color:rgba(255,255,255,.6);font-weight:500;}
 #dailySparkOverlay .dsp-title{margin:0 0 .55rem;font-size:1.2rem;line-height:1.4;font-weight:500;color:#eef4fb;}
 #dailySparkOverlay .dsp-faith .dsp-title{font-family:Georgia,'Times New Roman',serif;color:#f6edd9;}
 #dailySparkOverlay .dsp-body{margin:0 0 .6rem;font-size:.95rem;line-height:1.65;color:#dce7f3;}
@@ -23413,6 +23414,8 @@ document.addEventListener('DOMContentLoaded', function() {
   display:flex;align-items:center;justify-content:center;}
 #dailySparkChip.dsp-chip-faith{border-color:rgba(245,200,66,.4);background:rgba(14,20,38,.85);}
 #dailySparkChip[hidden]{display:none;}
+/* Demo banner pushes the top chrome down 28px — track it (matches #mBar). */
+body.demo-banner-on #dailySparkChip{top:calc(env(safe-area-inset-top,0px) + 96px);}
 /* Light mode — interface-layer card, so it papers over per the standing rule. */
 :root.light #dailySparkOverlay .dsp-backdrop{background:rgba(44,36,22,.42);}
 :root.light #dailySparkOverlay .dsp-card.dsp-faith{background:#fbf7ef;border-color:rgba(146,64,14,.3);}
@@ -23422,7 +23425,7 @@ document.addEventListener('DOMContentLoaded', function() {
 :root.light #dailySparkOverlay .dsp-faith .dsp-ref{color:#92400e;}
 :root.light #dailySparkOverlay .dsp-main .dsp-eyebrow,
 :root.light #dailySparkOverlay .dsp-main .dsp-ref{color:#0e7490;}
-:root.light #dailySparkOverlay .dsp-kicker{color:rgba(40,44,52,.6);}
+:root.light #dailySparkOverlay .dsp-eyebrow-kicker{color:#4a5462;}
 :root.light #dailySparkOverlay .dsp-title{color:#26303c;}
 :root.light #dailySparkOverlay .dsp-faith .dsp-title{color:#3b2f1a;}
 :root.light #dailySparkOverlay .dsp-body{color:#3a4452;}
