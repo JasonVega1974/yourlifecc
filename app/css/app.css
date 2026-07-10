@@ -1839,9 +1839,18 @@ body{top:0!important;}
   }
   .ob-box {
     margin-top:0;
-    max-height:calc(100vh - 124px);
+    /* dvh (dynamic viewport) so the box — and its .ob-footer button row —
+       is measured against the *visible* height, not the large-viewport 100vh
+       that pushed Next/Skip/Back below the fold on mobile. */
+    max-height:calc(100dvh - 124px);
   }
 }
+/* While an onboarding wizard is open, drop the fixed bottom tab bar entirely.
+   The wizard overlay already sits above it (z 99999 > 950), but the bar still
+   occupied the bottom ~72px where .ob-footer lands — leaving Next/Skip/Back
+   unreachable on mobile. :has() is used throughout this sheet already. */
+body:has(#parentOnboard.open) #bottomTabBar,
+body:has(#kidOnboard.open) #bottomTabBar { display:none !important; }
 #parentOnboard.open, #kidOnboard.open {
   display:flex;
   animation:obBackdropIn .3s ease;
