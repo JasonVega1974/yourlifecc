@@ -13621,11 +13621,13 @@
       <div class="bf-sub">Explore the real places where the Bible happened — 32 sites, twenty archaeological discoveries — tap any card or any place name in the Bible reader to walk its story.</div>
     </div>
 
-    <!-- View tabs: Sites · Discoveries · Pilgrimage -->
-    <div style="display:flex;gap:.4rem;margin-bottom:.7rem;">
-      <button class="bw-vtab active" data-bw-view="sites" onclick="bwSetView('sites',this)" style="flex:1;background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🗺️ Sites (32)</button>
-      <button class="bw-vtab" data-bw-view="discoveries" onclick="bwSetView('discoveries',this)" style="flex:1;background:rgba(255,255,255,.04);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🏺 Discoveries (20)</button>
-      <button class="bw-vtab" data-bw-view="pilgrimage" onclick="bwSetView('pilgrimage',this)" style="flex:1;background:rgba(255,255,255,.04);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🏆 Pilgrimage</button>
+    <!-- View tabs: Sites · Discoveries · Pilgrimage · Passport (2x2 wrap so
+         four tabs stay legible at 375px — see DIG_MODE_PASSPORT_SPEC pipeline). -->
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.7rem;">
+      <button class="bw-vtab active" data-bw-view="sites" onclick="bwSetView('sites',this)" style="flex:1 1 calc(50% - .2rem);background:var(--cd-banner);color:var(--cd-banner-text);border:none;border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:800;cursor:pointer;font-family:var(--fm);">🗺️ Sites (32)</button>
+      <button class="bw-vtab" data-bw-view="discoveries" onclick="bwSetView('discoveries',this)" style="flex:1 1 calc(50% - .2rem);background:rgba(255,255,255,.04);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🏺 Discoveries (20)</button>
+      <button class="bw-vtab" data-bw-view="pilgrimage" onclick="bwSetView('pilgrimage',this)" style="flex:1 1 calc(50% - .2rem);background:rgba(255,255,255,.04);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">🏆 Pilgrimage</button>
+      <button class="bw-vtab" data-bw-view="passport" onclick="bwSetView('passport',this)" style="flex:1 1 calc(50% - .2rem);background:rgba(255,255,255,.04);color:var(--tx);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.5rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--fm);">📔 Passport</button>
     </div>
 
     <!-- Sites view: era rail + map + grid. 2026-07-07 — rail restyle:
@@ -13675,6 +13677,10 @@
       <div class="bw-section-hdr">Pilgrimage Badges</div>
       <div id="bwBadgeGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem;"></div>
     </div>
+
+    <!-- Passport view: 32-stamp Expedition Passport — filled by
+         bible-world-dig.js renderBwPassport() (scene-layer dark document). -->
+    <div id="bwPassportView" style="display:none;"></div>
   </div>
 
   <!-- ════ DISCOVERY DETAIL MODAL (F3-D) ════ -->
