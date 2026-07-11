@@ -1,3 +1,5 @@
+> **⚠️ STALE SNAPSHOT (2026-05-22).** Historical audit baseline. For current verified state see **`STATUS_RECONCILED_2026-07-10.md`**.
+
 # YourLife CC — Full App Audit Report
 
 **Date:** 2026-05-22
