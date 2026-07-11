@@ -8,7 +8,7 @@
 - **service-worker.js `CACHE_NAME` = `yourlifecc-v521`** at reconciliation time; **bumped to `v522` with Dig Mode (Build 1)** below. Older docs cite v228 / v6 / v337 — all stale.
 - **Phase 0 recon = DONE**, findings preserved verbatim in `docs/MAINAPP_PHASE0_AUDIT.md` (committed `a3c812d`, dated 2026-07-09).
 - **Dig Mode = SHIPPED** `c57c45c` (Build 1, 2026-07-10) — spec `docs/DIG_MODE_PASSPORT_SPEC.md`. Was PLANNED at reconciliation; built same day.
-- **Expedition Passport = PLANNED** (Build 2 of the same spec; not yet built).
+- **Expedition Passport = SHIPPED** `22fdc29` (Build 2, 2026-07-10, SW v523). Was PLANNED at reconciliation; built same day. Both builds of the spec are complete.
 
 ---
 
@@ -48,8 +48,10 @@
 - **Skeptic vs Evidence** swipe deck — `skeptic-debates.js` `597dabf`.
 - **Convince Me** swipe deck — `ppOpenConvince()` (Proof & Prophecy area).
 
-### Biblical Archaeology — Dig Mode (Build 1)
-- **Dig Mode** — `bible-world-dig.js` `c57c45c` (2026-07-10, SW v522). Scratch-to-excavate over the discoveries grid: buried cards → canvas scratch (40/70/95% reveal) → gold EXCAVATED stamp; persists in `D.faithBibleWorld.excavated`; reduced-motion tap path; `sfx.stamp`. Monkeypatches `faith.js` (untouched). Smoke: 21/21 headless assertions. Spec `docs/DIG_MODE_PASSPORT_SPEC.md`. (Build 2 — Expedition Passport — still PLANNED.)
+### Biblical Archaeology — Dig Mode + Expedition Passport
+- **Dig Mode** (Build 1) — `bible-world-dig.js` `c57c45c` (2026-07-10, SW v522). Scratch-to-excavate over the discoveries grid: buried cards → canvas scratch (40/70/95% reveal) → gold EXCAVATED stamp; persists in `D.faithBibleWorld.excavated`; reduced-motion tap path; `sfx.stamp`. Smoke: 21/21 headless assertions.
+- **Expedition Passport** (Build 2) — `22fdc29` (2026-07-10, SW v523). 4th Bible World view: 32 stamp slots × 5 regions, era-color stamps, seeded rotation; auto-stamp on excavation (caesarea guard); region badges + gold medals; all-32 Master Archaeologist canvas certificate (share/download). Smoke: 27/27 headless assertions.
+- Both monkeypatch `faith.js` (untouched). Spec `docs/DIG_MODE_PASSPORT_SPEC.md`.
 
 ### Main-app world-class transformation (post-Phase-0 remediation)
 - **Phase 0 recon audit** (4 parallel read-only audits, findings preserved) — `docs/MAINAPP_PHASE0_AUDIT.md`, committed `a3c812d`.
@@ -79,7 +81,7 @@
 
 ## PLANNED — decided/mentioned, zero code exists
 
-- **Expedition Passport** — Build 2 of `docs/DIG_MODE_PASSPORT_SPEC.md`. 32-stamp passport (5 regions), auto-stamp on excavation, region badges, Master Archaeologist certificate. Not yet built. _(Dig Mode, Build 1, shipped `c57c45c` — see SHIPPED §.)_
+_(Both `docs/DIG_MODE_PASSPORT_SPEC.md` builds — Dig Mode `c57c45c` and Expedition Passport `22fdc29` — have shipped; see SHIPPED §.)_
 - **Scholarship level gate** — no gated feature exists. Static scholarship content ships; an XP/level-gated reveal is unbuilt.
 - **Mascot (WC-D4)** — `grep mascot` hits docs only. `YLCC_DELIGHT_PHASE.md` itself scopes it as a "decision spike, not a build." Zero code.
 - **Juice rollout to non-faith surfaces** — the intended distribution of the shipped juice layer into sports/school/chores/goals/habits/skills.

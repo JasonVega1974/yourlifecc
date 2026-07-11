@@ -4,7 +4,9 @@
 
 _Status transitions to SHIPPED (with commit hash) per build as each lands:_
 - _Build 1 — Dig Mode: **SHIPPED** `c57c45c` (2026-07-10, SW v522). Smoke: 21/21 headless-Chrome assertions._
-- _Build 2 — Expedition Passport: PLANNED_
+- _Build 2 — Expedition Passport: **SHIPPED** `22fdc29` (2026-07-10, SW v523). Smoke: 27/27 headless-Chrome assertions (incl. no-orphans, caesarea guard, region badges, all-32 master, certificate render)._
+
+**Both builds SHIPPED. Feature complete.**
 
 Ground truth at spec time: `STATUS_RECONCILED_2026-07-10.md` — both features PLANNED, zero code. Phase 0 recon (`docs/MAINAPP_PHASE0_AUDIT.md`) is the source of truth. All decisions below are final; do not re-litigate.
 
