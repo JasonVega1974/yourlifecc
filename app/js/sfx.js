@@ -108,6 +108,13 @@
     _tone(392, 0.9, 'sine', 0.10, 0);
     _tone(784, 0.7, 'sine', 0.035, 0.02);   // faint octave shimmer
   }
+  // stamp    — short low-freq thud (excavation reveal + passport stamp).
+  // Percussive, tactile — a rubber-stamp/pickaxe "thunk", not a chime.
+  // Synthesized (no asset). Used by bible-world-dig.js.
+  function stamp(){
+    _tone(150, 0.14, 'triangle', 0.17, 0);   // low thud body
+    _tone(92,  0.11, 'sine',     0.11, 0.005); // sub reinforcement
+  }
 
   if(typeof window !== 'undefined'){
     window.sfx = {
@@ -116,6 +123,7 @@
       perfect: perfect,
       streak: streak,
       settle: settle,
+      stamp: stamp,
       unlock: _unlock,
       isEnabled: _enabled
     };

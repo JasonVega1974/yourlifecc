@@ -127,7 +127,7 @@ const DEF = {
   faithAcademyProgress:{ lessons:{}, courses:{}, badges:{} },
   // F3-B/D Bible Lands visit + badge progress.
   // Shape: { sites:{ '<siteId>': isoDate }, discoveries:{ '<discId>': isoDate }, badges:{ '<badgeId>': isoDate } }
-  faithBibleWorld:{ sites:{}, discoveries:{}, badges:{} },
+  faithBibleWorld:{ sites:{}, discoveries:{}, badges:{}, excavated:{}, regionBadges:{}, hintSeen:false }, // Bible Lands. excavated{id:{ts}}=Dig Mode; regionBadges{regionId:{ts}}=passport regions; hintSeen=dig coach mark shown (bible-world-dig.js)
   // F2-H sermon notes — added in 🌟 Journey tab. Each entry:
   // { id, date, church, speaker, title, scriptures, notes, takeaway, actionStep, createdAt, updatedAt }
   sermonNotes:[],

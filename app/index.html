@@ -13695,6 +13695,15 @@
     </div>
   </div>
 
+  <!-- ════ DIG MODE MODAL — buried discovery scratch-to-excavate ════
+       Shell only; bible-world-dig.js builds the stage/canvas/reveal
+       layers into #bwDigMount and drives the scratch interaction. -->
+  <div id="bwDigModal" class="mo" onclick="if(event.target===this&&window.bwDigClose)bwDigClose()">
+    <div class="md" style="max-width:520px;padding:0;overflow:hidden;">
+      <div id="bwDigMount"></div>
+    </div>
+  </div>
+
   <!-- ════ BIBLICAL SITE DETAIL MODAL (F3-B) ════ -->
   <div id="bwSiteModal" class="mo" onclick="if(event.target===this)bwCloseSite()">
     <div class="md" style="max-width:600px;padding:0;">
@@ -22717,6 +22726,11 @@
      Open Full Proof door can call bfTab/ppOpenModal/ylccEnsureData. -->
 <script defer src="/app/js/skeptic-debates.js"></script>
 <script defer src="/app/js/faith-resources.js"></script>
+<!-- Biblical Archaeology — Dig Mode + Expedition Passport. Loads AFTER
+     faith.js so it can override bwRenderDiscoveries/openBwDiscovery/
+     bwSetView (monkeypatch; faith.js stays untouched). Spec:
+     docs/DIG_MODE_PASSPORT_SPEC.md. -->
+<script defer src="/app/js/bible-world-dig.js"></script>
 <!-- The Story scrollytelling (2026-07-05) — Who Is Jesus seven-chapter
      scroll journey over JESUS_DATA. bfTab('jesus') in faith.js calls
      renderJesusStory typeof-guarded, so ordering after faith.js is a
