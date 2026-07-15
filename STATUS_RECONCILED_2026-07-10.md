@@ -37,6 +37,7 @@
 - **Haptics layer** — `haptics.js` `window.haptics` + `D.hapticsEnabled` Settings toggle (`230f2f9`, WC-D3).
 - **Celebrations + traits** — `celebrations.js`, `traits.js` (gamification foundation, pre-existing; live).
 - **Daily Spark** — once-per-day engagement card, both apps (`a3c812d`, hardening `bed64e3`/`2d4fd93`).
+- **Juice-parity rollout (WC-2c distribution)** — `xp-juice-hooks.js` `90b4203` (2026-07-14, SW v524). Wraps 16 non-faith completion globals (school `toggleAsg`, sports `addSportMilestone`/`addSeasonStat`, goals + milestones, chores, habits, health workout/sleep/water/PR, finance tx/savings-goal/money-milestones) per `HOME_UPGRADE_PLAN.md` §5 — sfx/haptic pair on already-XP'd events, XP + full juice on the previously-silent ones. Additive `XP_VALUES` keys (`school`/`sports`/`milestone`/`water`/`pr`/`finance_goal`/`finance_tx`). Zero feature-file edits; kill switch `window._juiceHooksOff`. Faith surfaces untouched. Smoke: 58/58 Node (behavior + drift guard) + 29/29 live headless-Chrome install probe.
 
 ### Home surfaces
 - **Command Center hero home** — `command-center.js` + `constellation-kit.js`. Constellation hero is the **live** home surface by default for full-app + child accounts (origin `d616d5e`; art `b09ffca`; photo-card chooser `2fc6d65`). Rollback is console-only `window._ccDisabled=true`. (ux-visual-reviewer graded it C+ — live but not yet at the faith-home quality bar.)
@@ -73,8 +74,8 @@
 
 - **My Climb (Road to Adulthood)** — fully built AND wired: `life-path.js` + `data/life-stations-data.js` in the script block, `lifePath:{}` in DEF (`data.js:175`), live Command Center doorway `ccOpenClimb()` → `renderLifePath('lifePathWrap')`, featured MY CLIMB card. Commits `33c2ff0` (dark-launch files) + `39344d0` (CC doorway, 2026-07-03). **Why PARTIAL:** the only in-app entry point is inside the Command Center, which paints only when `ylcc_entry_gate === '1'` (**default OFF**, `index.html:729`). With the flag off, the engine is dormant — no production user reaches it. **Also a functional gap:** 9 of 12 `LIFE_QUESTS_POOL` weekly quests can never progress (metrics never bumped) — flagged in Phase 0 Audit C/D. *(Note: `CLIMB_INTEGRATION.md` still describes install + child-home entry as pending TODOs — it is stale/understated; that work is done, behind the flag.)*
 - **Flat-nav home reorganization** — dark-launched behind `ylcc_entry_gate` (default OFF). The Command Center *hero* is live regardless; the flag additionally turns the CC into whole-app navigation (sidebar hidden, section grids). Restore commit `44d21cd`; Home Shortcuts `b2ebc7d`; Life jump-in `2b4c202`.
-- **Juice distribution** — the primitives are shipped (see SHIPPED), but calls are faith/lesson-heavy. `awardXP` callers: `faith.js`, `faith-zones.js`, `life-path.js`, `walk-path.js` only. **Zero `awardXP`/`sfx`/`haptics` in sports, school, chores, goals, habits, skills.** (HOME_UPGRADE_PLAN.md §0 already caught this: "school and sports have zero juice and zero XP.")
-- **Sports game-loop integration** — content/visual build shipped (see SHIPPED); the XP/juice wiring is **not** built. `sports.js` has zero `awardXP`/`sfx`/`haptics`/`xpJuice` calls.
+- ~~**Juice distribution**~~ — **RESOLVED `90b4203`** (2026-07-14): `xp-juice-hooks.js` distributes sfx/haptics/XP onto school, sports, chores, goals, habits, health, and finance completions (see SHIPPED §, "Juice-parity rollout"). Skills quiz was already full-stack.
+- ~~**Sports game-loop integration**~~ — **RESOLVED `90b4203`**: `addSportMilestone` (XP + streak pair + confetti) and `addSeasonStat` (tick + toast) wired via the hooks module; `sports.js` itself untouched by design (wrapper pattern).
 - **8-tab masterplan status** *(carried from `MASTERPLAN_RECONCILED.md` 2026-06-04 — NOT re-verified this pass; treat as approximate)*: **DONE** Habits · **PARTIAL** Money, Goals, Schedule, Skills, Parent Hub · **NOT STARTED** Chores, CBT Training. Storage buckets 0 of 5. Re-verify before building on these.
 
 ---
@@ -84,7 +85,7 @@
 _(Both `docs/DIG_MODE_PASSPORT_SPEC.md` builds — Dig Mode `c57c45c` and Expedition Passport `22fdc29` — have shipped; see SHIPPED §.)_
 - **Scholarship level gate** — no gated feature exists. Static scholarship content ships; an XP/level-gated reveal is unbuilt.
 - **Mascot (WC-D4)** — `grep mascot` hits docs only. `YLCC_DELIGHT_PHASE.md` itself scopes it as a "decision spike, not a build." Zero code.
-- **Juice rollout to non-faith surfaces** — the intended distribution of the shipped juice layer into sports/school/chores/goals/habits/skills.
+- ~~**Juice rollout to non-faith surfaces**~~ — **SHIPPED `90b4203`** (2026-07-14, SW v524); see SHIPPED §, "Juice-parity rollout". Deliberate scope notes: water XP uses its own `water` key (not `health`) so the once/day health cap still protects workout/sleep; PR juice on strict beat only; `addSeasonStat`/`addTx` stay XP-light per plan ("logging ≠ achievement").
 - **5 Supabase Storage buckets** (`chore-proofs`, `goal-images`, `legacy-vault`, `cbt-thumbnails`, `skill-evidence`) — 0 of 5 exist (`MASTERPLAN_RECONCILED.md` §3; carried).
 - **Remaining masterplan tab upgrades** — Chores 5 sub-tabs, Skills Legacy Vault (Lifetime anchor), Money Allowance/Learn, Schedule real recurrence, Parent Hub Approvals/Messages/Dashboard, etc. (`MASTERPLAN_RECONCILED.md` §6; carried, unbuilt.)
 
