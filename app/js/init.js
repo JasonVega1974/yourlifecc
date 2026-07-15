@@ -2493,12 +2493,72 @@ async function onbComplete(){
       overlay.style.transition = '';
       document.body.style.overflow = '';
       if(typeof showSection === 'function') showSection('s-hero');
+      _onbMaybeShowFirstWin();
     }, 450);
   } else {
     document.body.style.overflow = '';
     if(typeof showSection === 'function') showSection('s-hero');
+    _onbMaybeShowFirstWin();
   }
   if(typeof showToast === 'function') showToast('Welcome aboard 🎉');
+}
+
+// HOME_UPGRADE_PLAN.md Session 2 task 4 (WC-3c) — 90-second first-win: one
+// guided action right after onboarding so the ring/streak/toast/sfx/haptic
+// loop is felt before the kid has done anything themselves. Skippable,
+// shown at most once per account (D.onboardingFirstWinShown), and only for
+// accounts landing on the Command Center (parent-mode and faith-free both
+// own their own first-run experience already).
+function _onbMaybeShowFirstWin(){
+  if(_onbSelectedAge === 'parent') return;
+  setTimeout(_onbShowFirstWin, 700);
+}
+function _onbShowFirstWin(){
+  try {
+    if(typeof window === 'undefined' || window._faithFree) return;
+    if(typeof D === 'undefined' || !D || D.onboardingFirstWinShown) return;
+    D.onboardingFirstWinShown = true;
+    if(typeof save === 'function') save();
+
+    var reduced = false;
+    try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch(_e){}
+
+    var wrap = document.createElement('div');
+    wrap.id = 'onbFirstWinPrompt';
+    wrap.style.cssText = 'position:fixed;left:50%;bottom:22px;transform:translateX(-50%)'
+      + (reduced ? '' : ' translateY(12px)')
+      + ';z-index:99998;display:flex;align-items:center;gap:.7rem;padding:.85rem 1.1rem;'
+      + 'border-radius:16px;background:linear-gradient(135deg,#1c2333,#161b27);'
+      + 'border:1px solid rgba(34,211,238,.35);box-shadow:0 14px 40px rgba(0,0,0,.4);'
+      + 'max-width:min(92vw,380px);opacity:0;transition:opacity .4s ease, transform .4s ease;';
+    wrap.innerHTML =
+        '<span style="font-size:1.4rem;line-height:1;">✨</span>'
+      + '<span style="flex:1;font:600 .92rem/1.3 var(--fm,Inter,sans-serif);color:#f1f5f9;">Try your first win — tap to see your ring move</span>'
+      + '<button type="button" id="onbFirstWinBtn" style="flex:none;background:#22d3ee;color:#062226;border:0;border-radius:999px;padding:.5rem .9rem;font:700 .82rem/1 var(--fm,Inter,sans-serif);cursor:pointer;">Try it</button>'
+      + '<button type="button" id="onbFirstWinSkip" aria-label="Dismiss" style="flex:none;background:transparent;border:0;color:#64748b;font-size:1rem;cursor:pointer;padding:.2rem .3rem;">×</button>';
+    document.body.appendChild(wrap);
+    requestAnimationFrame(function(){
+      wrap.style.opacity = '1';
+      if(!reduced) wrap.style.transform = 'translateX(-50%) translateY(0)';
+    });
+
+    function dismiss(){
+      wrap.style.opacity = '0';
+      setTimeout(function(){ if(wrap.parentNode) wrap.remove(); }, reduced ? 0 : 350);
+    }
+
+    var skipBtn = document.getElementById('onbFirstWinSkip');
+    if(skipBtn) skipBtn.addEventListener('click', dismiss);
+    var tryBtn = document.getElementById('onbFirstWinBtn');
+    if(tryBtn) tryBtn.addEventListener('click', function(){
+      try { if(typeof awardXP === 'function') awardXP(5, 'onboarding'); } catch(_e){}
+      try { if(window.sfx && typeof window.sfx.correct === 'function') window.sfx.correct(); } catch(_e){}
+      try { if(window.haptics && typeof window.haptics.correct === 'function') window.haptics.correct(); } catch(_e){}
+      try { if(typeof renderCommandCenter === 'function') renderCommandCenter(); } catch(_e){}
+      try { if(typeof renderDailyBriefing === 'function') renderDailyBriefing(); } catch(_e){}
+      dismiss();
+    });
+  } catch(e){}
 }
 
 function saveHeroReflect(){

@@ -516,6 +516,10 @@ const DEF = {
   // is the multi-select from step 3 — used by goal-suggest, content
   // personalization, and future home-screen curation.
   onboardingDone:false, onboardingInterests:[],
+  // HOME_UPGRADE_PLAN.md Session 2 task 4 (WC-3c) — the guided first-win
+  // banner shown once right after the wizard closes. Set true whether the
+  // kid taps "Try it" or dismisses; never shown again after either.
+  onboardingFirstWinShown:false,
   // 2026-07-07 — faith-only 3-screen wizard (onboard.html, standalone
   // page, no sync.js loaded there). Written directly into the shared
   // localStorage blob on wizard completion; must exist here for

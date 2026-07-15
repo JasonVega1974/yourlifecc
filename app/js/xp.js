@@ -38,6 +38,7 @@
     skill_cert:     25,   // finishSkillQuiz, first cert only (rare, biggest)
     health:          8,   // first workout/sleep log of the day (wellbeing: never weight/food)
     practice_set:    6,   // WC-D1 exercise engine — first clear of a given set per day
+    onboarding:      5,   // WC-3c first-win demo — awarded once via the onboarding wizard's guided first action
     // WC-2c juice-parity rollout — awarded by xp-juice-hooks.js wrappers:
     school:          8,   // toggleAsg — assignment marked done (parity with chore)
     sports:         10,   // addSportMilestone — sports milestone logged (rare, meaningful)

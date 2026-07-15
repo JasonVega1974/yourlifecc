@@ -124,6 +124,9 @@
     var d = _D(); return (d && d.moneyMilestones && typeof d.moneyMilestones === 'object') ? Object.keys(d.moneyMilestones).length : 0;
   }
   function _txLen(){ var d = _D(); return (d && Array.isArray(d.transactions)) ? d.transactions.length : 0; }
+  function _selfChoresApprovedCount(){
+    var d = _D(); return (d && Array.isArray(d.selfChores)) ? d.selfChores.filter(function(c){ return c && c.status === 'approved'; }).length : 0;
+  }
   function _sportMsTotal(){
     var d = _D(); if (!d || !Array.isArray(d.mySports)) return 0;
     return d.mySports.reduce(function(n, s){ return n + ((s && Array.isArray(s.milestones)) ? s.milestones.length : 0); }, 0);
@@ -287,13 +290,23 @@
     _wrapDelta('addSeasonStat', '_jhSportStat', _seasonsTotal, function(){
       _sfx('correct'); _toast('Season stats saved 📊');
     });
+
+    // PARENT HUB — approveSelfChore is the parent's most-repeated approval
+    // action (HOME_UPGRADE_PLAN §4 Session 3 task 4); it already awards
+    // chorePoints + PB and shows its own toast, but had zero sfx/haptic.
+    // Chore-family register (matches markChoreDone's 'correct'). No XP —
+    // chorePoints/PB are separate currencies from unified XP by design.
+    _wrapDelta('approveSelfChore', '_jhApproveChore', _selfChoresApprovedCount, function(){
+      _sfx('correct'); _hap('correct');
+    });
   }
 
   // ── self-install (DOMContentLoaded) + retries, mirrors xp.js ─
   var _JH_FLAGS = [
     '_jhSchool', '_jhGoalToggle', '_jhGoalBtn', '_jhGoalAuto', '_jhMilestone',
     '_jhChore', '_jhHabit', '_jhWorkout', '_jhSleep', '_jhWater', '_jhPR',
-    '_jhFinTx', '_jhFinGoal', '_jhFinMs', '_jhSportMs', '_jhSportStat'
+    '_jhFinTx', '_jhFinGoal', '_jhFinMs', '_jhSportMs', '_jhSportStat',
+    '_jhApproveChore'
   ];
   function _allWrapped(){ return _JH_FLAGS.every(function(f){ return !!window[f]; }); }
 

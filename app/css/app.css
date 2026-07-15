@@ -2544,6 +2544,7 @@ body.child-view:not(.parent-unlocked) #sideSignOutBtn                           
 :root.light .phKidCard .pkName{ color:#0f172a; }
 :root.light .phKidCard .pkStatus{ color:#64748b; }
 :root.light .phKidCard .pkPill{ background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.1); }
+:root.light .phKidCard .pkPill.win{ color:#166534; }
 :root.light .ph-nav-item:hover{ background:rgba(0,0,0,.05); }
 :root.light #parentGate{ background:rgba(248,250,252,.95); }
 

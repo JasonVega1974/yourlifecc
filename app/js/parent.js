@@ -2975,7 +2975,16 @@ function _phChildSummary(child){
   ).length;
   const homeworkDue = (data.assignments||[]).filter(a => !a.done).length;
   const goalsActive = (data.goals||[]).filter(g => !g.done).length;
-  const streak = data.streak || 0;
+  // HOME_UPGRADE_PLAN §4 Session 3 task 3 — unified streak (same fix
+  // already applied to the All Children Overview card above / app-home.js
+  // / daily-briefing.js): a fresh xpStreak read, not the stale
+  // never-resetting data.streak.
+  const streak = (typeof window.getXpStreakFromData === 'function') ? window.getXpStreakFromData(data) : (data.streak || 0);
+  // xpTotal, not xpToday — xpToday only rolls over via _rollover() on the
+  // ACTIVE D, so an inactive kid's saved xpToday could be stale from a
+  // prior day. xpTotal is monotonic and safe to read directly off any
+  // profile's data.
+  const xpTotal = +data.xpTotal || 0;
 
   let status;
   if(choresDue === 0 && homeworkDue === 0) status = 'Caught up today';
@@ -2987,6 +2996,7 @@ function _phChildSummary(child){
   if(homeworkDue > 0) pills.push({cls:'due', t: homeworkDue + ' homework'});
   if(goalsActive > 0) pills.push({cls:'', t: goalsActive + ' active goal' + (goalsActive>1?'s':'')});
   if(streak >= 3) pills.push({cls:'win', t: streak + '-day streak 🔥'});
+  if(xpTotal > 0) pills.push({cls:'win', t: xpTotal + ' XP'});
   return { status, pills };
 }
 function _phPendingApprovalCount(){
