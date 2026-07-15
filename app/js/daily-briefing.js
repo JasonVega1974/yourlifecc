@@ -5,7 +5,9 @@
    What it renders:
      - Time-aware greeting (morning / afternoon / evening) + first name
      - Streak flame with 4 size/glow tiers (small / medium / large / epic)
-       sourced from getScriptureStreak() with a D.streak fallback
+       sourced from getXpStreak() with a D.streak fallback — the unified
+       streak shared with the Command Center (HOME_UPGRADE_PLAN.md
+       Session 1 task 4)
      - Daily 3 tiles (Faith mystery / Growth / Real-Life Win) wired to the
        sections that hold those features today; Sessions 2-4 will swap the
        routes as the new features land.
@@ -54,8 +56,8 @@ function _dbFirstName() {
 }
 
 function _dbStreakDays() {
-  if (typeof getScriptureStreak === 'function') {
-    var n = getScriptureStreak();
+  if (typeof getXpStreak === 'function') {
+    var n = getXpStreak();
     if (typeof n === 'number' && n >= 0) return n;
   }
   if (typeof D !== 'undefined' && D && typeof D.streak === 'number') return D.streak;

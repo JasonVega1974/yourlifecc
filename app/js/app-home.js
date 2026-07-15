@@ -16,8 +16,9 @@
      full section opens (sidebar/bottom-nav cohesive). No new
      destination shell — that pattern only made sense for the faith
      tab's sub-features.
-   - Streak resolution chain mirrors the faith greeting:
-     getScriptureStreak() → D.streak → 0. (No D.dailyStreak exists.)
+   - Streak resolution chain mirrors the Command Center's unified streak
+     (HOME_UPGRADE_PLAN.md Session 1 task 4 — one streak everywhere):
+     getXpStreak() → D.streak → 0. (No D.dailyStreak exists.)
    - First-name resolution chain mirrors daily-briefing._dbFirstName:
      D.name → _supaUser.user_metadata.first_name/full_name →
      email prefix → "friend".
@@ -49,8 +50,8 @@
   }
 
   function _ahStreak(){
-    if (typeof getScriptureStreak === 'function'){
-      var n = getScriptureStreak();
+    if (typeof getXpStreak === 'function'){
+      var n = getXpStreak();
       if (typeof n === 'number' && n >= 0) return n;
     }
     if (typeof D !== 'undefined' && D && typeof D.streak === 'number') return D.streak;
