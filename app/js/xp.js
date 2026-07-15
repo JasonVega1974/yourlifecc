@@ -37,7 +37,15 @@
     goal:           20,   // toggleGoal / completeGoal / checkGoalAutoComplete
     skill_cert:     25,   // finishSkillQuiz, first cert only (rare, biggest)
     health:          8,   // first workout/sleep log of the day (wellbeing: never weight/food)
-    practice_set:    6    // WC-D1 exercise engine — first clear of a given set per day
+    practice_set:    6,   // WC-D1 exercise engine — first clear of a given set per day
+    // WC-2c juice-parity rollout — awarded by xp-juice-hooks.js wrappers:
+    school:          8,   // toggleAsg — assignment marked done (parity with chore)
+    sports:         10,   // addSportMilestone — sports milestone logged (rare, meaningful)
+    milestone:       3,   // toggleMilestone — goal milestone check-off (non-final; final = goal)
+    water:           5,   // logWater — daily water-goal cross (own key: 'health' would trip the once/day cap above)
+    pr:             10,   // addPR — strictly beat an existing personal record
+    finance_goal:   15,   // _quickAddSave — savings goal target reached (rare, big)
+    finance_tx:      2    // addTx — transaction logged (tiny; logging ≠ achievement)
   };
   var DEFAULT_DAILY_GOAL = 25;
   var XP_LOG_CAP = 365;
