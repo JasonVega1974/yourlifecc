@@ -111,6 +111,7 @@ select option{background:#0c1220;}
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(6,16,30,.3);border-top-color:#06101e;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 </style>
+<script src="js/attribution.js"></script>
 </head>
 <body>
 
@@ -258,6 +259,22 @@ select option{background:#0c1220;}
         <div id="sponsorConfirm" style="display:none;background:rgba(129,140,248,.05);border:1px solid rgba(129,140,248,.2);border-radius:12px;padding:1.2rem;margin-bottom:1.1rem;">
           <div style="font-size:.82rem;color:var(--c2);font-weight:700;margin-bottom:.3rem;">🎟️ Sponsor Code Applied</div>
           <div id="sponsorOrgName" style="font-size:.78rem;color:var(--tx2);"></div>
+        </div>
+
+        <!-- HOW DID YOU HEAR ABOUT US — attribution backstop for stripped
+             UTMs / forgotten codes. Optional end-to-end: never validated,
+             never required, never blocks account creation or checkout. -->
+        <div style="margin-bottom:1.1rem;">
+          <label for="hearAbout" style="display:block;font-size:.78rem;color:var(--tx2);margin-bottom:.35rem;">How did you hear about us? <span style="opacity:.6;">(optional)</span></label>
+          <select id="hearAbout" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:.65rem .7rem;color:var(--tx);font-family:inherit;font-size:.82rem;">
+            <option value="">Select one…</option>
+            <option value="podcast">Podcast</option>
+            <option value="book">Book</option>
+            <option value="search">Search</option>
+            <option value="referral">Friend / referral</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="text" id="hearAboutDetail" maxlength="100" placeholder="Anything specific? A show, a person, a code… (optional)" style="width:100%;margin-top:.5rem;">
         </div>
 
         <button class="btn btn-main" id="launchBtn" onclick="createAccount()">
@@ -562,6 +579,28 @@ function setupStep3(){
   }
 }
 
+// ── Partner attribution (additive — must never block a purchase) ──
+// UTMs were captured into sessionStorage by js/attribution.js on whichever
+// page the visitor landed on; the "How did you hear about us?" dropdown is
+// the backstop for stripped UTMs. Everything here degrades to empty
+// strings — a buyer with no UTMs and an untouched dropdown produces the
+// exact same checkout call shape as before this feature existed.
+function getAttribution(){
+  const a = { utmSource:'', utmMedium:'', utmCampaign:'', hearAbout:'', hearAboutDetail:'' };
+  try {
+    a.utmSource   = sessionStorage.getItem('ylcc_utm_source')   || '';
+    a.utmMedium   = sessionStorage.getItem('ylcc_utm_medium')   || '';
+    a.utmCampaign = sessionStorage.getItem('ylcc_utm_campaign') || '';
+  } catch(e) { /* storage blocked — fine */ }
+  try {
+    const sel = document.getElementById('hearAbout');
+    const det = document.getElementById('hearAboutDetail');
+    a.hearAbout       = (sel && sel.value) ? sel.value : '';
+    a.hearAboutDetail = (det && det.value) ? det.value.trim().slice(0,100) : '';
+  } catch(e) { /* field missing — fine */ }
+  return a;
+}
+
 async function createAccount(){
   hideMessages();
   const btn=document.getElementById('launchBtn');
@@ -571,6 +610,17 @@ async function createAccount(){
   const name=document.getElementById('regName').value.trim();
   const email=document.getElementById('regEmail').value.trim();
   const plan=sponsorData?'sponsored':selectedPlan;
+
+  // Attribution snapshot for this attempt. Only non-empty values are
+  // forwarded anywhere; the empty case is byte-identical to pre-feature
+  // behavior apart from the (ignored-if-empty) attribution field below.
+  const attribution = getAttribution();
+  const attribMeta = {};
+  if(attribution.utmSource)       attribMeta.utm_source         = attribution.utmSource;
+  if(attribution.utmMedium)       attribMeta.utm_medium         = attribution.utmMedium;
+  if(attribution.utmCampaign)     attribMeta.utm_campaign       = attribution.utmCampaign;
+  if(attribution.hearAbout)       attribMeta.heard_about        = attribution.hearAbout;
+  if(attribution.hearAboutDetail) attribMeta.heard_about_detail = attribution.hearAboutDetail;
 
   // Temp password — overwritten by user at set-password.html after email
   // confirmation. signUp requires a password param; we can't use signInWithOtp
@@ -599,7 +649,9 @@ async function createAccount(){
           emailRedirectTo: 'https://yourlifecc.com/activate.html',
           // signup_source goes into user_metadata so it survives cross-device
           // (desktop signup → mobile email click). localStorage isn't enough.
-          data: { full_name: name, signup_source: _signupSource }
+          // attribMeta rides along so free signups keep attribution too —
+          // spread of {} when empty, i.e. a no-op for unattributed buyers.
+          data: { full_name: name, signup_source: _signupSource, ...attribMeta }
         }
       });
       const authError = sign.error;
@@ -686,6 +738,11 @@ async function createAccount(){
           // referrer with contest entries. Without it, paid signups via
           // a referral code earn the new user nothing.
           referredBy: referredBy || null,
+          // Partner attribution → Stripe session metadata (utm_source /
+          // utm_medium / utm_campaign / heard_about / heard_about_detail).
+          // Optional end-to-end: the Edge Function ignores empty values,
+          // so unattributed buyers check out exactly as before.
+          attribution: attribution,
         })
       });
       const csData = await csResp.json();

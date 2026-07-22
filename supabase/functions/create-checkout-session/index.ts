@@ -31,6 +31,16 @@
 // via email lookup and ignores the metadata.familyId/userId/name fields
 // we set below. Those three are forwarded for future-compat / audit only.
 //
+// Partner attribution (2026-07): the optional body.attribution object
+// ({utmSource, utmMedium, utmCampaign, hearAbout, hearAboutDetail}) is
+// sanitized and forwarded as session metadata (utm_source / utm_medium /
+// utm_campaign / heard_about / heard_about_detail), mirrored onto
+// subscription metadata (subscriptions) or PaymentIntent metadata
+// (one-time payments) so the source is visible on the payment record in
+// the Stripe dashboard. The webhook does not read these keys; they are
+// dashboard/reporting data only, and absent entirely for unattributed
+// buyers.
+//
 // Called from: register.html createAccount() — paid plans only.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -92,6 +102,7 @@ Deno.serve(async (req: Request) => {
     familyId,
     couponCode = null,
     referredBy = null,
+    attribution = null,
   } = body || {};
 
   // ── Validate inputs ────────────────────────────────────────
@@ -128,6 +139,30 @@ Deno.serve(async (req: Request) => {
 
   const isSubscription = SUBSCRIPTION_PLANS.has(plan);
 
+  // ── Optional partner attribution → Stripe metadata ─────────
+  // Strictly additive: never validated as a blocker, and a missing or
+  // malformed attribution object degrades to zero extra metadata keys —
+  // an unattributed buyer's session config is identical to pre-feature
+  // output. Values are trimmed and length-capped (Stripe allows 500
+  // chars/value; 100 is plenty for UTM tags and the backstop field).
+  const attr: Record<string, unknown> =
+    (attribution && typeof attribution === 'object') ? attribution as Record<string, unknown> : {};
+  const cleanAttr = (v: unknown): string =>
+    (typeof v === 'string') ? v.trim().slice(0, 100) : '';
+  const attributionMeta: Record<string, string> = {};
+  {
+    const utmSource       = cleanAttr(attr.utmSource);
+    const utmMedium       = cleanAttr(attr.utmMedium);
+    const utmCampaign     = cleanAttr(attr.utmCampaign);
+    const hearAbout       = cleanAttr(attr.hearAbout);
+    const hearAboutDetail = cleanAttr(attr.hearAboutDetail);
+    if (utmSource)       attributionMeta.utm_source         = utmSource;
+    if (utmMedium)       attributionMeta.utm_medium         = utmMedium;
+    if (utmCampaign)     attributionMeta.utm_campaign       = utmCampaign;
+    if (hearAbout)       attributionMeta.heard_about        = hearAbout;
+    if (hearAboutDetail) attributionMeta.heard_about_detail = hearAboutDetail;
+  }
+
   // ── Build the Checkout Session config ──────────────────────
   const sessionConfig: any = {
     mode:           isSubscription ? 'subscription' : 'payment',
@@ -138,11 +173,15 @@ Deno.serve(async (req: Request) => {
     metadata: {
       // Read by the webhook today: plan, referred_by.
       // Forwarded for future-compat / audit only: familyId, userId, name.
+      // attributionMeta: utm_source / utm_medium / utm_campaign /
+      // heard_about / heard_about_detail — dashboard-visible source data;
+      // present only when the buyer arrived with attribution.
       plan,
       referred_by: (typeof referredBy === 'string' && referredBy.trim()) ? referredBy.trim() : '',
       familyId,
       userId,
       name: name || '',
+      ...attributionMeta,
     },
   };
 
@@ -157,8 +196,19 @@ Deno.serve(async (req: Request) => {
         plan,
         userId,
         referred_by: (typeof referredBy === 'string' && referredBy.trim()) ? referredBy.trim() : '',
+        ...attributionMeta,
       },
     };
+  } else {
+    // One-time (lifetime) purchases: mirror attribution onto the
+    // PaymentIntent so the source shows on the payment record itself in
+    // the Stripe dashboard — same Session+PaymentIntent mirroring pattern
+    // as api/donate.js. Metadata only; no payment behavior changes.
+    if (Object.keys(attributionMeta).length > 0) {
+      sessionConfig.payment_intent_data = {
+        metadata: { plan, familyId, ...attributionMeta },
+      };
+    }
   }
 
   // ── Coupon / promotion code handling ──────────────────────
